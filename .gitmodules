@@ -1,3 +1,3 @@
-[submodule "GLFundamentals"]
+[submodule "GL"]
 	path = GL
-	url = https://github.com/rlk/GLFundamentals.git
+	url = https://github.com/rlk/GLFundamentals
