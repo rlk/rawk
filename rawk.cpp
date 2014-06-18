@@ -3,7 +3,7 @@
 
 //------------------------------------------------------------------------------
 
-class rawk : public demonstration
+class rawk : public gl::demonstration
 {
 public:
 
