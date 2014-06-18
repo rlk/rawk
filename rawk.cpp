@@ -1,9 +1,15 @@
 #include "GL/GLFundamentals.hpp"
 #include "GL/GLDemonstration.hpp"
 
-#include <cstdio>
-#include <cstring>
 #include <string>
+
+#include <stdio.h>
+#include <fcntl.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/mman.h>
+
+extern int errno;
 
 //------------------------------------------------------------------------------
 
@@ -16,6 +22,355 @@
 ///       signed 32 ... i
 ///        float 32 ... f
 ///        float 64 ... d
+
+class raw
+{
+public:
+    raw(std::string, int, int, int, int);
+
+    virtual void   put(int, int, int, double) = 0;
+    virtual double get(int, int, int)         = 0;
+
+    virtual ~raw();
+
+    size_t h;
+    size_t w;
+    size_t d;
+
+protected:
+
+    size_t index(int i, int j, int k) const { return ((i * w) + j) * d + k; }
+
+    void  *map(size_t, int);
+    void unmap(size_t, void *);
+
+    int f;
+};
+
+raw::raw(std::string s, int h, int w, int d, int o) : h(h), w(w), d(d), f(0)
+{
+    if ((f = open(s.c_str(), o, 0666)) == -1)
+        throw std::runtime_error(strerror(errno));
+}
+
+raw::~raw()
+{
+    if (close(f) == -1)
+        throw std::runtime_error(strerror(errno));
+}
+
+void *raw::map(size_t size, int prot)
+{
+    // If writing, initialize storage by extending the file.
+
+    size_t n = h * w * d * size;
+
+    if (prot & PROT_WRITE && ftruncate(f, n) == -1)
+        std::runtime_error(strerror(errno));
+
+    // Map the contents of the file onto memory.
+
+    void *p = mmap(0, n, prot, MAP_SHARED, f, 0);
+
+    if (p == MAP_FAILED)
+        throw std::runtime_error(strerror(errno));
+
+    return p;
+}
+
+void raw::unmap(size_t size, void *p)
+{
+    size_t n = h * w * d * size;
+
+    if (munmap(p, n) == -1)
+        throw std::runtime_error(strerror(errno));
+}
+
+//------------------------------------------------------------------------------
+
+class rawb : public raw
+{
+public:
+    rawb(std::string, int, int, int, int, int);
+   ~rawb();
+
+    void   put(int, int, int, double);
+    double get(int, int, int);
+
+private:
+    unsigned char *p;
+};
+
+class rawc : public raw
+{
+public:
+    rawc(std::string, int, int, int, int, int);
+   ~rawc();
+
+    void   put(int, int, int, double);
+    double get(int, int, int);
+
+private:
+    char *p;
+};
+
+class rawu : public raw
+{
+public:
+    rawu(std::string, int, int, int, int, int);
+   ~rawu();
+
+    void   put(int, int, int, double);
+    double get(int, int, int);
+
+private:
+    unsigned short *p;
+};
+
+class raws : public raw
+{
+public:
+    raws(std::string, int, int, int, int, int);
+   ~raws();
+
+    void   put(int, int, int, double);
+    double get(int, int, int);
+
+private:
+    short *p;
+};
+
+class rawl : public raw
+{
+public:
+    rawl(std::string, int, int, int, int, int);
+   ~rawl();
+
+    void   put(int, int, int, double);
+    double get(int, int, int);
+
+private:
+    unsigned int *p;
+};
+
+class rawi : public raw
+{
+public:
+    rawi(std::string, int, int, int, int, int);
+   ~rawi();
+
+    void   put(int, int, int, double);
+    double get(int, int, int);
+
+private:
+    int *p;
+};
+
+class rawf : public raw
+{
+public:
+    rawf(std::string, int, int, int, int, int);
+   ~rawf();
+
+    void   put(int, int, int, double);
+    double get(int, int, int);
+
+private:
+    float *p;
+};
+
+class rawd : public raw
+{
+public:
+    rawd(std::string, int, int, int, int, int);
+   ~rawd();
+
+    void   put(int, int, int, double);
+    double get(int, int, int);
+
+private:
+    double *p;
+};
+
+//------------------------------------------------------------------------------
+
+rawb::rawb(std::string s, int h, int w, int d, int o, int r)
+    : raw(s, h, w, d, o), p((unsigned char *) map(sizeof (unsigned char), r))
+{
+}
+
+rawc::rawc(std::string s, int h, int w, int d, int o, int r)
+    : raw(s, h, w, d, o), p((char *) map(sizeof (char), r))
+{
+}
+
+rawu::rawu(std::string s, int h, int w, int d, int o, int r)
+    : raw(s, h, w, d, o), p((unsigned short *) map(sizeof (unsigned short), r))
+{
+}
+
+raws::raws(std::string s, int h, int w, int d, int o, int r)
+    : raw(s, h, w, d, o), p((short *) map(sizeof (short), r))
+{
+}
+
+rawl::rawl(std::string s, int h, int w, int d, int o, int r)
+    : raw(s, h, w, d, o), p((unsigned int *) map(sizeof (unsigned int), r))
+{
+}
+
+rawi::rawi(std::string s, int h, int w, int d, int o, int r)
+    : raw(s, h, w, d, o), p((int *) map(sizeof (int), r))
+{
+}
+
+rawf::rawf(std::string s, int h, int w, int d, int o, int r)
+    : raw(s, h, w, d, o), p((float *) map(sizeof (float), r))
+{
+}
+
+rawd::rawd(std::string s, int h, int w, int d, int o, int r)
+    : raw(s, h, w, d, o), p((double *) map(sizeof (double), r))
+{
+}
+
+//------------------------------------------------------------------------------
+
+rawb::~rawb()
+{
+    unmap(sizeof(unsigned char), p);
+}
+
+rawc::~rawc()
+{
+    unmap(sizeof(char), p);
+}
+
+rawu::~rawu()
+{
+    unmap(sizeof(unsigned short), p);
+}
+
+raws::~raws()
+{
+    unmap(sizeof(short), p);
+}
+
+rawl::~rawl()
+{
+    unmap(sizeof(unsigned int), p);
+}
+
+rawi::~rawi()
+{
+    unmap(sizeof(int), p);
+}
+
+rawf::~rawf()
+{
+    unmap(sizeof(float), p);
+}
+
+rawd::~rawd()
+{
+    unmap(sizeof(double), p);
+}
+
+//------------------------------------------------------------------------------
+
+void rawb::put(int i, int j, int k, double v)
+{
+    if      (v >  1.0) p[index(i, j, k)] =  255;
+    else if (v <  0.0) p[index(i, j, k)] =    0;
+    else               p[index(i, j, k)] = (unsigned char) (v * 255);
+}
+
+void rawc::put(int i, int j, int k, double v)
+{
+    if      (v >  1.0) p[index(i, j, k)] =  127;
+    else if (v < -1.0) p[index(i, j, k)] = -127;
+    else               p[index(i, j, k)] = (char) (v * 127);
+}
+
+void rawu::put(int i, int j, int k, double v)
+{
+    if      (v >  1.0) p[index(i, j, k)] =  65535;
+    else if (v <  0.0) p[index(i, j, k)] =      0;
+    else               p[index(i, j, k)] = (unsigned char) (v * 65535);
+}
+
+void raws::put(int i, int j, int k, double v)
+{
+    if      (v >  1.0) p[index(i, j, k)] =  32767;
+    else if (v < -1.0) p[index(i, j, k)] = -32767;
+    else               p[index(i, j, k)] = (char) (v * 32767);
+}
+
+void rawl::put(int i, int j, int k, double v)
+{
+    if      (v >  1.0) p[index(i, j, k)] =  4294967295;
+    else if (v <  0.0) p[index(i, j, k)] =           0;
+    else               p[index(i, j, k)] = (unsigned char) (v * 4294967295);
+}
+
+void rawi::put(int i, int j, int k, double v)
+{
+    if      (v >  1.0) p[index(i, j, k)] =  2147483647;
+    else if (v < -1.0) p[index(i, j, k)] = -2147483647;
+    else               p[index(i, j, k)] = (char) (v * 2147483647);
+}
+
+void rawf::put(int i, int j, int k, double v)
+{
+    p[index(i, j, k)] = float(v);
+}
+
+void rawd::put(int i, int j, int k, double v)
+{
+    p[index(i, j, k)] = v;
+}
+
+//------------------------------------------------------------------------------
+
+double rawb::get(int i, int j, int k)
+{
+    return double(p[index(i, j, k)]) / 255.0;
+}
+
+double rawc::get(int i, int j, int k)
+{
+    return double(p[index(i, j, k)]) / 127.0;
+}
+
+double rawu::get(int i, int j, int k)
+{
+    return double(p[index(i, j, k)]) / 65535.0;
+}
+
+double raws::get(int i, int j, int k)
+{
+    return double(p[index(i, j, k)]) / 32767.0;
+}
+
+double rawl::get(int i, int j, int k)
+{
+    return double(p[index(i, j, k)]) / 4294967295.0;
+}
+
+double rawi::get(int i, int j, int k)
+{
+    return double(p[index(i, j, k)]) / 2147483647.0;
+}
+
+double rawf::get(int i, int j, int k)
+{
+    return double(p[index(i, j, k)]);
+}
+
+double rawd::get(int i, int j, int k)
+{
+    return double(p[index(i, j, k)]);
+}
 
 //------------------------------------------------------------------------------
 
@@ -35,25 +390,42 @@ public:
     virtual ~image() { }
 };
 
+/// RAW file reader.
+
+class input : public image
+{
+public:
+    input(std::string, int, int, int, char);
+   ~input();
+
+    double get(int i, int j, int k) const { return r->get(i, j, k); }
+
+    int geth() const { return r->h; }
+    int getw() const { return r->w; }
+    int getd() const { return r->d; }
+
+private:
+    raw *r;
+};
+
 /// RAW file writer with pass-through.
 
 class output : public image
 {
 public:
-    output(std::string name, char type, const image *src)
-        : name(name), type(type), src(src) { }
+    output(std::string, char, const image *);
+   ~output();
 
     double get(int i, int j, int k) const { return src->get(i, j, k); }
 
-    int geth() const { return src->geth(); }
-    int getw() const { return src->getw(); }
-    int getd() const { return src->getd(); }
+    int geth() const { return r->h; }
+    int getw() const { return r->w; }
+    int getd() const { return r->d; }
 
     void go() const;
 
 private:
-    std::string name;
-    char        type;
+    raw *r;
     const image *src;
 };
 
@@ -71,161 +443,65 @@ public:
 
 //------------------------------------------------------------------------------
 
-/// Class raw implements a RAW image file templated over the sample type.
-
-template <typename sample> class raw
+input::input(std::string s, int h, int w, int d, char t) : r(0)
 {
-public:
+    const int o = O_RDONLY;
+    const int p = PROT_READ;
 
-    void write(std::string, const image *);
+    switch (t)
+    {
+        case 'b': r = new rawb(s, h, w, d, o, p); break;
+        case 'c': r = new rawc(s, h, w, d, o, p); break;
+        case 'u': r = new rawu(s, h, w, d, o, p); break;
+        case 's': r = new raws(s, h, w, d, o, p); break;
+        case 'l': r = new rawl(s, h, w, d, o, p); break;
+        case 'i': r = new rawi(s, h, w, d, o, p); break;
+        case 'f': r = new rawf(s, h, w, d, o, p); break;
+        case 'd': r = new rawd(s, h, w, d, o, p); break;
+    }
+}
 
-    static sample fromd(double);
-    static double   tod(sample);
-};
-
-/// Write the given image to a named RAW image file.
-
-template <typename sample> void raw<sample>::write(std::string name,
-                                                   const image *src)
+input::~input()
 {
-    extern int errno;
+    delete r;
+}
+
+//------------------------------------------------------------------------------
+
+output::output(std::string s, char t, const image *src) : r(0), src(src)
+{
+    const int o = O_RDWR | O_TRUNC | O_CREAT;
+    const int p = PROT_READ | PROT_WRITE;
 
     const int h = src->geth();
     const int w = src->getw();
     const int d = src->getd();
 
-    sample buffer[w * d];
-
-    FILE *stream;
-
-    if ((stream = fopen(name.c_str(), "wb")) == 0)
-        throw(std::runtime_error(strerror(errno)));
-
-    for (int i = 0; i < h; ++i)
+    switch (t)
     {
-        for     (int j = 0; j < w; ++j)
-            for (int k = 0; k < d; ++k)
-                buffer[d * j + k] = fromd(src->get(i, j, k));
-
-        if (fwrite(buffer, sizeof (sample), w * d, stream) < w * d)
-            throw(std::runtime_error(strerror(errno)));
+        case 'b': r = new rawb(s, h, w, d, o, p); break;
+        case 'c': r = new rawc(s, h, w, d, o, p); break;
+        case 'u': r = new rawu(s, h, w, d, o, p); break;
+        case 's': r = new raws(s, h, w, d, o, p); break;
+        case 'l': r = new rawl(s, h, w, d, o, p); break;
+        case 'i': r = new rawi(s, h, w, d, o, p); break;
+        case 'f': r = new rawf(s, h, w, d, o, p); break;
+        case 'd': r = new rawd(s, h, w, d, o, p); break;
     }
-
-    if (fclose(stream) == EOF)
-        throw(std::runtime_error(strerror(errno)));
 }
 
-// Specializations for conversion from double to RAW sample types.
-
-template <> unsigned char raw<unsigned char>::fromd(double d)
+output::~output()
 {
-    if      (d >  1.0) return 255;
-    else if (d <  0.0) return   0;
-    else               return (unsigned char) (d * 255);
+    delete r;
+    delete src;
 }
-
-template <> char raw<char>::fromd(double d)
-{
-    if      (d >  1.0) return  127;
-    else if (d < -1.0) return -127;
-    else               return (char) (d * 127);
-}
-
-template <> unsigned short raw<unsigned short>::fromd(double d)
-{
-    if      (d >  1.0) return 65535;
-    else if (d <  0.0) return     0;
-    else               return (unsigned short) (d * 65535);
-}
-
-template <> short raw<short>::fromd(double d)
-{
-    if      (d >  1.0) return  32767;
-    else if (d < -1.0) return -32767;
-    else               return (short) (d * 32767);
-}
-
-template <> unsigned int raw<unsigned int>::fromd(double d)
-{
-    if      (d >  1.0) return 4294967295;
-    else if (d <  0.0) return          0;
-    else               return (unsigned int) (d * 4294967295);
-}
-
-template <> int raw<int>::fromd(double d)
-{
-    if      (d >  1.0) return  2147483647;
-    else if (d < -1.0) return -2147483647;
-    else               return (int) (d * 2147483647);
-}
-
-template <> float raw<float>::fromd(double d)
-{
-    return float(d);
-}
-
-template <> double raw<double>::fromd(double d)
-{
-    return d;
-}
-
-/// Specializations for convertion from RAW sample types to double.
-
-template <> double raw<unsigned char>::tod(unsigned char b)
-{
-    return double(b) / 255.0;
-}
-
-template <> double raw<char>::tod(char c)
-{
-    return double(c) / 127.0;
-}
-
-template <> double raw<unsigned short>::tod(unsigned short u)
-{
-    return double(u) / 65536.0;
-}
-
-template <> double raw<short>::tod(short s)
-{
-    return double(s) / 32767.0;
-}
-
-template <> double raw<unsigned int>::tod(unsigned int u)
-{
-    return double(u) / 4294967295.0;
-}
-
-template <> double raw<int>::tod(int s)
-{
-    return double(s) / 2147483647.0;
-}
-
-template <> double raw<float>::tod(float f)
-{
-    return double(f);
-}
-
-template <> double raw<double>::tod(double d)
-{
-    return d;
-}
-
-//------------------------------------------------------------------------------
 
 void output::go() const
 {
-    switch (type)
-    {
-        case 'b': raw<unsigned char>   b; b.write(name, src); break;
-        case 'c': raw<         char>   c; c.write(name, src); break;
-        case 'u': raw<unsigned short>  u; u.write(name, src); break;
-        case 's': raw<         short>  s; s.write(name, src); break;
-        case 'l': raw<unsigned int>    i; i.write(name, src); break;
-        case 'i': raw<         int>    l; l.write(name, src); break;
-        case 'f': raw<         float>  f; f.write(name, src); break;
-        case 'd': raw<         double> d; d.write(name, src); break;
-    }
+    for         (int i = 0; i < geth(); ++i)
+        for     (int j = 0; j < getw(); ++j)
+            for (int k = 0; k < getd(); ++k)
+                r->put(i, j, k, src->get(i, j, k));
 }
 
 //------------------------------------------------------------------------------
@@ -277,7 +553,7 @@ int main(int argc, char **argv)
 {
     try
     {
-        output *o = new output("out.raw", 'b', new test());
+        output *o = new output("out.raw", 'u', new test());
         o->go();
 
         rawk app;
