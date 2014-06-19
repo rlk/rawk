@@ -14,6 +14,31 @@ extern int errno;
 
 //------------------------------------------------------------------------------
 
+static inline double unsignedclamp(double d)
+{
+    if      (d >  1.0) return  1;
+    else if (d <  0.0) return  0;
+    else               return  d;
+}
+
+static inline double signedclamp(double d)
+{
+    if      (d >  1.0) return  1;
+    else if (d < -1.0) return -1;
+    else               return  d;
+}
+
+//------------------------------------------------------------------------------
+
+static inline void swap(char *a, char *b)
+{
+    char tt = *a;
+    *a = *b;
+    *b = tt;
+}
+
+//------------------------------------------------------------------------------
+
 /// The following sample type abbreviations are used consistently throughout.
 /// Capitalization implies non-native byte order.
 ///
@@ -29,7 +54,7 @@ extern int errno;
 class raw
 {
 public:
-    raw(std::string, int, int, int, int);
+    raw(std::string, int, int, int, int, bool);
 
     virtual void   put(int, int, int, double) = 0;
     virtual double get(int, int, int)         = 0;
@@ -43,23 +68,25 @@ public:
 protected:
 
     size_t index(int, int, int) const;
-    bool   valid(int, int, int) const;
+    bool isvalid(int, int, int) const;
 
     void  *map(size_t, int);
     void unmap(size_t, void *);
 
-    int f;
+    int  file;
+    bool doswap;
 };
 
-raw::raw(std::string s, int h, int w, int d, int o) : h(h), w(w), d(d), f(0)
+raw::raw(std::string s, int h, int w, int d, int o, bool b)
+    : h(h), w(w), d(d), file(0), doswap(b)
 {
-    if ((f = open(s.c_str(), o, 0666)) == -1)
+    if ((file = open(s.c_str(), o, 0666)) == -1)
         throw std::runtime_error(strerror(errno));
 }
 
 raw::~raw()
 {
-    if (close(f) == -1)
+    if (close(file) == -1)
         throw std::runtime_error(strerror(errno));
 }
 
@@ -68,7 +95,7 @@ size_t raw::index(int i, int j, int k) const
     return ((i * w) + j) * d + k;
 }
 
-bool raw::valid(int i, int j, int k) const
+bool raw::isvalid(int i, int j, int k) const
 {
     return (0 <= i && i < h
          && 0 <= j && j < w
@@ -82,12 +109,12 @@ void *raw::map(size_t size, int prot)
 
     // If writing, initialize empty storage by extending the file.
 
-    if (prot & PROT_WRITE && ftruncate(f, n) == -1)
+    if (prot & PROT_WRITE && ftruncate(file, n) == -1)
         throw std::runtime_error(strerror(errno));
 
     // Map the contents of the file onto memory.
 
-    if ((p = mmap(0, n, prot, MAP_SHARED, f, 0)) == MAP_FAILED)
+    if ((p = mmap(0, n, prot, MAP_SHARED, file, 0)) == MAP_FAILED)
         throw std::runtime_error(strerror(errno));
 
     return p;
@@ -106,7 +133,7 @@ void raw::unmap(size_t size, void *p)
 class rawb : public raw
 {
 public:
-    rawb(std::string, int, int, int, int, int);
+    rawb(std::string, int, int, int, int, int, bool);
    ~rawb();
 
     void   put(int, int, int, double);
@@ -119,7 +146,7 @@ private:
 class rawc : public raw
 {
 public:
-    rawc(std::string, int, int, int, int, int);
+    rawc(std::string, int, int, int, int, int, bool);
    ~rawc();
 
     void   put(int, int, int, double);
@@ -132,120 +159,126 @@ private:
 class rawu : public raw
 {
 public:
-    rawu(std::string, int, int, int, int, int);
+    rawu(std::string, int, int, int, int, int, bool);
    ~rawu();
 
     void   put(int, int, int, double);
     double get(int, int, int);
 
 private:
+    unsigned short swap(unsigned short) const;
     unsigned short *p;
 };
 
 class raws : public raw
 {
 public:
-    raws(std::string, int, int, int, int, int);
+    raws(std::string, int, int, int, int, int, bool);
    ~raws();
 
     void   put(int, int, int, double);
     double get(int, int, int);
 
 private:
+    short swap(short) const;
     short *p;
 };
 
 class rawl : public raw
 {
 public:
-    rawl(std::string, int, int, int, int, int);
+    rawl(std::string, int, int, int, int, int, bool);
    ~rawl();
 
     void   put(int, int, int, double);
     double get(int, int, int);
 
 private:
+    unsigned int swap(unsigned int) const;
     unsigned int *p;
 };
 
 class rawi : public raw
 {
 public:
-    rawi(std::string, int, int, int, int, int);
+    rawi(std::string, int, int, int, int, int, bool);
    ~rawi();
 
     void   put(int, int, int, double);
     double get(int, int, int);
 
 private:
+    int swap(int) const;
     int *p;
 };
 
 class rawf : public raw
 {
 public:
-    rawf(std::string, int, int, int, int, int);
+    rawf(std::string, int, int, int, int, int, bool);
    ~rawf();
 
     void   put(int, int, int, double);
     double get(int, int, int);
 
 private:
+    float swap(float) const;
     float *p;
 };
 
 class rawd : public raw
 {
 public:
-    rawd(std::string, int, int, int, int, int);
+    rawd(std::string, int, int, int, int, int, bool);
    ~rawd();
 
     void   put(int, int, int, double);
     double get(int, int, int);
 
 private:
+    double swap(double) const;
     double *p;
 };
 
 //------------------------------------------------------------------------------
 
-rawb::rawb(std::string s, int h, int w, int d, int o, int r)
-    : raw(s, h, w, d, o), p((unsigned char *) map(sizeof (unsigned char), r))
+rawb::rawb(std::string s, int h, int w, int d, int o, int r, bool b)
+    : raw(s, h, w, d, o, b), p((unsigned char *) map(sizeof (unsigned char), r))
 {
 }
 
-rawc::rawc(std::string s, int h, int w, int d, int o, int r)
-    : raw(s, h, w, d, o), p((char *) map(sizeof (char), r))
+rawc::rawc(std::string s, int h, int w, int d, int o, int r, bool b)
+    : raw(s, h, w, d, o, b), p((char *) map(sizeof (char), r))
 {
 }
 
-rawu::rawu(std::string s, int h, int w, int d, int o, int r)
-    : raw(s, h, w, d, o), p((unsigned short *) map(sizeof (unsigned short), r))
+rawu::rawu(std::string s, int h, int w, int d, int o, int r, bool b)
+    : raw(s, h, w, d, o, b), p((unsigned short *) map(sizeof (unsigned short), r))
 {
 }
 
-raws::raws(std::string s, int h, int w, int d, int o, int r)
-    : raw(s, h, w, d, o), p((short *) map(sizeof (short), r))
+raws::raws(std::string s, int h, int w, int d, int o, int r, bool b)
+    : raw(s, h, w, d, o, b), p((short *) map(sizeof (short), r))
 {
 }
 
-rawl::rawl(std::string s, int h, int w, int d, int o, int r)
-    : raw(s, h, w, d, o), p((unsigned int *) map(sizeof (unsigned int), r))
+rawl::rawl(std::string s, int h, int w, int d, int o, int r, bool b)
+    : raw(s, h, w, d, o, b), p((unsigned int *) map(sizeof (unsigned int), r))
 {
 }
 
-rawi::rawi(std::string s, int h, int w, int d, int o, int r)
-    : raw(s, h, w, d, o), p((int *) map(sizeof (int), r))
+rawi::rawi(std::string s, int h, int w, int d, int o, int r, bool b)
+    : raw(s, h, w, d, o, b), p((int *) map(sizeof (int), r))
 {
 }
 
-rawf::rawf(std::string s, int h, int w, int d, int o, int r)
-    : raw(s, h, w, d, o), p((float *) map(sizeof (float), r))
+rawf::rawf(std::string s, int h, int w, int d, int o, int r, bool b)
+    : raw(s, h, w, d, o, b), p((float *) map(sizeof (float), r))
 {
 }
 
-rawd::rawd(std::string s, int h, int w, int d, int o, int r)
-    : raw(s, h, w, d, o), p((double *) map(sizeof (double), r))
+rawd::rawd(std::string s, int h, int w, int d, int o, int r, bool b)
+    : raw(s, h, w, d, o, b), p((double *) map(sizeof (double), r))
 {
 }
 
@@ -293,116 +326,162 @@ rawd::~rawd()
 
 //------------------------------------------------------------------------------
 
+unsigned short rawu::swap(unsigned short u) const
+{
+    if (doswap)
+    {
+        char *p = (char *) &u;
+        ::swap(p + 0, p + 1);
+    }
+    return u;
+}
+
+short raws::swap(short s) const
+{
+    if (doswap)
+    {
+        char *p = (char *) &s;
+        ::swap(p + 0, p + 1);
+    }
+    return s;
+}
+
+unsigned int rawl::swap(unsigned int l) const
+{
+    if (doswap)
+    {
+        char *p = (char *) &l;
+        ::swap(p + 0, p + 3);
+        ::swap(p + 1, p + 2);
+    }
+    return l;
+}
+
+int rawi::swap(int i) const
+{
+    if (doswap)
+    {
+        char *p = (char *) &i;
+        ::swap(p + 0, p + 3);
+        ::swap(p + 1, p + 2);
+    }
+    return i;
+}
+
+float rawf::swap(float f) const
+{
+    if (doswap)
+    {
+        char *p = (char *) &f;
+        ::swap(p + 0, p + 3);
+        ::swap(p + 1, p + 2);
+    }
+    return f;
+}
+
+double rawd::swap(double d) const
+{
+    if (doswap)
+    {
+        char *p = (char *) &d;
+        ::swap(p + 0, p + 7);
+        ::swap(p + 1, p + 6);
+        ::swap(p + 2, p + 5);
+        ::swap(p + 3, p + 4);
+    }
+    return d;
+}
+
+//------------------------------------------------------------------------------
+
 void rawb::put(int i, int j, int k, double v)
 {
-    if (valid(i, j, k))
-    {
-        if      (v >  1.0) p[index(i, j, k)] =  255;
-        else if (v <  0.0) p[index(i, j, k)] =    0;
-        else               p[index(i, j, k)] = (unsigned char) (v * 255);
-    }
+    if (isvalid(i, j, k))
+        p[index(i, j, k)] = (unsigned char) (unsignedclamp(v) * 255);
 }
 
 void rawc::put(int i, int j, int k, double v)
 {
-    if (valid(i, j, k))
-    {
-        if      (v >  1.0) p[index(i, j, k)] =  127;
-        else if (v < -1.0) p[index(i, j, k)] = -127;
-        else               p[index(i, j, k)] = (char) (v * 127);
-    }
+    if (isvalid(i, j, k))
+        p[index(i, j, k)] = (char) (signedclamp(v) * 127);
 }
 
 void rawu::put(int i, int j, int k, double v)
 {
-    if (valid(i, j, k))
-    {
-        if      (v >  1.0) p[index(i, j, k)] =  65535;
-        else if (v <  0.0) p[index(i, j, k)] =      0;
-        else               p[index(i, j, k)] = (unsigned short) (v * 65535);
-    }
+    if (isvalid(i, j, k))
+        p[index(i, j, k)] = swap((unsigned short) (unsignedclamp(v) * 65535));
 }
 
 void raws::put(int i, int j, int k, double v)
 {
-    if (valid(i, j, k))
-    {
-        if      (v >  1.0) p[index(i, j, k)] =  32767;
-        else if (v < -1.0) p[index(i, j, k)] = -32767;
-        else               p[index(i, j, k)] = (short) (v * 32767);
-    }
+    if (isvalid(i, j, k))
+        p[index(i, j, k)] = swap((short) (signedclamp(v) * 32767));
 }
 
 void rawl::put(int i, int j, int k, double v)
 {
-    if (valid(i, j, k))
-    {
-        if      (v >  1.0) p[index(i, j, k)] =  4294967295;
-        else if (v <  0.0) p[index(i, j, k)] =           0;
-        else               p[index(i, j, k)] = (unsigned int) (v * 4294967295);
-    }
+    if (isvalid(i, j, k))
+        p[index(i, j, k)] = swap((unsigned int) (unsignedclamp(v) * 4294967295));
 }
 
 void rawi::put(int i, int j, int k, double v)
 {
-    if (valid(i, j, k))
-    {
-        if      (v >  1.0) p[index(i, j, k)] =  2147483647;
-        else if (v < -1.0) p[index(i, j, k)] = -2147483647;
-        else               p[index(i, j, k)] = (int) (v * 2147483647);
-    }
+    if (isvalid(i, j, k))
+        p[index(i, j, k)] = swap((short) (signedclamp(v) * 2147483647));
 }
 
 void rawf::put(int i, int j, int k, double v)
 {
-    if (valid(i, j, k)) p[index(i, j, k)] = float(v);
+    if (isvalid(i, j, k))
+        p[index(i, j, k)] = swap(float(v));
 }
 
 void rawd::put(int i, int j, int k, double v)
 {
-    if (valid(i, j, k)) p[index(i, j, k)] = v;
+    if (isvalid(i, j, k))
+        p[index(i, j, k)] = swap(v);
 }
 
 //------------------------------------------------------------------------------
 
 double rawb::get(int i, int j, int k)
 {
-    return valid(i, j, k) ? double(p[index(i, j, k)]) / 255.0 : 0.0;
+    return isvalid(i, j, k) ? p[index(i, j, k)] / 255.0 : 0.0;
 }
 
 double rawc::get(int i, int j, int k)
 {
-    return valid(i, j, k) ? double(p[index(i, j, k)]) / 127.0 : 0.0;
+    return isvalid(i, j, k) ? p[index(i, j, k)] / 127.0 : 0.0;
 }
 
 double rawu::get(int i, int j, int k)
 {
-    return valid(i, j, k) ? double(p[index(i, j, k)]) / 65535.0 : 0.0;
+    return isvalid(i, j, k) ? swap(p[index(i, j, k)]) / 65535.0 : 0;
 }
 
 double raws::get(int i, int j, int k)
 {
-    return valid(i, j, k) ? double(p[index(i, j, k)]) / 32767.0 : 0.0;
+    return isvalid(i, j, k) ? swap(p[index(i, j, k)]) / 32767.0 : 0.0;
 }
 
 double rawl::get(int i, int j, int k)
 {
-    return valid(i, j, k) ? double(p[index(i, j, k)]) / 4294967295.0 : 0.0;
+    return isvalid(i, j, k) ? swap(p[index(i, j, k)]) / 4294967295.0 : 0.0;
 }
 
 double rawi::get(int i, int j, int k)
 {
-    return valid(i, j, k) ? double(p[index(i, j, k)]) / 2147483647.0 : 0.0;
+    return isvalid(i, j, k) ? swap(p[index(i, j, k)]) / 2147483647.0 : 0.0;
 }
 
 double rawf::get(int i, int j, int k)
 {
-    return valid(i, j, k) ? double(p[index(i, j, k)]) : 0.0;
+    return isvalid(i, j, k) ? swap(p[index(i, j, k)]) : 0.0;
 }
 
 double rawd::get(int i, int j, int k)
 {
-    return valid(i, j, k) ? double(p[index(i, j, k)]) : 0.0;
+    return isvalid(i, j, k) ? swap(p[index(i, j, k)]) : 0.0;
 }
 
 //------------------------------------------------------------------------------
@@ -483,14 +562,20 @@ input::input(std::string s, int h, int w, int d, char t) : r(0)
 
     switch (t)
     {
-        case 'b': r = new rawb(s, h, w, d, o, p); break;
-        case 'c': r = new rawc(s, h, w, d, o, p); break;
-        case 'u': r = new rawu(s, h, w, d, o, p); break;
-        case 's': r = new raws(s, h, w, d, o, p); break;
-        case 'l': r = new rawl(s, h, w, d, o, p); break;
-        case 'i': r = new rawi(s, h, w, d, o, p); break;
-        case 'f': r = new rawf(s, h, w, d, o, p); break;
-        case 'd': r = new rawd(s, h, w, d, o, p); break;
+        case 'b': r = new rawb(s, h, w, d, o, p, false); break;
+        case 'c': r = new rawc(s, h, w, d, o, p, false); break;
+        case 'u': r = new rawu(s, h, w, d, o, p, false); break;
+        case 's': r = new raws(s, h, w, d, o, p, false); break;
+        case 'l': r = new rawl(s, h, w, d, o, p, false); break;
+        case 'i': r = new rawi(s, h, w, d, o, p, false); break;
+        case 'f': r = new rawf(s, h, w, d, o, p, false); break;
+        case 'd': r = new rawd(s, h, w, d, o, p, false); break;
+        case 'U': r = new rawu(s, h, w, d, o, p, true);  break;
+        case 'S': r = new raws(s, h, w, d, o, p, true);  break;
+        case 'L': r = new rawl(s, h, w, d, o, p, true);  break;
+        case 'I': r = new rawi(s, h, w, d, o, p, true);  break;
+        case 'F': r = new rawf(s, h, w, d, o, p, true);  break;
+        case 'D': r = new rawd(s, h, w, d, o, p, true);  break;
     }
 }
 
@@ -512,14 +597,20 @@ output::output(std::string s, char t, const image *src) : r(0), src(src)
 
     switch (t)
     {
-        case 'b': r = new rawb(s, h, w, d, o, p); break;
-        case 'c': r = new rawc(s, h, w, d, o, p); break;
-        case 'u': r = new rawu(s, h, w, d, o, p); break;
-        case 's': r = new raws(s, h, w, d, o, p); break;
-        case 'l': r = new rawl(s, h, w, d, o, p); break;
-        case 'i': r = new rawi(s, h, w, d, o, p); break;
-        case 'f': r = new rawf(s, h, w, d, o, p); break;
-        case 'd': r = new rawd(s, h, w, d, o, p); break;
+        case 'b': r = new rawb(s, h, w, d, o, p, false); break;
+        case 'c': r = new rawc(s, h, w, d, o, p, false); break;
+        case 'u': r = new rawu(s, h, w, d, o, p, false); break;
+        case 's': r = new raws(s, h, w, d, o, p, false); break;
+        case 'l': r = new rawl(s, h, w, d, o, p, false); break;
+        case 'i': r = new rawi(s, h, w, d, o, p, false); break;
+        case 'f': r = new rawf(s, h, w, d, o, p, false); break;
+        case 'd': r = new rawd(s, h, w, d, o, p, false); break;
+        case 'U': r = new rawu(s, h, w, d, o, p, true);  break;
+        case 'S': r = new raws(s, h, w, d, o, p, true);  break;
+        case 'L': r = new rawl(s, h, w, d, o, p, true);  break;
+        case 'I': r = new rawi(s, h, w, d, o, p, true);  break;
+        case 'F': r = new rawf(s, h, w, d, o, p, true);  break;
+        case 'D': r = new rawd(s, h, w, d, o, p, true);  break;
     }
 }
 
@@ -590,22 +681,22 @@ private:
     GLint  u_offset;
     GLint  u_scale;
 
-    int    point_x;       // Current mouse pointer position x
-    int    point_y;       // Current mouse pointer position y
+    int    point_x;             // Current mouse pointer position x
+    int    point_y;             // Current mouse pointer position y
 
-    double image_x;       // Current image view position x
-    double image_y;       // Current image view position y
-    double image_z;       // Current image view zoom
+    double image_x;             // Current image view position x
+    double image_y;             // Current image view position y
+    double image_z;             // Current image view zoom
 
-    double cache_x;       // Cached image view position x
-    double cache_y;       // Cached image view position y
-    double cache_z;       // Cached image view zoom
+    double cache_x;             // Cached image view position x
+    double cache_y;             // Cached image view position y
+    double cache_z;             // Cached image view zoom
 
-    bool   dragging;      // Is a drag in progress?
-    int    drag_point_x;  // Mouse pointer position at beginning of drag
-    int    drag_point_y;  // Mouse pointer position at beginning of drag
-    double drag_image_x;  // Image view position at beginning of drag
-    double drag_image_y;  // Image view position at beginning of drag
+    bool   dragging;            // Is a drag in progress?
+    int    drag_point_x;        // Mouse pointer position at beginning of drag
+    int    drag_point_y;        // Mouse pointer position at beginning of drag
+    double drag_image_x;        // Image view position at beginning of drag
+    double drag_image_y;        // Image view position at beginning of drag
 
     image *src;
 
@@ -613,7 +704,7 @@ private:
     void  center();
 };
 
-rawk::rawk(image *src) : demonstration("RAWK", 640, 360), src(src)
+rawk::rawk(image *src) : demonstration("RAWK", 1280, 720), src(src)
 {
     glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
 
@@ -714,13 +805,14 @@ void rawk::refresh()
 
     const int depth = std::min(src->getd(), 3);
 
-    for         (int i = 0; i < height; ++i)
-        for     (int j = 0; j < width;  ++j)
+    for         (int r = 0; r < height; ++r)
+        for     (int c = 0; c < width;  ++c)
             for (int k = 0; k < depth;  ++k)
-
-                pixel[(i * width + j) * 3 + k]
-                    = src->get(toint(cache_y + (i - height / 2) * cache_z),
-                               toint(cache_x + (j - width  / 2) * cache_z), k);
+            {
+                int i = toint(cache_y + (r - height / 2) * cache_z);
+                int j = toint(cache_x + (c - width  / 2) * cache_z);
+                pixel[(r * width + c) * 3 + k] = src->get(i, j, k);
+            }
 
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height,
                     GL_RGB, GL_FLOAT, &pixel.front());
@@ -809,12 +901,12 @@ int main(int argc, char **argv)
 {
     try
     {
-        output *o = new output("out.raw", 'u', new test());
+        image *src = new input("megt00n090hb.img", 5632, 11520, 1, 'S');
 
-        rawk app(o);
+        rawk app(src);
         app.run(true);
 
-        delete(o);
+        delete(src);
 
         return 0;
     }
