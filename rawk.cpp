@@ -574,11 +574,11 @@ public:
     rawk(image *);
    ~rawk();
 
-   void   draw();
-   void  wheel(int, int);
-   void motion(int, int);
-   void button(int, bool);
-   void    key(int, bool, bool);
+    void    draw();
+    void   wheel(int, int);
+    void  motion(int, int);
+    void  button(int, bool);
+    void     key(int, bool, bool);
 
 private:
 
@@ -593,28 +593,29 @@ private:
     int    point_x;       // Current mouse pointer position x
     int    point_y;       // Current mouse pointer position y
 
-    int    image_x;       // Current image view position x
-    int    image_y;       // Current image view position y
+    double image_x;       // Current image view position x
+    double image_y;       // Current image view position y
     double image_z;       // Current image view zoom
 
-    int    cache_x;       // Cached image view position x
-    int    cache_y;       // Cached image view position y
+    double cache_x;       // Cached image view position x
+    double cache_y;       // Cached image view position y
     double cache_z;       // Cached image view zoom
 
     bool   dragging;      // Is a drag in progress?
     int    drag_point_x;  // Mouse pointer position at beginning of drag
     int    drag_point_y;  // Mouse pointer position at beginning of drag
-    int    drag_image_x;  // Image view position at beginning of drag
-    int    drag_image_y;  // Image view position at beginning of drag
+    double drag_image_x;  // Image view position at beginning of drag
+    double drag_image_y;  // Image view position at beginning of drag
 
     image *src;
 
     void refresh();
+    void  center();
 };
 
 rawk::rawk(image *src) : demonstration("RAWK", 640, 360), src(src)
 {
-    glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
+    glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
 
     // Initialize a texture object for the image cache.
 
@@ -636,10 +637,10 @@ rawk::rawk(image *src) : demonstration("RAWK", 640, 360), src(src)
         // Initialize a vertex buffer object to fill the screen.
 
         static const GLfloat rect[] = {
-            -1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-             1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-            -1.0f,  1.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-             1.0f,  1.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+            -1.0f, -1.0f, 0.0f, 0.0f,
+             1.0f, -1.0f, 1.0f, 0.0f,
+            -1.0f,  1.0f, 0.0f, 1.0f,
+             1.0f,  1.0f, 1.0f, 1.0f,
         };
 
         glGenVertexArrays(1, &varray);
@@ -657,8 +658,8 @@ rawk::rawk(image *src) : demonstration("RAWK", 640, 360), src(src)
         glEnableVertexAttribArray(p);
         glEnableVertexAttribArray(t);
 
-        glVertexAttribPointer(p, 4, GL_FLOAT, GL_FALSE, 24, (const void *)  0);
-        glVertexAttribPointer(t, 2, GL_FLOAT, GL_FALSE, 24, (const void *) 16);
+        glVertexAttribPointer(p, 2, GL_FLOAT, GL_FALSE, 16, (const void *) 0);
+        glVertexAttribPointer(t, 2, GL_FLOAT, GL_FALSE, 16, (const void *) 8);
 
         // Locate the program uniforms.
 
@@ -666,24 +667,11 @@ rawk::rawk(image *src) : demonstration("RAWK", 640, 360), src(src)
         u_scale  = glGetUniformLocation(program, "scale");
     }
 
-    // Set the initial view on the image.
-
-    const int h = src->geth();
-    const int w = src->getw();
-
-    if (double(width) / double(height) < double(w) / double(h))
-        image_z = double(w) / double(width);
-    else
-        image_z = double(h) / double(height);
-
-    image_x = w / 2;
-    image_y = h / 2;
-
-    point_x = 0;
-    point_y = 0;
-
     dragging = false;
+    point_x  = 0;
+    point_y  = 0;
 
+    center();
     refresh();
 }
 
@@ -695,18 +683,56 @@ rawk::~rawk()
     glDeleteVertexArrays(1, &varray);
 }
 
+static inline int toint(double d)
+{
+    double f = floor(d);
+    double c =  ceil(d);
+    return (c - d < d - f) ? int(c) : int(f);
+}
+
+void rawk::center()
+{
+    const int h = src->geth();
+    const int w = src->getw();
+
+    if (double(width) / double(height) < double(w) / double(h))
+        image_z = double(w) / double(width);
+    else
+        image_z = double(h) / double(height);
+
+    image_x = w / 2;
+    image_y = h / 2;
+}
+
+void rawk::refresh()
+{
+    std::vector<GLfloat> pixel(width * height * 3, 0);
+
+    cache_x = image_x;
+    cache_y = image_y;
+    cache_z = image_z;
+
+    const int depth = std::min(src->getd(), 3);
+
+    for         (int i = 0; i < height; ++i)
+        for     (int j = 0; j < width;  ++j)
+            for (int k = 0; k < depth;  ++k)
+
+                pixel[(i * width + j) * 3 + k]
+                    = src->get(toint(cache_y + (i - height / 2) * cache_z),
+                               toint(cache_x + (j - width  / 2) * cache_z), k);
+
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height,
+                    GL_RGB, GL_FLOAT, &pixel.front());
+}
+
 void rawk::draw()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // double z =        image_z / cache_z;
+    double x = 2.0 * (cache_x - image_x) / cache_z / width;
+    double y = 2.0 * (cache_y - image_y) / cache_z / height;
     double z =        cache_z / image_z;
-    double x = 2 * double(cache_x - image_x) / cache_z / (width  / 1);
-    double y = 2 * double(cache_y - image_y) / cache_z / (height / 1);
-
-    printf("%d %d %f ... %d %d %f ... %f %f %f\n",
-            image_x, image_y, image_z,
-            cache_x, cache_y, cache_z, x, y, z);
 
     glUniform1f(u_scale,  z);
     glUniform2f(u_offset, x, y);
@@ -752,7 +778,7 @@ void rawk::wheel(int dx, int dy)
 
     // Compute a new zoom level.
 
-    image_z = exp(log(image_z) + dy / 100.0);
+    image_z = exp(log(image_z) - dy / 100.0);
 
     // Compute image offsets to ensure the pointer remains over the same pixel.
 
@@ -766,38 +792,15 @@ void rawk::key(int key, bool down, bool repeat)
     {
         switch (key)
         {
-            case SDL_SCANCODE_SPACE: refresh(); break;
+            case SDL_SCANCODE_SPACE:
+                refresh();
+                break;
+
             case SDL_SCANCODE_RETURN:
-                cache_x = image_x = 0;
-                cache_y = image_y = 0;
-                cache_z = image_z = 2;
+                center();
                 break;
         }
     }
-}
-
-//------------------------------------------------------------------------------
-
-void rawk::refresh()
-{
-    std::vector<GLfloat> pixel(width * height * 3, 0);
-
-    cache_x = image_x;
-    cache_y = image_y;
-    cache_z = image_z;
-
-    const int depth = std::min(src->getd(), 3);
-
-    for         (int i = 0; i < height; ++i)
-        for     (int j = 0; j < width;  ++j)
-            for (int k = 0; k < depth;  ++k)
-
-                pixel[(i * width + j) * 3 + k]
-                    = src->get(int(floor(cache_y + (i - height / 2) * cache_z)),
-                               int(floor(cache_x + (j - width  / 2) * cache_z)), k);
-
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height,
-                    GL_RGB, GL_FLOAT, &pixel.front());
 }
 
 //------------------------------------------------------------------------------
