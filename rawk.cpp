@@ -13,15 +13,15 @@ extern int errno;
 
 //------------------------------------------------------------------------------
 
-/// The following sample type abbreviations are used consistently throughough:
-///     unsigned 8  ... b
-///       signed 8  ... c
-///     unsigned 16 ... u
-///       signed 16 ... s
-///     unsigned 32 ... l
-///       signed 32 ... i
-///        float 32 ... f
-///        float 64 ... d
+/// The following sample type abbreviations are used consistently throughout:
+///     unsigned char .... b
+///              char .... c
+///     unsigned short ... u
+///              short ... s
+///     unsigned int ..... l
+///              int ..... i
+///              float ... f
+///              double .. d
 
 class raw
 {
@@ -61,12 +61,12 @@ raw::~raw()
 
 void *raw::map(size_t size, int prot)
 {
-    // If writing, initialize storage by extending the file.
+    // If writing, initialize empty storage by extending the file.
 
     size_t n = h * w * d * size;
 
     if (prot & PROT_WRITE && ftruncate(f, n) == -1)
-        std::runtime_error(strerror(errno));
+        throw std::runtime_error(strerror(errno));
 
     // Map the contents of the file onto memory.
 
@@ -296,28 +296,28 @@ void rawu::put(int i, int j, int k, double v)
 {
     if      (v >  1.0) p[index(i, j, k)] =  65535;
     else if (v <  0.0) p[index(i, j, k)] =      0;
-    else               p[index(i, j, k)] = (unsigned char) (v * 65535);
+    else               p[index(i, j, k)] = (unsigned short) (v * 65535);
 }
 
 void raws::put(int i, int j, int k, double v)
 {
     if      (v >  1.0) p[index(i, j, k)] =  32767;
     else if (v < -1.0) p[index(i, j, k)] = -32767;
-    else               p[index(i, j, k)] = (char) (v * 32767);
+    else               p[index(i, j, k)] = (short) (v * 32767);
 }
 
 void rawl::put(int i, int j, int k, double v)
 {
     if      (v >  1.0) p[index(i, j, k)] =  4294967295;
     else if (v <  0.0) p[index(i, j, k)] =           0;
-    else               p[index(i, j, k)] = (unsigned char) (v * 4294967295);
+    else               p[index(i, j, k)] = (unsigned int) (v * 4294967295);
 }
 
 void rawi::put(int i, int j, int k, double v)
 {
     if      (v >  1.0) p[index(i, j, k)] =  2147483647;
     else if (v < -1.0) p[index(i, j, k)] = -2147483647;
-    else               p[index(i, j, k)] = (char) (v * 2147483647);
+    else               p[index(i, j, k)] = (int) (v * 2147483647);
 }
 
 void rawf::put(int i, int j, int k, double v)
