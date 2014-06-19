@@ -2,6 +2,7 @@
 #include "GL/GLDemonstration.hpp"
 
 #include <string>
+#include <vector>
 
 #include <stdio.h>
 #include <fcntl.h>
@@ -13,15 +14,17 @@ extern int errno;
 
 //------------------------------------------------------------------------------
 
-/// The following sample type abbreviations are used consistently throughout:
+/// The following sample type abbreviations are used consistently throughout.
+/// Capitalization implies non-native byte order.
+///
 ///     unsigned char .... b
 ///              char .... c
-///     unsigned short ... u
-///              short ... s
-///     unsigned int ..... l
-///              int ..... i
-///              float ... f
-///              double .. d
+///     unsigned short ... u U
+///              short ... s S
+///     unsigned int ..... l L
+///              int ..... i I
+///              float ... f F
+///              double .. d D
 
 class raw
 {
@@ -61,18 +64,17 @@ raw::~raw()
 
 void *raw::map(size_t size, int prot)
 {
-    // If writing, initialize empty storage by extending the file.
-
     size_t n = h * w * d * size;
+    void *p;
+
+    // If writing, initialize empty storage by extending the file.
 
     if (prot & PROT_WRITE && ftruncate(f, n) == -1)
         throw std::runtime_error(strerror(errno));
 
     // Map the contents of the file onto memory.
 
-    void *p = mmap(0, n, prot, MAP_SHARED, f, 0);
-
-    if (p == MAP_FAILED)
+    if ((p = mmap(0, n, prot, MAP_SHARED, f, 0)) == MAP_FAILED)
         throw std::runtime_error(strerror(errno));
 
     return p;
@@ -534,17 +536,126 @@ int test::getd() const
 class rawk : public gl::demonstration
 {
 public:
-
-    rawk();
+    rawk(image *);
    ~rawk();
+
+   void   draw();
+   void motion(int, int);
+   void button(int, bool);
+   void    key(int, bool, bool);
+
+private:
+    GLuint texture;
+    GLuint program;
+    GLuint vbuffer;
+    GLuint varray;
+
+    image *src;
+
+    void refresh();
 };
 
-rawk::rawk() : demonstration("RAWK", 1280, 720)
+rawk::rawk(image *src) : demonstration("RAWK", 1280, 720), src(src)
 {
+    // Initialize a texture object for the image cache.
+
+    glGenTextures(1, &texture);
+
+    glBindTexture  (GL_TEXTURE_2D, texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, width, height, 0,
+                                   GL_RGB, GL_FLOAT, 0);
+
+    // Initialize the GLSL program.
+
+    if ((program = gl::init_program("rawk.vert", "rawk.frag")))
+    {
+        glUseProgram(program);
+
+        // Initialize a vertex buffer object to fill the screen.
+
+        static const GLfloat rect[] = {
+            -1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+             1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f,
+            -1.0f,  1.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+             1.0f,  1.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+        };
+
+        glGenVertexArrays(1, &varray);
+        glBindVertexArray(    varray);
+
+        glGenBuffers(1, &vbuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, vbuffer);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(rect), rect, GL_STATIC_DRAW);
+
+        // Bind the vertex buffer object to the program attributes.
+
+        GLint p = glGetAttribLocation(program, "vPosition");
+        GLint t = glGetAttribLocation(program, "vTexCoord");
+
+        glEnableVertexAttribArray(p);
+        glEnableVertexAttribArray(t);
+
+        glVertexAttribPointer(p, 4, GL_FLOAT, GL_FALSE, 24, (const void *)  0);
+        glVertexAttribPointer(t, 2, GL_FLOAT, GL_FALSE, 24, (const void *) 16);
+    }
+
+    glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
+
+    refresh();
 }
 
 rawk::~rawk()
 {
+    glDeleteProgram(program);
+    glDeleteBuffers (1, &vbuffer);
+    glDeleteTextures(1, &texture);
+    glDeleteVertexArrays(1, &varray);
+}
+
+void rawk::draw()
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+}
+
+void rawk::motion(int x, int y)
+{
+}
+
+void rawk::button(int button, bool down)
+{
+}
+
+void rawk::key(int key, bool down, bool repeat)
+{
+    if (down && !repeat)
+    {
+        switch (key)
+        {
+            case SDL_SCANCODE_SPACE: refresh(); break;
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+
+void rawk::refresh()
+{
+    std::vector<GLfloat> pixel(width * height * 3, 0);
+
+    const int depth = src->getd();
+
+    for         (int r = 0; r < height; ++r)
+        for     (int c = 0; c < width;  ++c)
+            for (int d = 0; d < depth;  ++d)
+
+                pixel[(r * width + c) * 3 + d] = src->get(r, c, d);
+
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height,
+                    GL_RGB, GL_FLOAT, &pixel.front());
 }
 
 //------------------------------------------------------------------------------
@@ -554,9 +665,8 @@ int main(int argc, char **argv)
     try
     {
         output *o = new output("out.raw", 'u', new test());
-        o->go();
 
-        rawk app;
+        rawk app(o);
         app.run(true);
 
         delete(o);
