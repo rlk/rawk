@@ -42,7 +42,8 @@ public:
 
 protected:
 
-    size_t index(int i, int j, int k) const { return ((i * w) + j) * d + k; }
+    size_t index(int, int, int) const;
+    bool   valid(int, int, int) const;
 
     void  *map(size_t, int);
     void unmap(size_t, void *);
@@ -60,6 +61,18 @@ raw::~raw()
 {
     if (close(f) == -1)
         throw std::runtime_error(strerror(errno));
+}
+
+size_t raw::index(int i, int j, int k) const
+{
+    return ((i * w) + j) * d + k;
+}
+
+bool raw::valid(int i, int j, int k) const
+{
+    return (0 <= i && i < h
+         && 0 <= j && j < w
+         && 0 <= k && k < d);
 }
 
 void *raw::map(size_t size, int prot)
@@ -282,96 +295,114 @@ rawd::~rawd()
 
 void rawb::put(int i, int j, int k, double v)
 {
-    if      (v >  1.0) p[index(i, j, k)] =  255;
-    else if (v <  0.0) p[index(i, j, k)] =    0;
-    else               p[index(i, j, k)] = (unsigned char) (v * 255);
+    if (valid(i, j, k))
+    {
+        if      (v >  1.0) p[index(i, j, k)] =  255;
+        else if (v <  0.0) p[index(i, j, k)] =    0;
+        else               p[index(i, j, k)] = (unsigned char) (v * 255);
+    }
 }
 
 void rawc::put(int i, int j, int k, double v)
 {
-    if      (v >  1.0) p[index(i, j, k)] =  127;
-    else if (v < -1.0) p[index(i, j, k)] = -127;
-    else               p[index(i, j, k)] = (char) (v * 127);
+    if (valid(i, j, k))
+    {
+        if      (v >  1.0) p[index(i, j, k)] =  127;
+        else if (v < -1.0) p[index(i, j, k)] = -127;
+        else               p[index(i, j, k)] = (char) (v * 127);
+    }
 }
 
 void rawu::put(int i, int j, int k, double v)
 {
-    if      (v >  1.0) p[index(i, j, k)] =  65535;
-    else if (v <  0.0) p[index(i, j, k)] =      0;
-    else               p[index(i, j, k)] = (unsigned short) (v * 65535);
+    if (valid(i, j, k))
+    {
+        if      (v >  1.0) p[index(i, j, k)] =  65535;
+        else if (v <  0.0) p[index(i, j, k)] =      0;
+        else               p[index(i, j, k)] = (unsigned short) (v * 65535);
+    }
 }
 
 void raws::put(int i, int j, int k, double v)
 {
-    if      (v >  1.0) p[index(i, j, k)] =  32767;
-    else if (v < -1.0) p[index(i, j, k)] = -32767;
-    else               p[index(i, j, k)] = (short) (v * 32767);
+    if (valid(i, j, k))
+    {
+        if      (v >  1.0) p[index(i, j, k)] =  32767;
+        else if (v < -1.0) p[index(i, j, k)] = -32767;
+        else               p[index(i, j, k)] = (short) (v * 32767);
+    }
 }
 
 void rawl::put(int i, int j, int k, double v)
 {
-    if      (v >  1.0) p[index(i, j, k)] =  4294967295;
-    else if (v <  0.0) p[index(i, j, k)] =           0;
-    else               p[index(i, j, k)] = (unsigned int) (v * 4294967295);
+    if (valid(i, j, k))
+    {
+        if      (v >  1.0) p[index(i, j, k)] =  4294967295;
+        else if (v <  0.0) p[index(i, j, k)] =           0;
+        else               p[index(i, j, k)] = (unsigned int) (v * 4294967295);
+    }
 }
 
 void rawi::put(int i, int j, int k, double v)
 {
-    if      (v >  1.0) p[index(i, j, k)] =  2147483647;
-    else if (v < -1.0) p[index(i, j, k)] = -2147483647;
-    else               p[index(i, j, k)] = (int) (v * 2147483647);
+    if (valid(i, j, k))
+    {
+        if      (v >  1.0) p[index(i, j, k)] =  2147483647;
+        else if (v < -1.0) p[index(i, j, k)] = -2147483647;
+        else               p[index(i, j, k)] = (int) (v * 2147483647);
+    }
 }
 
 void rawf::put(int i, int j, int k, double v)
 {
-    p[index(i, j, k)] = float(v);
+    if (valid(i, j, k)) p[index(i, j, k)] = float(v);
 }
 
 void rawd::put(int i, int j, int k, double v)
 {
-    p[index(i, j, k)] = v;
+    if (valid(i, j, k)) p[index(i, j, k)] = v;
 }
 
 //------------------------------------------------------------------------------
 
 double rawb::get(int i, int j, int k)
 {
-    return double(p[index(i, j, k)]) / 255.0;
+    return valid(i, j, k) ? double(p[index(i, j, k)]) / 255.0 : 0.0;
 }
 
 double rawc::get(int i, int j, int k)
 {
-    return double(p[index(i, j, k)]) / 127.0;
+    return valid(i, j, k) ? double(p[index(i, j, k)]) / 127.0 : 0.0;
 }
 
 double rawu::get(int i, int j, int k)
 {
-    return double(p[index(i, j, k)]) / 65535.0;
+    return valid(i, j, k) ? double(p[index(i, j, k)]) / 65535.0 : 0.0;
 }
 
 double raws::get(int i, int j, int k)
 {
-    return double(p[index(i, j, k)]) / 32767.0;
+    return valid(i, j, k) ? double(p[index(i, j, k)]) / 32767.0 : 0.0;
 }
 
 double rawl::get(int i, int j, int k)
 {
-    return double(p[index(i, j, k)]) / 4294967295.0;
+    return valid(i, j, k) ? double(p[index(i, j, k)]) / 4294967295.0 : 0.0;
 }
 
 double rawi::get(int i, int j, int k)
 {
-    return double(p[index(i, j, k)]) / 2147483647.0;
+    return valid(i, j, k) ? double(p[index(i, j, k)]) / 2147483647.0 : 0.0;
 }
 
 double rawf::get(int i, int j, int k)
 {
-    return double(p[index(i, j, k)]);
+    return valid(i, j, k) ? double(p[index(i, j, k)]) : 0.0;
 }
 
 double rawd::get(int i, int j, int k)
 {
-    return double(p[index(i, j, k)]);
+    return valid(i, j, k) ? double(p[index(i, j, k)]) : 0.0;
 }
 
 //------------------------------------------------------------------------------
@@ -510,10 +541,14 @@ void output::go() const
 
 double test::get(int i, int j, int k) const
 {
-    if (((i / (1 << (5 + k))) % 2) == ((j / (1 << (5 + k))) % 2))
-        return 1.0f;
-    else
-        return 0.0f;
+    if (0 <= i && i < geth() && 0 <= j && j < getw() && 0 <= k && k < getd())
+    {
+        if (((i / (1 << (5 + k))) % 2) == ((j / (1 << (5 + k))) % 2))
+            return 1.0;
+        else
+            return 0.0;
+    }
+    return 0.0;
 }
 
 int test::geth() const
@@ -540,23 +575,47 @@ public:
    ~rawk();
 
    void   draw();
+   void  wheel(int, int);
    void motion(int, int);
    void button(int, bool);
    void    key(int, bool, bool);
 
 private:
+
     GLuint texture;
     GLuint program;
     GLuint vbuffer;
     GLuint varray;
+
+    GLint  u_offset;
+    GLint  u_scale;
+
+    int    point_x;       // Current mouse pointer position x
+    int    point_y;       // Current mouse pointer position y
+
+    int    image_x;       // Current image view position x
+    int    image_y;       // Current image view position y
+    double image_z;       // Current image view zoom
+
+    int    cache_x;       // Cached image view position x
+    int    cache_y;       // Cached image view position y
+    double cache_z;       // Cached image view zoom
+
+    bool   dragging;      // Is a drag in progress?
+    int    drag_point_x;  // Mouse pointer position at beginning of drag
+    int    drag_point_y;  // Mouse pointer position at beginning of drag
+    int    drag_image_x;  // Image view position at beginning of drag
+    int    drag_image_y;  // Image view position at beginning of drag
 
     image *src;
 
     void refresh();
 };
 
-rawk::rawk(image *src) : demonstration("RAWK", 1280, 720), src(src)
+rawk::rawk(image *src) : demonstration("RAWK", 640, 360), src(src)
 {
+    glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
+
     // Initialize a texture object for the image cache.
 
     glGenTextures(1, &texture);
@@ -600,9 +659,30 @@ rawk::rawk(image *src) : demonstration("RAWK", 1280, 720), src(src)
 
         glVertexAttribPointer(p, 4, GL_FLOAT, GL_FALSE, 24, (const void *)  0);
         glVertexAttribPointer(t, 2, GL_FLOAT, GL_FALSE, 24, (const void *) 16);
+
+        // Locate the program uniforms.
+
+        u_offset = glGetUniformLocation(program, "offset");
+        u_scale  = glGetUniformLocation(program, "scale");
     }
 
-    glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
+    // Set the initial view on the image.
+
+    const int h = src->geth();
+    const int w = src->getw();
+
+    if (double(width) / double(height) < double(w) / double(h))
+        image_z = double(w) / double(width);
+    else
+        image_z = double(h) / double(height);
+
+    image_x = w / 2;
+    image_y = h / 2;
+
+    point_x = 0;
+    point_y = 0;
+
+    dragging = false;
 
     refresh();
 }
@@ -618,15 +698,66 @@ rawk::~rawk()
 void rawk::draw()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // double z =        image_z / cache_z;
+    double z =        cache_z / image_z;
+    double x = 2 * double(cache_x - image_x) / cache_z / (width  / 1);
+    double y = 2 * double(cache_y - image_y) / cache_z / (height / 1);
+
+    printf("%d %d %f ... %d %d %f ... %f %f %f\n",
+            image_x, image_y, image_z,
+            cache_x, cache_y, cache_z, x, y, z);
+
+    glUniform1f(u_scale,  z);
+    glUniform2f(u_offset, x, y);
+
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
 void rawk::motion(int x, int y)
 {
+    point_x = x;
+    point_y = y;
+
+    if (dragging)
+    {
+        image_x = drag_image_x + (drag_point_x - x) * image_z;
+        image_y = drag_image_y + (y - drag_point_y) * image_z;
+    }
 }
 
 void rawk::button(int button, bool down)
 {
+    if (button == SDL_BUTTON_LEFT)
+    {
+        dragging     = down;
+        drag_image_x = image_x;
+        drag_image_y = image_y;
+        drag_point_x = point_x;
+        drag_point_y = point_y;
+    }
+}
+
+void rawk::wheel(int dx, int dy)
+{
+    // Compute pointer position relativate to the center of the screen.
+
+    double xx = point_x - 0.5 * width;
+    double yy = point_y - 0.5 * height;
+
+    // Compute the image pixel on which the pointer lies.
+
+    double x = image_x + xx * image_z;
+    double y = image_y - yy * image_z;
+
+    // Compute a new zoom level.
+
+    image_z = exp(log(image_z) + dy / 100.0);
+
+    // Compute image offsets to ensure the pointer remains over the same pixel.
+
+    image_x = x - xx * image_z;
+    image_y = y + yy * image_z;
 }
 
 void rawk::key(int key, bool down, bool repeat)
@@ -636,6 +767,11 @@ void rawk::key(int key, bool down, bool repeat)
         switch (key)
         {
             case SDL_SCANCODE_SPACE: refresh(); break;
+            case SDL_SCANCODE_RETURN:
+                cache_x = image_x = 0;
+                cache_y = image_y = 0;
+                cache_z = image_z = 2;
+                break;
         }
     }
 }
@@ -646,13 +782,19 @@ void rawk::refresh()
 {
     std::vector<GLfloat> pixel(width * height * 3, 0);
 
-    const int depth = src->getd();
+    cache_x = image_x;
+    cache_y = image_y;
+    cache_z = image_z;
 
-    for         (int r = 0; r < height; ++r)
-        for     (int c = 0; c < width;  ++c)
-            for (int d = 0; d < depth;  ++d)
+    const int depth = std::min(src->getd(), 3);
 
-                pixel[(r * width + c) * 3 + d] = src->get(r, c, d);
+    for         (int i = 0; i < height; ++i)
+        for     (int j = 0; j < width;  ++j)
+            for (int k = 0; k < depth;  ++k)
+
+                pixel[(i * width + j) * 3 + k]
+                    = src->get(int(floor(cache_y + (i - height / 2) * cache_z)),
+                               int(floor(cache_x + (j - width  / 2) * cache_z)), k);
 
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height,
                     GL_RGB, GL_FLOAT, &pixel.front());
