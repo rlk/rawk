@@ -1,6 +1,8 @@
 #ifndef RAW_HPP
 #define RAW_HPP
 
+#include <string>
+
 extern int errno;
 
 /// The following sample type abbreviations are used consistently throughout.
@@ -131,35 +133,6 @@ protected:
     int    f;
     void  *p;
 };
-
-raw::raw(std::string t, size_t h, size_t w, size_t d, size_t s, bool o)
-    : h(h), w(w), d(d), s(s), f(0), p(0)
-{
-    size_t n = h * w * d * s;
-
-    int mode = o ? O_RDWR | O_TRUNC | O_CREAT : O_RDONLY;
-    int prot = o ? PROT_READ | PROT_WRITE : PROT_READ;
-
-    if ((f = open(t.c_str(), mode, 0666)) == -1)
-        throw std::runtime_error(strerror(errno));
-
-    if (o && ftruncate(f, n) == -1)
-        throw std::runtime_error(strerror(errno));
-
-    if ((p = mmap(0, n, prot, MAP_SHARED, f, 0)) == MAP_FAILED)
-        throw std::runtime_error(strerror(errno));
-}
-
-raw::~raw()
-{
-    size_t n = h * w * d * s;
-
-    if (munmap(p, n) == -1)
-        throw std::runtime_error(strerror(errno));
-
-    if (close(f) == -1)
-        throw std::runtime_error(strerror(errno));
-}
 
 //------------------------------------------------------------------------------
 

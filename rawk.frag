@@ -7,6 +7,7 @@ out vec4 fColor;
 
 void main()
 {
-	vec2 bound = step(vec2(0.0), fTexCoord) * step(fTexCoord, vec2(1.0));
-	fColor = texture(Image, fTexCoord) * bound.x * bound.y;
+	vec2 bound = step(vec2(0.), fTexCoord) * step(fTexCoord, vec2(1.));
+	vec4 color = texture(Image, fTexCoord) * bound.x * bound.y;
+	fColor = vec4(color.r, color.r, color.r, 1.0);
 }
