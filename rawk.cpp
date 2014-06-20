@@ -15,7 +15,7 @@
 
 //------------------------------------------------------------------------------
 
-/// Base class for all image data sources.
+/// Base class for all image data sources
 
 class image
 {
@@ -39,7 +39,7 @@ protected:
     image *tail;
 };
 
-/// RAW file reader.
+/// RAW file reader
 
 class input : public image
 {
@@ -57,7 +57,7 @@ private:
     raw *file;
 };
 
-/// RAW file writer with pass-through.
+/// RAW file writer with pass-through
 
 class output : public image
 {
@@ -73,7 +73,33 @@ private:
     raw *file;
 };
 
-/// Test pattern generator.
+/// Offset filter
+
+class offset : public image
+{
+public:
+    offset(double d, image *H) : image(H), value(d) { }
+
+    virtual double get(int, int, int) const;
+
+private:
+    double value;
+};
+
+/// Scale filter
+
+class scale : public image
+{
+public:
+    scale(double d, image *H) : image(H), value(d) { }
+
+    virtual double get(int, int, int) const;
+
+private:
+    double value;
+};
+
+/// Test pattern generator
 
 class test : public image
 {
@@ -167,6 +193,18 @@ void output::go() const
         for     (int j = 0; j < getw(); ++j)
             for (int k = 0; k < getd(); ++k)
                 file->put(i, j, k, head->get(i, j, k));
+}
+
+//------------------------------------------------------------------------------
+
+double offset::get(int i, int j, int k) const
+{
+    return head->get(i, j, k) + value;
+}
+
+double scale::get(int i, int j, int k) const
+{
+    return head->get(i, j, k) * value;
 }
 
 //------------------------------------------------------------------------------
@@ -442,8 +480,10 @@ int main(int argc, char **argv)
 {
     try
     {
-        // image *src = new input("megt00n090hb.img", 5632, 11520, 1, 'S');
-        image *src = new test();
+        image *src = new offset(0.5,
+                                new scale(2.0,
+                                          new input("megt00n090hb.img", 5632, 11520, 1, 'S')));
+        // image *src = new test();
 
         rawk app(src);
         app.run(true);
