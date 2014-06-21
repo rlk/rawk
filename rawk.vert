@@ -9,6 +9,7 @@ out vec2 fTexCoord;
 
 void main()
 {
-	fTexCoord   = vTexCoord;
-	gl_Position = vec4((vPosition + offset) * scale, 0.0, 1.0);
+	vec2 pos = (vPosition + offset) * scale;
+	fTexCoord = vTexCoord;
+	gl_Position = vec4(pos.x, -pos.y, 0.0, 1.0);
 }

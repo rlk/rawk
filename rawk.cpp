@@ -189,7 +189,7 @@ void rawk::motion(int x, int y)
     if (dragging)
     {
         image_x = drag_image_x + (drag_point_x - x) * image_z;
-        image_y = drag_image_y + (y - drag_point_y) * image_z;
+        image_y = drag_image_y + (drag_point_y - y) * image_z;
     }
 }
 
@@ -215,7 +215,7 @@ void rawk::wheel(int dx, int dy)
     // Compute the image pixel on which the pointer lies.
 
     double x = image_x + xx * image_z;
-    double y = image_y - yy * image_z;
+    double y = image_y + yy * image_z;
 
     // Compute a new zoom level.
 
@@ -224,7 +224,7 @@ void rawk::wheel(int dx, int dy)
     // Compute image offsets to ensure the pointer remains over the same pixel.
 
     image_x = x - xx * image_z;
-    image_y = y + yy * image_z;
+    image_y = y - yy * image_z;
 }
 
 void rawk::key(int key, bool down, bool repeat)
