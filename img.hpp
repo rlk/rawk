@@ -26,6 +26,11 @@ public:
         if (head) delete head;
     }
 
+    virtual std::string doc() const { return std::string("ndocumented"); }
+
+    image *gethead() { return head; }
+    image *gettail() { return tail; }
+
 protected:
     image *head;
     image *tail;
@@ -41,9 +46,11 @@ public:
 
     virtual double get(int, int, int) const;
 
-    virtual int geth() const { return file->h; }
-    virtual int getw() const { return file->w; }
-    virtual int getd() const { return file->d; }
+    virtual int geth() const { return file->geth(); }
+    virtual int getw() const { return file->getw(); }
+    virtual int getd() const { return file->getd(); }
+
+    virtual std::string doc() const;
 
 private:
     raw *file;
@@ -58,6 +65,8 @@ public:
    ~output();
 
     virtual double get(int, int, int) const;
+
+    virtual std::string doc() const;
 
     void go() const;
 
@@ -74,6 +83,8 @@ public:
 
     virtual double get(int, int, int) const;
 
+    virtual std::string doc() const;
+
 private:
     double value;
 };
@@ -87,8 +98,29 @@ public:
 
     virtual double get(int, int, int) const;
 
+    virtual std::string doc() const;
+
 private:
     double value;
+};
+
+/// Overlay operator
+
+class paste : public image
+{
+public:
+    paste(int r, int c, image *H, image *T) : image(H, T), row(r), col(c) { }
+
+    virtual double get(int, int, int) const;
+
+    virtual int geth() const;
+    virtual int getw() const;
+
+    virtual std::string doc() const;
+
+private:
+    int row;
+    int col;
 };
 
 /// Test pattern generator
@@ -101,6 +133,8 @@ public:
     virtual int geth() const;
     virtual int getw() const;
     virtual int getd() const;
+
+    virtual std::string doc() const;
 };
 
 //------------------------------------------------------------------------------

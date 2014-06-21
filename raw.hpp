@@ -112,12 +112,12 @@ public:
     virtual void   put(int, int, int, double) = 0;
     virtual double get(int, int, int) const   = 0;
 
-    virtual ~raw();
+    std::string getname() const { return name; }
+    int         geth()    const { return h;    }
+    int         getw()    const { return w;    }
+    int         getd()    const { return d;    }
 
-    size_t h;
-    size_t w;
-    size_t d;
-    size_t s;
+    virtual ~raw();
 
 protected:
 
@@ -130,6 +130,12 @@ protected:
         return       (uint8_t *) p + (((i * w) + j) * d + k) * s;
     }
 
+    std::string name;
+
+    size_t h;
+    size_t w;
+    size_t d;
+    size_t s;
     int    f;
     void  *p;
 };

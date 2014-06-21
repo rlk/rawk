@@ -3,6 +3,7 @@
 
 #include "img.hpp"
 
+#include <iostream>
 #include <vector>
 
 //------------------------------------------------------------------------------
@@ -245,14 +246,81 @@ void rawk::key(int key, bool down, bool repeat)
 
 //------------------------------------------------------------------------------
 
+void dump(image *p, int d)
+{
+    for (int i = 0; i < d; ++i)
+        std::cout << "    ";
+
+    std::cout << p->doc() << std::endl;
+
+    if (p->gethead()) dump(p->gethead(), d + 1);
+    if (p->gettail()) dump(p->gettail(), d + 1);
+}
+
+image *parse(int& i, char **v)
+{
+    if (v[i])
+    {
+        std::string op(v[i++]);
+
+        if (op == "offset")
+        {
+            double d = strtod(v[i++], 0);
+            image *p = parse(i, v);
+            return new offset(d, p);
+        }
+
+        if (op == "scale")
+        {
+            double d = strtod(v[i++], 0);
+            image *p = parse(i, v);
+            return new scale(d, p);
+        }
+
+        if (op == "paste")
+        {
+            int    r = int(strtol(v[i++], 0, 0));
+            int    c = int(strtol(v[i++], 0, 0));
+            image *H = parse(i, v);
+            image *T = parse(i, v);
+            return new paste(r, c, H, T);
+        }
+
+        if (op == "input")
+        {
+            char  *a = v[i++];
+            int    h = int(strtol(v[i++], 0, 0));
+            int    w = int(strtol(v[i++], 0, 0));
+            int    d = int(strtol(v[i++], 0, 0));
+            char   t = v[i++][0];
+            return new input(a, h, w, d, t);
+        }
+
+        if (op == "output")
+        {
+            char  *a = v[i++];
+            char   t = v[i++][0];
+            image *H = parse(i, v);
+            return new output(a, t, H);
+        }
+
+        if (op == "test")
+            return new test();
+    }
+    throw std::runtime_error("Expected image argument");
+    return 0;
+}
+
+//------------------------------------------------------------------------------
+
 int main(int argc, char **argv)
 {
     try
     {
-        image *src = new offset(0.5,
-                                new scale(2.0,
-                                          new input("megt00n090hb.img", 5632, 11520, 1, 'S')));
-        // image *src = new test();
+        int argi = 1;
+        image *src = parse(argi, argv);
+
+        dump(src, 0);
 
         rawk app(src);
         app.run(true);
@@ -263,7 +331,7 @@ int main(int argc, char **argv)
     }
     catch (std::exception &e)
     {
-        fprintf(stderr, "%s\n", e.what());
+        std::cerr << e.what() << std::endl;
         return 1;
     }
 }
