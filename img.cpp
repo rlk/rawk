@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <sys/mman.h>
 
+#include <stdexcept>
 #include <sstream>
 
 #include "img.hpp"

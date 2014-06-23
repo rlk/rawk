@@ -3,6 +3,7 @@
 
 #include "img.hpp"
 
+#include <stdexcept>
 #include <iostream>
 #include <sstream>
 #include <vector>
@@ -215,9 +216,14 @@ void rawk::refresh()
 
     const int depth = std::min(curr_image->getd(), 3);
 
-    for         (int r = 0; r < height; ++r)
-        for     (int c = 0; c < width;  ++c)
-            for (int k = 0; k < depth;  ++k)
+    int r;
+    int c;
+    int k;
+
+    #pragma omp parallel for private(c, k)
+    for         (r = 0; r < height; ++r)
+        for     (c = 0; c < width;  ++c)
+            for (k = 0; k < depth;  ++k)
             {
                 int i = toint(curr_state.y + (r - height / 2) * curr_state.z);
                 int j = toint(curr_state.x + (c - width  / 2) * curr_state.z);
