@@ -4,6 +4,7 @@
 #include "img.hpp"
 
 #include <iostream>
+#include <sstream>
 #include <vector>
 
 //------------------------------------------------------------------------------
@@ -53,9 +54,17 @@ private:
     state cache_state;
     state click_state;
 
+    image *goL(image *);
+    image *goR(image *);
+    image *goP(image *);
+
     void refresh();
+    void  select(int);
     void  center(state *, image *);
+    image *title(image *, bool=false);
 };
+
+//------------------------------------------------------------------------------
 
 rawk::rawk(image *p) : demonstration("RAWK", 1280, 720)
 {
@@ -111,16 +120,17 @@ rawk::rawk(image *p) : demonstration("RAWK", 1280, 720)
         u_scale  = glGetUniformLocation(program, "scale");
     }
 
-    dragging = false;
-    selector = 0;
-    point_x  = 0;
-    point_y  = 0;
+    dragging =  false;
+    selector = -1;
+    point_x  =  0;
+    point_y  =  0;
 
     for (int i = 0; i < 12; i++)
         center(mark_state + i, (mark_image[i] = p));
 
     curr_state = mark_state[0];
     curr_image = mark_image[0];
+    select(-1);
     refresh();
 }
 
@@ -132,11 +142,57 @@ rawk::~rawk()
     glDeleteVertexArrays(1, &varray);
 }
 
+//------------------------------------------------------------------------------
+
 static inline int toint(double d)
 {
     double f = floor(d);
     double c =  ceil(d);
     return (c - d < d - f) ? int(c) : int(f);
+}
+
+image *rawk::title(image *p, bool temporary)
+{
+    std::ostringstream title;
+
+    if (temporary)
+        title << "(" << p->doc() << ")";
+    else
+        title <<        p->doc();
+
+    SDL_SetWindowTitle(window, title.str().c_str());
+    return p;
+}
+
+image *rawk::goL(image *p)
+{
+    if (p->getL())
+        return title(p->getL());
+    return p;
+}
+
+image *rawk::goR(image *p)
+{
+    if (p->getR())
+        return title(p->getR());
+    return p;
+}
+
+image *rawk::goP(image *p)
+{
+    if (p->getP())
+        return title(p->getP());
+    return p;
+}
+
+void rawk::select(int i)
+{
+    selector = i;
+
+    if (selector < 0)
+        title(curr_image, false);
+    else
+        title(mark_image[i], true);
 }
 
 void rawk::center(state *s, image *p)
@@ -173,6 +229,8 @@ void rawk::refresh()
 
     cache_state = curr_state;
 }
+
+//------------------------------------------------------------------------------
 
 void rawk::draw()
 {
@@ -242,38 +300,65 @@ void rawk::key(int key, bool down, bool repeat)
             switch (key)
             {
                 case SDL_SCANCODE_SPACE:
-                    if (selector)
+                    if (selector >= 0)
                     {
-                        curr_state = mark_state[selector - 1];
-                        curr_image = mark_image[selector - 1];
+                        curr_state = mark_state[selector];
+                        curr_image = mark_image[selector];
                     }
                     refresh();
                     break;
 
                 case SDL_SCANCODE_RETURN:
-                    if (selector)
+                    if (selector >= 0)
                     {
-                        mark_state[selector - 1] = curr_state;
-                        mark_image[selector - 1] = curr_image;
+                        mark_state[selector] = curr_state;
+                        mark_image[selector] = curr_image;
                     }
+                    break;
+
+                case SDL_SCANCODE_LEFT:
+                    if (selector < 0)
+                    {
+                        curr_image = goL(curr_image);
+                        refresh();
+                    }
+                    else mark_image[selector] = goL(mark_image[selector]);
+                    break;
+
+                case SDL_SCANCODE_RIGHT:
+                    if (selector < 0)
+                    {
+                        curr_image = goR(curr_image);
+                        refresh();
+                    }
+                    else mark_image[selector] = goR(mark_image[selector]);
+                    break;
+
+                case SDL_SCANCODE_UP:
+                    if (selector < 0)
+                    {
+                        curr_image = goP(curr_image);
+                        refresh();
+                    }
+                    else mark_image[selector] = goP(mark_image[selector]);
                     break;
             }
         }
 
         switch (key)
         {
-            case SDL_SCANCODE_F1:  selector = down ?  1 : 0; break;
-            case SDL_SCANCODE_F2:  selector = down ?  2 : 0; break;
-            case SDL_SCANCODE_F3:  selector = down ?  3 : 0; break;
-            case SDL_SCANCODE_F4:  selector = down ?  4 : 0; break;
-            case SDL_SCANCODE_F5:  selector = down ?  5 : 0; break;
-            case SDL_SCANCODE_F6:  selector = down ?  6 : 0; break;
-            case SDL_SCANCODE_F7:  selector = down ?  7 : 0; break;
-            case SDL_SCANCODE_F8:  selector = down ?  8 : 0; break;
-            case SDL_SCANCODE_F9:  selector = down ?  9 : 0; break;
-            case SDL_SCANCODE_F10: selector = down ? 10 : 0; break;
-            case SDL_SCANCODE_F11: selector = down ? 11 : 0; break;
-            case SDL_SCANCODE_F12: selector = down ? 12 : 0; break;
+            case SDL_SCANCODE_F1:  select(down ?  0 : -1); break;
+            case SDL_SCANCODE_F2:  select(down ?  1 : -1); break;
+            case SDL_SCANCODE_F3:  select(down ?  2 : -1); break;
+            case SDL_SCANCODE_F4:  select(down ?  3 : -1); break;
+            case SDL_SCANCODE_F5:  select(down ?  4 : -1); break;
+            case SDL_SCANCODE_F6:  select(down ?  5 : -1); break;
+            case SDL_SCANCODE_F7:  select(down ?  6 : -1); break;
+            case SDL_SCANCODE_F8:  select(down ?  7 : -1); break;
+            case SDL_SCANCODE_F9:  select(down ?  8 : -1); break;
+            case SDL_SCANCODE_F10: select(down ?  9 : -1); break;
+            case SDL_SCANCODE_F11: select(down ? 10 : -1); break;
+            case SDL_SCANCODE_F12: select(down ? 11 : -1); break;
         }
     }
 }
@@ -287,8 +372,8 @@ void dump(image *p, int d)
 
     std::cout << p->doc() << std::endl;
 
-    if (p->gethead()) dump(p->gethead(), d + 1);
-    if (p->gettail()) dump(p->gettail(), d + 1);
+    if (p->getL()) dump(p->getL(), d + 1);
+    if (p->getR()) dump(p->getR(), d + 1);
 }
 
 image *parse(int& i, char **v)

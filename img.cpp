@@ -42,6 +42,14 @@ raw::~raw()
 
 //------------------------------------------------------------------------------
 
+image::image(image *L, image *R) : L(L), R(R), P(0)
+{
+    if (L) L->setP(this);
+    if (R) R->setP(this);
+}
+
+//------------------------------------------------------------------------------
+
 input::input(std::string a, int h, int w, int d, char t) : file(0)
 {
     switch (t)
@@ -91,11 +99,11 @@ std::string input::doc() const
 
 output::output(std::string name, char t, image *H) : image(H), file(0)
 {
-    assert(head);
+    assert(L);
 
-    const int h = head->geth();
-    const int w = head->getw();
-    const int d = head->getd();
+    const int h = L->geth();
+    const int w = L->getw();
+    const int d = L->getd();
 
     switch (t)
     {
@@ -123,7 +131,7 @@ output::~output()
 
 double output::get(int i, int j, int k) const
 {
-    return head->get(i, j, k);
+    return L->get(i, j, k);
 }
 
 std::string output::doc() const
@@ -141,14 +149,14 @@ void output::go() const
     for         (int i = 0; i < geth(); ++i)
         for     (int j = 0; j < getw(); ++j)
             for (int k = 0; k < getd(); ++k)
-                file->put(i, j, k, head->get(i, j, k));
+                file->put(i, j, k, L->get(i, j, k));
 }
 
 //------------------------------------------------------------------------------
 
 double bias::get(int i, int j, int k) const
 {
-    return head->get(i, j, k) + value;
+    return L->get(i, j, k) + value;
 }
 
 std::string bias::doc() const
@@ -162,7 +170,7 @@ std::string bias::doc() const
 
 double scale::get(int i, int j, int k) const
 {
-    return head->get(i, j, k) * value;
+    return L->get(i, j, k) * value;
 }
 
 std::string scale::doc() const
@@ -176,21 +184,21 @@ std::string scale::doc() const
 
 double paste::get(int i, int j, int k) const
 {
-    if (row <= i && i < row + head->geth() &&
-        col <= j && j < col + head->getw())
-        return head->get(i - row, j - col, k);
+    if (row <= i && i < row + L->geth() &&
+        col <= j && j < col + L->getw())
+        return L->get(i - row, j - col, k);
     else
-        return tail->get(i, j, k);
+        return R->get(i, j, k);
 }
 
 int paste::geth() const
 {
-    return std::max(head->geth() + row, tail->geth());
+    return std::max(L->geth() + row, R->geth());
 }
 
 int paste::getw() const
 {
-    return std::max(head->getw() + col, tail->getw());
+    return std::max(L->getw() + col, R->getw());
 }
 
 std::string paste::doc() const

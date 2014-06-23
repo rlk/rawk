@@ -12,28 +12,32 @@
 class image
 {
 public:
-    image(image *H=0, image *T=0) : head(H), tail(T) { }
+    image(image *L=0, image *R=0);
 
     virtual double get(int, int, int) const = 0;
 
-    virtual int geth() const { return head ? head->geth() : 0; }
-    virtual int getw() const { return head ? head->getw() : 0; }
-    virtual int getd() const { return head ? head->getd() : 0; }
+    virtual int geth() const { return L ? L->geth() : 0; }
+    virtual int getw() const { return L ? L->getw() : 0; }
+    virtual int getd() const { return L ? L->getd() : 0; }
 
     virtual ~image()
     {
-        if (tail) delete tail;
-        if (head) delete head;
+        if (R) delete R;
+        if (L) delete L;
     }
 
     virtual std::string doc() const { return std::string("ndocumented"); }
 
-    image *gethead() { return head; }
-    image *gettail() { return tail; }
+    image *getL() { return L; }
+    image *getR() { return R; }
+    image *getP() { return P; }
+
+    void setP(image *p) { P = p; }
 
 protected:
-    image *head;
-    image *tail;
+    image *L;
+    image *R;
+    image *P;
 };
 
 /// RAW file reader
