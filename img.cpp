@@ -1,3 +1,4 @@
+#include <math.h>
 #include <stdio.h>
 #include <fcntl.h>
 #include <assert.h>
@@ -12,6 +13,13 @@
 
 //------------------------------------------------------------------------------
 
+class raw_error : public std::runtime_error
+{
+public :
+    raw_error(const std::string& a,
+              const std::string& b) : std::runtime_error(a + ": " + b) { }
+};
+
 raw::raw(std::string name, size_t h, size_t w, size_t d, size_t s, bool o)
     : name(name), h(h), w(w), d(d), s(s), f(0), p(0)
 {
@@ -21,13 +29,13 @@ raw::raw(std::string name, size_t h, size_t w, size_t d, size_t s, bool o)
     int prot = o ? PROT_READ | PROT_WRITE : PROT_READ;
 
     if ((f = open(name.c_str(), mode, 0666)) == -1)
-        throw std::runtime_error(strerror(errno));
+        throw raw_error(name, strerror(errno));
 
     if (o && ftruncate(f, n) == -1)
-        throw std::runtime_error(strerror(errno));
+        throw raw_error(name, strerror(errno));
 
     if ((p = mmap(0, n, prot, MAP_SHARED, f, 0)) == MAP_FAILED)
-        throw std::runtime_error(strerror(errno));
+        throw raw_error(name, strerror(errno));
 }
 
 raw::~raw()
@@ -35,10 +43,10 @@ raw::~raw()
     size_t n = h * w * d * s;
 
     if (munmap(p, n) == -1)
-        throw std::runtime_error(strerror(errno));
+        throw raw_error(name, strerror(errno));
 
     if (close(f) == -1)
-        throw std::runtime_error(strerror(errno));
+        throw raw_error(name, strerror(errno));
 }
 
 //------------------------------------------------------------------------------
@@ -207,6 +215,46 @@ std::string paste::doc() const
     std::ostringstream sout;
     sout << "paste " << row
               << " " << col;
+    return sout.str();
+}
+
+//------------------------------------------------------------------------------
+
+double gradient::get(int ic, int jc, int k) const
+{
+    const int h = L->geth();
+    const int w = L->getw();
+    const int d = L->getd();
+
+    if (0 <= ic && ic < h && 0 <= jc && jc < w && 0 <= k && k < d)
+    {
+        const int in = ::wrap(ic - 1, L->geth(), wrap & 1);
+        const int is = ::wrap(ic + 1, L->geth(), wrap & 1);
+        const int jw = ::wrap(jc - 1, L->getw(), wrap & 2);
+        const int je = ::wrap(jc + 1, L->getw(), wrap & 2);
+
+        double d1 = L->get(in, jw, k);
+        double d2 = L->get(in, jc, k);
+        double d3 = L->get(in, je, k);
+        double d4 = L->get(ic, jw, k);
+
+        double d6 = L->get(ic, je, k);
+        double d7 = L->get(is, jw, k);
+        double d8 = L->get(is, jc, k);
+        double d9 = L->get(is, je, k);
+
+        double Lx = d3 - d1 + 2.0 * (d6 - d4) + d9 - d7;
+        double Ly = d1 - d7 + 2.0 * (d2 - d8) + d3 - d9;
+
+        return sqrt(Lx * Lx + Ly * Ly);
+    }
+    return 0.0;
+}
+
+std::string gradient::doc() const
+{
+    std::ostringstream sout;
+    sout << "gradient " << wrap;
     return sout.str();
 }
 

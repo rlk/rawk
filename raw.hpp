@@ -48,6 +48,13 @@ static inline double clamp(double d)
     else               return  d;
 }
 
+static inline int wrap(int i, int n, bool w)
+{
+    if      (i <     0) return w ? i + n :     0;
+    else if (i > n - 1) return w ? i - n : n - 1;
+    else                return i;
+}
+
 //------------------------------------------------------------------------------
 
 // Byte swappers for all sample types.

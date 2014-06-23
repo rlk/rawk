@@ -83,7 +83,7 @@ private:
 class bias : public image
 {
 public:
-    bias(double d, image *H) : image(H), value(d) { }
+    bias(double d, image *L) : image(L), value(d) { }
 
     virtual double get(int, int, int) const;
 
@@ -98,7 +98,7 @@ private:
 class scale : public image
 {
 public:
-    scale(double d, image *H) : image(H), value(d) { }
+    scale(double d, image *L) : image(L), value(d) { }
 
     virtual double get(int, int, int) const;
 
@@ -113,7 +113,7 @@ private:
 class paste : public image
 {
 public:
-    paste(int r, int c, image *H, image *T) : image(H, T), row(r), col(c) { }
+    paste(int r, int c, image *L, image *R) : image(L, R), row(r), col(c) { }
 
     virtual double get(int, int, int) const;
 
@@ -125,6 +125,21 @@ public:
 private:
     int row;
     int col;
+};
+
+/// Gradient filter
+
+class gradient : public image
+{
+public:
+    gradient(int w, image *L) : image(L), wrap(w) { }
+
+    virtual double get(int, int, int) const;
+
+    virtual std::string doc() const;
+
+private:
+    int wrap;
 };
 
 /// Test pattern generator

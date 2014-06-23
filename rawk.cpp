@@ -402,6 +402,13 @@ image *parse(int& i, char **v)
             return new scale(d, p);
         }
 
+        if (op == "gradient")
+        {
+            int    w = int(strtol(v[i++], 0, 0));
+            image *p = parse(i, v);
+            return new gradient(w, p);
+        }
+
         if (op == "paste")
         {
             int    r = int(strtol(v[i++], 0, 0));
