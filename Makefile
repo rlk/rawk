@@ -17,7 +17,7 @@ test0 :
 
 test1 :
 	rawk \
-		offset 0 -23040 3 \
+		offset 0 0 2 \
 			bias 0.5 \
 				paste 16896 34560 input megt44s270hb.img 5632 11520 1 S \
 				paste 16896 23040 input megt44s180hb.img 5632 11520 1 S \

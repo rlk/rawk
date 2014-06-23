@@ -20,6 +20,8 @@ public:
     virtual int getw() const { return L ? L->getw() : 0; }
     virtual int getd() const { return L ? L->getd() : 0; }
 
+    virtual void tweak(int, int) { }
+
     virtual ~image()
     {
         if (R) delete R;
@@ -86,6 +88,7 @@ public:
     bias(double d, image *L) : image(L), value(d) { }
 
     virtual double get(int, int, int) const;
+    virtual void tweak(int, int);
 
     virtual std::string doc() const;
 
@@ -116,6 +119,7 @@ public:
     offset(int r, int c, int w, image *L) : image(L), row(r), col(c), wrap(w) { }
 
     virtual double get(int, int, int) const;
+    virtual void tweak(int, int);
 
     virtual std::string doc() const;
 

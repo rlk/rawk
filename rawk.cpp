@@ -55,9 +55,15 @@ private:
     state cache_state;
     state click_state;
 
-    image *goL(image *);
-    image *goR(image *);
-    image *goP(image *);
+    image *doL(image *);
+    image *doR(image *);
+    image *doU(image *);
+    image *doD(image *);
+
+    void   doL();
+    void   doR();
+    void   doU();
+    void   doD();
 
     void refresh();
     void  select(int);
@@ -165,27 +171,6 @@ image *rawk::title(image *p, bool temporary)
     return p;
 }
 
-image *rawk::goL(image *p)
-{
-    if (p->getL())
-        return title(p->getL());
-    return p;
-}
-
-image *rawk::goR(image *p)
-{
-    if (p->getR())
-        return title(p->getR());
-    return p;
-}
-
-image *rawk::goP(image *p)
-{
-    if (p->getP())
-        return title(p->getP());
-    return p;
-}
-
 void rawk::select(int i)
 {
     selector = i;
@@ -234,6 +219,85 @@ void rawk::refresh()
                     GL_RGB, GL_FLOAT, &pixel.front());
 
     cache_state = curr_state;
+}
+
+//------------------------------------------------------------------------------
+
+image *rawk::doL(image *p)
+{
+    const SDL_Keymod mod = SDL_GetModState();
+
+    if      (mod == KMOD_NONE)  p->tweak(0, -1);
+    else if (mod &  KMOD_SHIFT) p->tweak(0, -10);
+    else if (mod &  KMOD_GUI && p->getL()) p = p->getL();
+
+    return title(p);
+}
+
+image *rawk::doR(image *p)
+{
+    const SDL_Keymod mod = SDL_GetModState();
+
+    if      (mod == KMOD_NONE)  p->tweak(0, +1);
+    else if (mod &  KMOD_SHIFT) p->tweak(0, +10);
+    else if (mod &  KMOD_GUI && p->getR()) p = p->getR();
+
+    return title(p);
+}
+
+image *rawk::doU(image *p)
+{
+    const SDL_Keymod mod = SDL_GetModState();
+
+    if      (mod == KMOD_NONE)  p->tweak(1, -1);
+    else if (mod &  KMOD_SHIFT) p->tweak(1, -10);
+    else if (mod &  KMOD_GUI && p->getP()) p = p->getP();
+
+    return title(p);
+}
+
+image *rawk::doD(image *p)
+{
+    const SDL_Keymod mod = SDL_GetModState();
+
+    if      (mod == KMOD_NONE)  p->tweak(1, +1);
+    else if (mod &  KMOD_SHIFT) p->tweak(1, +10);
+
+    return title(p);
+}
+
+//------------------------------------------------------------------------------
+
+void rawk::doL()
+{
+    if (selector < 0)
+        curr_image = doL(curr_image);
+    else
+        mark_image[selector] = doL(mark_image[selector]);
+}
+
+void rawk::doR()
+{
+    if (selector < 0)
+        curr_image = doR(curr_image);
+    else
+        mark_image[selector] = doR(mark_image[selector]);
+}
+
+void rawk::doU()
+{
+    if (selector < 0)
+        curr_image = doU(curr_image);
+    else
+        mark_image[selector] = doU(mark_image[selector]);
+}
+
+void rawk::doD()
+{
+    if (selector < 0)
+        curr_image = doD(curr_image);
+    else
+        mark_image[selector] = doD(mark_image[selector]);
 }
 
 //------------------------------------------------------------------------------
@@ -299,7 +363,7 @@ void rawk::wheel(int dx, int dy)
 
 void rawk::key(int key, bool down, bool repeat)
 {
-    if (!repeat)
+    if (repeat == false)
     {
         if (down)
         {
@@ -321,33 +385,6 @@ void rawk::key(int key, bool down, bool repeat)
                         mark_image[selector] = curr_image;
                     }
                     break;
-
-                case SDL_SCANCODE_LEFT:
-                    if (selector < 0)
-                    {
-                        curr_image = goL(curr_image);
-                        refresh();
-                    }
-                    else mark_image[selector] = goL(mark_image[selector]);
-                    break;
-
-                case SDL_SCANCODE_RIGHT:
-                    if (selector < 0)
-                    {
-                        curr_image = goR(curr_image);
-                        refresh();
-                    }
-                    else mark_image[selector] = goR(mark_image[selector]);
-                    break;
-
-                case SDL_SCANCODE_UP:
-                    if (selector < 0)
-                    {
-                        curr_image = goP(curr_image);
-                        refresh();
-                    }
-                    else mark_image[selector] = goP(mark_image[selector]);
-                    break;
             }
         }
 
@@ -365,6 +402,17 @@ void rawk::key(int key, bool down, bool repeat)
             case SDL_SCANCODE_F10: select(down ?  9 : -1); break;
             case SDL_SCANCODE_F11: select(down ? 10 : -1); break;
             case SDL_SCANCODE_F12: select(down ? 11 : -1); break;
+        }
+    }
+
+    if (down)
+    {
+        switch (key)
+        {
+            case SDL_SCANCODE_LEFT:  doL(); break;
+            case SDL_SCANCODE_RIGHT: doR(); break;
+            case SDL_SCANCODE_UP:    doU(); break;
+            case SDL_SCANCODE_DOWN:  doD(); break;
         }
     }
 }

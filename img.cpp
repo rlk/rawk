@@ -168,6 +168,11 @@ double bias::get(int i, int j, int k) const
     return L->get(i, j, k) + value;
 }
 
+void bias::tweak(int a, int v)
+{
+    if (a == 0) value += 0.1 * v;
+}
+
 std::string bias::doc() const
 {
     std::ostringstream sout;
@@ -198,10 +203,16 @@ double offset::get(int i, int j, int k) const
     const int d = L->getd();
 
     if (0 <= i && i < h && 0 <= j && j < w && 0 <= k && k < d)
-        return L->get(::wrap(i + row, h, wrap & 1),
-                      ::wrap(j + col, w, wrap & 2), k);
+        return L->get(::wrap(i - row, h, wrap & 1),
+                      ::wrap(j - col, w, wrap & 2), k);
     else
         return 0.0;
+}
+
+void offset::tweak(int a, int v)
+{
+    if (a == 0) col += v;
+    if (a == 1) row += v;
 }
 
 std::string offset::doc() const
