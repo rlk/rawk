@@ -74,12 +74,12 @@ private:
     raw *file;
 };
 
-/// Offset filter
+/// Bias filter
 
-class offset : public image
+class bias : public image
 {
 public:
-    offset(double d, image *H) : image(H), value(d) { }
+    bias(double d, image *H) : image(H), value(d) { }
 
     virtual double get(int, int, int) const;
 

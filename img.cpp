@@ -146,15 +146,15 @@ void output::go() const
 
 //------------------------------------------------------------------------------
 
-double offset::get(int i, int j, int k) const
+double bias::get(int i, int j, int k) const
 {
     return head->get(i, j, k) + value;
 }
 
-std::string offset::doc() const
+std::string bias::doc() const
 {
     std::ostringstream sout;
-    sout << "offset " << value;
+    sout << "bias " << value;
     return sout.str();
 }
 

@@ -9,13 +9,13 @@ rawk : rawk.cpp raw.hpp img.cpp img.hpp
 
 test0 :
 	rawk \
-		offset 0.5 \
+		bias 0.5 \
 			scale 2.0 \
 				input megt00n000hb.img 5632 11520 1 S
 
 test1 :
 	rawk \
-		offset 0.5 \
+		bias 0.5 \
 			scale 1.0 \
 				paste 16896 34560 input megt44s270hb.img 5632 11520 1 S \
 				paste 16896 23040 input megt44s180hb.img 5632 11520 1 S \

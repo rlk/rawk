@@ -289,11 +289,11 @@ image *parse(int& i, char **v)
     {
         std::string op(v[i++]);
 
-        if (op == "offset")
+        if (op == "bias")
         {
             double d = strtod(v[i++], 0);
             image *p = parse(i, v);
-            return new offset(d, p);
+            return new bias(d, p);
         }
 
         if (op == "scale")
