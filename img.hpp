@@ -108,6 +108,23 @@ private:
     double value;
 };
 
+/// Offset filter
+
+class offset : public image
+{
+public:
+    offset(int r, int c, int w, image *L) : image(L), row(r), col(c), wrap(w) { }
+
+    virtual double get(int, int, int) const;
+
+    virtual std::string doc() const;
+
+private:
+    int row;
+    int col;
+    int wrap;
+};
+
 /// Overlay operator
 
 class paste : public image

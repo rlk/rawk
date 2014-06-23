@@ -402,6 +402,15 @@ image *parse(int& i, char **v)
             return new scale(d, p);
         }
 
+        if (op == "offset")
+        {
+            int    r = int(strtol(v[i++], 0, 0));
+            int    c = int(strtol(v[i++], 0, 0));
+            int    w = int(strtol(v[i++], 0, 0));
+            image *p = parse(i, v);
+            return new offset(r, c, w, p);
+        }
+
         if (op == "gradient")
         {
             int    w = int(strtol(v[i++], 0, 0));
@@ -413,9 +422,9 @@ image *parse(int& i, char **v)
         {
             int    r = int(strtol(v[i++], 0, 0));
             int    c = int(strtol(v[i++], 0, 0));
-            image *H = parse(i, v);
+            image *L = parse(i, v);
             image *T = parse(i, v);
-            return new paste(r, c, H, T);
+            return new paste(r, c, L, T);
         }
 
         if (op == "input")
@@ -432,8 +441,8 @@ image *parse(int& i, char **v)
         {
             char  *a = v[i++];
             char   t = v[i++][0];
-            image *H = parse(i, v);
-            return new output(a, t, H);
+            image *p = parse(i, v);
+            return new output(a, t, p);
         }
 
         if (op == "test")
