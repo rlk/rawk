@@ -8,7 +8,7 @@
 
 //------------------------------------------------------------------------------
 
-struct view
+struct state
 {
     double x;
     double y;
@@ -45,18 +45,19 @@ private:
     int    click_x;
     int    click_y;
 
-    struct view store_view[12];
-    struct view image_view;
-    struct view cache_view;
-    struct view click_view;
+    state  curr_state;
+    image *curr_image;
+    state  mark_state[12];
+    image *mark_image[12];
 
-    image *src;
+    state cache_state;
+    state click_state;
 
     void refresh();
-    void  center(struct view&);
+    void  center(state *, image *);
 };
 
-rawk::rawk(image *src) : demonstration("RAWK", 1280, 720), src(src)
+rawk::rawk(image *p) : demonstration("RAWK", 1280, 720)
 {
     glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
 
@@ -116,9 +117,10 @@ rawk::rawk(image *src) : demonstration("RAWK", 1280, 720), src(src)
     point_y  = 0;
 
     for (int i = 0; i < 12; i++)
-        center(store_view[i]);
+        center(mark_state + i, (mark_image[i] = p));
 
-    center(image_view);
+    curr_state = mark_state[0];
+    curr_image = mark_image[0];
     refresh();
 }
 
@@ -137,48 +139,48 @@ static inline int toint(double d)
     return (c - d < d - f) ? int(c) : int(f);
 }
 
-void rawk::center(struct view& v)
+void rawk::center(state *s, image *p)
 {
-    const int h = src->geth();
-    const int w = src->getw();
+    const int h = p->geth();
+    const int w = p->getw();
 
     if (double(width) / double(height) < double(w) / double(h))
-        v.z = double(w) / double(width);
+        s->z = double(w) / double(width);
     else
-        v.z = double(h) / double(height);
+        s->z = double(h) / double(height);
 
-    v.x = w / 2;
-    v.y = h / 2;
+    s->x = w / 2;
+    s->y = h / 2;
 }
 
 void rawk::refresh()
 {
     std::vector<GLfloat> pixel(width * height * 3, 0);
 
-    const int depth = std::min(src->getd(), 3);
+    const int depth = std::min(curr_image->getd(), 3);
 
     for         (int r = 0; r < height; ++r)
         for     (int c = 0; c < width;  ++c)
             for (int k = 0; k < depth;  ++k)
             {
-                int i = toint(image_view.y + (r - height / 2) * image_view.z);
-                int j = toint(image_view.x + (c - width  / 2) * image_view.z);
-                pixel[(r * width + c) * 3 + k] = src->get(i, j, k);
+                int i = toint(curr_state.y + (r - height / 2) * curr_state.z);
+                int j = toint(curr_state.x + (c - width  / 2) * curr_state.z);
+                pixel[(r * width + c) * 3 + k] = curr_image->get(i, j, k);
             }
 
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height,
                     GL_RGB, GL_FLOAT, &pixel.front());
 
-    cache_view = image_view;
+    cache_state = curr_state;
 }
 
 void rawk::draw()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    double x = 2.0 * (cache_view.x - image_view.x) / cache_view.z / width;
-    double y = 2.0 * (cache_view.y - image_view.y) / cache_view.z / height;
-    double z =        cache_view.z / image_view.z;
+    double x = 2.0 * (cache_state.x - curr_state.x) / cache_state.z / width;
+    double y = 2.0 * (cache_state.y - curr_state.y) / cache_state.z / height;
+    double z =        cache_state.z / curr_state.z;
 
     glUniform1f(u_scale,  z);
     glUniform2f(u_offset, x, y);
@@ -193,8 +195,8 @@ void rawk::motion(int x, int y)
 
     if (dragging)
     {
-        image_view.x = click_view.x + (click_x - x) * image_view.z;
-        image_view.y = click_view.y + (click_y - y) * image_view.z;
+        curr_state.x = click_state.x + (click_x - x) * curr_state.z;
+        curr_state.y = click_state.y + (click_y - y) * curr_state.z;
     }
 }
 
@@ -203,7 +205,7 @@ void rawk::button(int button, bool down)
     if (button == SDL_BUTTON_LEFT)
     {
         dragging   = down;
-        click_view = image_view;
+        click_state = curr_state;
         click_x    = point_x;
         click_y    = point_y;
     }
@@ -218,17 +220,17 @@ void rawk::wheel(int dx, int dy)
 
     // Compute the image pixel on which the pointer lies.
 
-    double x = image_view.x + xx * image_view.z;
-    double y = image_view.y + yy * image_view.z;
+    double x = curr_state.x + xx * curr_state.z;
+    double y = curr_state.y + yy * curr_state.z;
 
     // Compute a new zoom level.
 
-    image_view.z = exp(log(image_view.z) - dy / 100.0);
+    curr_state.z = exp(log(curr_state.z) - dy / 100.0);
 
     // Compute image offsets to ensure the pointer remains over the same pixel.
 
-    image_view.x = x - xx * image_view.z;
-    image_view.y = y - yy * image_view.z;
+    curr_state.x = x - xx * curr_state.z;
+    curr_state.y = y - yy * curr_state.z;
 }
 
 void rawk::key(int key, bool down, bool repeat)
@@ -241,13 +243,19 @@ void rawk::key(int key, bool down, bool repeat)
             {
                 case SDL_SCANCODE_SPACE:
                     if (selector)
-                        image_view = store_view[selector - 1];
+                    {
+                        curr_state = mark_state[selector - 1];
+                        curr_image = mark_image[selector - 1];
+                    }
                     refresh();
                     break;
 
                 case SDL_SCANCODE_RETURN:
                     if (selector)
-                        store_view[selector - 1] = image_view;
+                    {
+                        mark_state[selector - 1] = curr_state;
+                        mark_image[selector - 1] = curr_image;
+                    }
                     break;
             }
         }
@@ -344,14 +352,9 @@ int main(int argc, char **argv)
     try
     {
         int argi = 1;
-        image *src = parse(argi, argv);
 
-        dump(src, 0);
-
-        rawk app(src);
+        rawk app(parse(argi, argv));
         app.run(true);
-
-        delete(src);
 
         return 0;
     }
