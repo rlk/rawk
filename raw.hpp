@@ -1,3 +1,15 @@
+// RAWK Copyright (C) 2014 Robert Kooima
+//
+// This program is free software: you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by the Free
+// Software Foundation, either version 3 of the License, or (at your option)
+// any later version.
+//
+// This program is distributed in the hope that it will be useful, but WITH-
+// OUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+// FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+// more details.
+
 #ifndef RAW_HPP
 #define RAW_HPP
 
@@ -126,13 +138,6 @@ static inline double clamp(double d)
     if      (d >  1.0) return  1;
     else if (d < -1.0) return -1;
     else               return  d;
-}
-
-static inline int wrap(int i, int n, bool w)
-{
-    if      (i <     0) return w ? i + n :     0;
-    else if (i > n - 1) return w ? i - n : n - 1;
-    else                return i;
 }
 
 //------------------------------------------------------------------------------

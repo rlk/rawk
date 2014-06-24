@@ -1,12 +1,25 @@
 #include "GL/GLFundamentals.hpp"
 #include "GL/GLDemonstration.hpp"
 
-#include "img.hpp"
-
 #include <stdexcept>
 #include <iostream>
 #include <sstream>
+#include <string>
 #include <vector>
+
+#include "image_bias.hpp"
+#include "image_channel.hpp"
+#include "image_flatten.hpp"
+#include "image_gradient.hpp"
+#include "image_input.hpp"
+#include "image_nearest.hpp"
+#include "image_offset.hpp"
+#include "image_output.hpp"
+#include "image_paste.hpp"
+#include "image_scale.hpp"
+#include "image_solid.hpp"
+#include "image_sum.hpp"
+#include "image_trim.hpp"
 
 //------------------------------------------------------------------------------
 
@@ -565,9 +578,6 @@ image *parse(int& i, char **v)
             image *p = parse(i, v);
             return new output(a, t, p);
         }
-
-        if (op == "test")
-            return new test();
     }
     throw std::runtime_error("Expected image argument");
     return 0;
