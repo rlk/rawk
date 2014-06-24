@@ -225,8 +225,8 @@ void rawk::center(state *s, image *p)
     else
         s->z = double(h) / double(height);
 
-    s->x = w / 2;
-    s->y = h / 2;
+    s->x = w * 0.5 - 0.5;
+    s->y = h * 0.5 - 0.5;
 }
 
 void rawk::refresh()
@@ -351,8 +351,8 @@ void rawk::draw()
 
     std::ostringstream stream;
 
-    int px = int(curr_state.x + (point_x - 0.5 * width)  * curr_state.z);
-    int py = int(curr_state.y + (point_y - 0.5 * height) * curr_state.z);
+    int px = int(0.5 + curr_state.x + (point_x - 0.5 * width)  * curr_state.z);
+    int py = int(0.5 + curr_state.y + (point_y - 0.5 * height) * curr_state.z);
 
     stream << title << " (" << px << ", " << py << ")";
 
