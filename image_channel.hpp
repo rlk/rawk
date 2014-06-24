@@ -13,8 +13,6 @@
 #ifndef IMAGE_CHANNEL_HPP
 #define IMAGE_CHANNEL_HPP
 
-#include "image.hpp"
-
 //------------------------------------------------------------------------------
 
 /// Channel reassignment filter
@@ -33,6 +31,8 @@ public:
 private:
     int index;
 };
+
+//------------------------------------------------------------------------------
 
 double channel::get(int i, int j, int k) const
 {

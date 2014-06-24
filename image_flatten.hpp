@@ -13,8 +13,6 @@
 #ifndef IMAGE_FLATTEN_HPP
 #define IMAGE_FLATTEN_HPP
 
-#include "image.hpp"
-
 //------------------------------------------------------------------------------
 
 /// Spherical flatten
@@ -32,6 +30,8 @@ public:
 private:
     double value;
 };
+
+//------------------------------------------------------------------------------
 
 double flatten::get(int i, int j, int k) const
 {

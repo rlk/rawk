@@ -13,8 +13,6 @@
 #ifndef IMAGE_BIAS_HPP
 #define IMAGE_BIAS_HPP
 
-#include "image.hpp"
-
 //------------------------------------------------------------------------------
 
 /// Bias filter
@@ -32,6 +30,8 @@ public:
 private:
     double value;
 };
+
+//------------------------------------------------------------------------------
 
 double bias::get(int i, int j, int k) const
 {

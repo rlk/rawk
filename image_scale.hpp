@@ -13,8 +13,6 @@
 #ifndef IMAGE_SCALE_HPP
 #define IMAGE_SCALE_HPP
 
-#include "image.hpp"
-
 //------------------------------------------------------------------------------
 
 /// Scale filter
@@ -25,6 +23,7 @@ public:
     scale(double d, image *L) : image(L), value(d) { }
 
     virtual double get(int, int, int) const;
+    virtual void tweak(int, int);
 
     virtual std::string doc() const;
 
@@ -32,9 +31,16 @@ private:
     double value;
 };
 
+//------------------------------------------------------------------------------
+
 double scale::get(int i, int j, int k) const
 {
     return L->get(i, j, k) * value;
+}
+
+void scale::tweak(int a, int v)
+{
+    if (a == 0) value += 0.1 * v;
 }
 
 std::string scale::doc() const

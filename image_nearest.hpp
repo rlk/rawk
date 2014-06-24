@@ -13,8 +13,6 @@
 #ifndef IMAGE_NEAREST_HPP
 #define IMAGE_NEAREST_HPP
 
-#include "image.hpp"
-
 //------------------------------------------------------------------------------
 
 /// Nearest filter
@@ -36,6 +34,8 @@ private:
     int h;
     int w;
 };
+
+//------------------------------------------------------------------------------
 
 double nearest::get(int i, int j, int k) const
 {

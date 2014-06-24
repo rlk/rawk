@@ -13,8 +13,6 @@
 #ifndef IMAGE_SUM_HPP
 #define IMAGE_SUM_HPP
 
-#include "image.hpp"
-
 //------------------------------------------------------------------------------
 
 /// Sum operator
@@ -28,6 +26,8 @@ public:
 
     virtual std::string doc() const;
 };
+
+//------------------------------------------------------------------------------
 
 double sum::get(int i, int j, int k) const
 {

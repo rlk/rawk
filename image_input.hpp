@@ -13,9 +13,6 @@
 #ifndef IMAGE_INPUT_HPP
 #define IMAGE_INPUT_HPP
 
-#include "image.hpp"
-#include "raw.hpp"
-
 //------------------------------------------------------------------------------
 
 /// RAW file reader

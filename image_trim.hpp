@@ -13,8 +13,6 @@
 #ifndef IMAGE_TRIM_HPP
 #define IMAGE_TRIM_HPP
 
-#include "image.hpp"
-
 //------------------------------------------------------------------------------
 
 /// Trim filter
@@ -36,6 +34,8 @@ private:
     int h;
     int w;
 };
+
+//------------------------------------------------------------------------------
 
 double trim::get(int i, int j, int k) const
 {

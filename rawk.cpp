@@ -7,6 +7,9 @@
 #include <string>
 #include <vector>
 
+#include "raw.hpp"
+#include "image.hpp"
+
 #include "image_bias.hpp"
 #include "image_channel.hpp"
 #include "image_flatten.hpp"
@@ -192,11 +195,8 @@ image *rawk::retitle(image *p, bool temporary)
 
     // Document the head and tail for ease of navigation.
 
-    stream <<  " ... [ "
-           << (p->getL() ? p->getL()->doc() : "NULL")
-           << " / "
-           << (p->getR() ? p->getR()->doc() : "NULL")
-           << " ]";
+    stream << " ... [ " << (p->getL() ? p->getL()->doc() : "NULL")
+               << " / " << (p->getR() ? p->getR()->doc() : "NULL") << " ]";
 
     title = stream.str();
 
@@ -460,17 +460,6 @@ void rawk::key(int key, bool down, bool repeat)
 
 //------------------------------------------------------------------------------
 
-void dump(image *p, int d)
-{
-    for (int i = 0; i < d; ++i)
-        std::cout << "    ";
-
-    std::cout << p->doc() << std::endl;
-
-    if (p->getL()) dump(p->getL(), d + 1);
-    if (p->getR()) dump(p->getR(), d + 1);
-}
-
 image *parse(int& i, char **v)
 {
     if (v[i])
@@ -484,35 +473,11 @@ image *parse(int& i, char **v)
             return new bias(d, p);
         }
 
-        if (op == "scale")
+        if (op == "channel")
         {
-            double d = strtod(v[i++], 0);
+            int    k = int(strtol(v[i++], 0, 0));
             image *p = parse(i, v);
-            return new scale(d, p);
-        }
-
-        if (op == "offset")
-        {
-            int    r = int(strtol(v[i++], 0, 0));
-            int    c = int(strtol(v[i++], 0, 0));
-            int    w = int(strtol(v[i++], 0, 0));
-            image *p = parse(i, v);
-            return new offset(r, c, w, p);
-        }
-
-        if (op == "gradient")
-        {
-            int    w = int(strtol(v[i++], 0, 0));
-            image *p = parse(i, v);
-            return new gradient(w, p);
-        }
-
-        if (op == "nearest")
-        {
-            int    h = int(strtol(v[i++], 0, 0));
-            int    w = int(strtol(v[i++], 0, 0));
-            image *p = parse(i, v);
-            return new nearest(h, w, p);
+            return new channel(k, p);
         }
 
         if (op == "flatten")
@@ -522,43 +487,11 @@ image *parse(int& i, char **v)
             return new flatten(d, p);
         }
 
-        if (op == "trim")
+        if (op == "gradient")
         {
-            int    h = int(strtol(v[i++], 0, 0));
             int    w = int(strtol(v[i++], 0, 0));
             image *p = parse(i, v);
-            return new trim(h, w, p);
-        }
-
-        if (op == "channel")
-        {
-            int    k = int(strtol(v[i++], 0, 0));
-            image *p = parse(i, v);
-            return new channel(k, p);
-        }
-
-        if (op == "paste")
-        {
-            int    r = int(strtol(v[i++], 0, 0));
-            int    c = int(strtol(v[i++], 0, 0));
-            image *L = parse(i, v);
-            image *R = parse(i, v);
-            return new paste(r, c, L, R);
-        }
-
-        if (op == "sum")
-        {
-            image *L = parse(i, v);
-            image *R = parse(i, v);
-            return new sum(L, R);
-        }
-
-        if (op == "solid")
-        {
-            int    h = int(strtol(v[i++], 0, 0));
-            int    w = int(strtol(v[i++], 0, 0));
-            double d = strtod(v[i++], 0);
-            return new solid(h, w, d);
+            return new gradient(w, p);
         }
 
         if (op == "input")
@@ -571,12 +504,68 @@ image *parse(int& i, char **v)
             return new input(a, h, w, d, t);
         }
 
+        if (op == "nearest")
+        {
+            int    h = int(strtol(v[i++], 0, 0));
+            int    w = int(strtol(v[i++], 0, 0));
+            image *p = parse(i, v);
+            return new nearest(h, w, p);
+        }
+
+        if (op == "offset")
+        {
+            int    r = int(strtol(v[i++], 0, 0));
+            int    c = int(strtol(v[i++], 0, 0));
+            int    w = int(strtol(v[i++], 0, 0));
+            image *p = parse(i, v);
+            return new offset(r, c, w, p);
+        }
+
         if (op == "output")
         {
             char  *a = v[i++];
             char   t = v[i++][0];
             image *p = parse(i, v);
             return new output(a, t, p);
+        }
+
+        if (op == "paste")
+        {
+            int    r = int(strtol(v[i++], 0, 0));
+            int    c = int(strtol(v[i++], 0, 0));
+            image *L = parse(i, v);
+            image *R = parse(i, v);
+            return new paste(r, c, L, R);
+        }
+
+        if (op == "scale")
+        {
+            double d = strtod(v[i++], 0);
+            image *p = parse(i, v);
+            return new scale(d, p);
+        }
+
+        if (op == "solid")
+        {
+            int    h = int(strtol(v[i++], 0, 0));
+            int    w = int(strtol(v[i++], 0, 0));
+            double d = strtod(v[i++], 0);
+            return new solid(h, w, d);
+        }
+
+        if (op == "sum")
+        {
+            image *L = parse(i, v);
+            image *R = parse(i, v);
+            return new sum(L, R);
+        }
+
+        if (op == "trim")
+        {
+            int    h = int(strtol(v[i++], 0, 0));
+            int    w = int(strtol(v[i++], 0, 0));
+            image *p = parse(i, v);
+            return new trim(h, w, p);
         }
     }
     throw std::runtime_error("Expected image argument");

@@ -13,8 +13,6 @@
 #ifndef IMAGE_SOLID_HPP
 #define IMAGE_SOLID_HPP
 
-#include "image.hpp"
-
 //------------------------------------------------------------------------------
 
 /// Solid color generator
@@ -36,6 +34,8 @@ private:
     int w;
     double value;
 };
+
+//------------------------------------------------------------------------------
 
 double solid::get(int i, int j, int k) const
 {

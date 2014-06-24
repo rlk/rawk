@@ -13,8 +13,6 @@
 #ifndef IMAGE_GRADIENT_HPP
 #define IMAGE_GRADIENT_HPP
 
-#include "image.hpp"
-
 //------------------------------------------------------------------------------
 
 /// Gradient filter
@@ -31,6 +29,8 @@ public:
 private:
     int mode;
 };
+
+//------------------------------------------------------------------------------
 
 double gradient::get(int ic, int jc, int k) const
 {

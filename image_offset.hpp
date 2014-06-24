@@ -13,8 +13,6 @@
 #ifndef IMAGE_OFFSETS_HPP
 #define IMAGE_OFFSETS_HPP
 
-#include "image.hpp"
-
 //------------------------------------------------------------------------------
 
 /// Offset filter
@@ -34,6 +32,8 @@ private:
     int col;
     int mode;
 };
+
+//------------------------------------------------------------------------------
 
 double offset::get(int i, int j, int k) const
 {

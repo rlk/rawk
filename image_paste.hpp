@@ -13,8 +13,6 @@
 #ifndef IMAGE_PASTE_HPP
 #define IMAGE_PASTE_HPP
 
-#include "image.hpp"
-
 //------------------------------------------------------------------------------
 
 /// Overlay operator
@@ -35,6 +33,8 @@ private:
     int row;
     int col;
 };
+
+//------------------------------------------------------------------------------
 
 double paste::get(int i, int j, int k) const
 {

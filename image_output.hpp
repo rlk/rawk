@@ -13,9 +13,6 @@
 #ifndef IMAGE_OUTPUT_HPP
 #define IMAGE_OUTPUT_HPP
 
-#include "image.hpp"
-#include "raw.hpp"
-
 //------------------------------------------------------------------------------
 
 /// RAW file writer with pass-through
@@ -35,6 +32,8 @@ public:
 private:
     raw *file;
 };
+
+//------------------------------------------------------------------------------
 
 output::output(std::string name, char t, image *H) : image(H), file(0)
 {
