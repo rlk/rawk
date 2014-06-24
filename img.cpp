@@ -1,53 +1,8 @@
 #include <math.h>
-#include <stdio.h>
-#include <fcntl.h>
-#include <assert.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/mman.h>
 
-#include <stdexcept>
 #include <sstream>
 
 #include "img.hpp"
-
-//------------------------------------------------------------------------------
-
-class raw_error : public std::runtime_error
-{
-public :
-    raw_error(const std::string& a,
-              const std::string& b) : std::runtime_error(a + ": " + b) { }
-};
-
-raw::raw(std::string name, size_t h, size_t w, size_t d, size_t s, bool o)
-    : name(name), h(h), w(w), d(d), s(s), f(0), p(0)
-{
-    size_t n = h * w * d * s;
-
-    int mode = o ? O_RDWR | O_TRUNC | O_CREAT : O_RDONLY;
-    int prot = o ? PROT_READ | PROT_WRITE : PROT_READ;
-
-    if ((f = open(name.c_str(), mode, 0666)) == -1)
-        throw raw_error(name, strerror(errno));
-
-    if (o && ftruncate(f, n) == -1)
-        throw raw_error(name, strerror(errno));
-
-    if ((p = mmap(0, n, prot, MAP_SHARED, f, 0)) == MAP_FAILED)
-        throw raw_error(name, strerror(errno));
-}
-
-raw::~raw()
-{
-    size_t n = h * w * d * s;
-
-    if (munmap(p, n) == -1)
-        throw raw_error(name, strerror(errno));
-
-    if (close(f) == -1)
-        throw raw_error(name, strerror(errno));
-}
 
 //------------------------------------------------------------------------------
 
@@ -111,8 +66,6 @@ input::~input()
 
 double input::get(int i, int j, int k) const
 {
-    assert(file);
-
     return (0 <= i && i < file->geth() &&
             0 <= j && j < file->getw() &&
             0 <= k && k < file->getd()) ? file->get(i, j, k) : 0.0;
@@ -132,8 +85,6 @@ std::string input::doc() const
 
 output::output(std::string name, char t, image *H) : image(H), file(0)
 {
-    assert(L);
-
     const int h = L->geth();
     const int w = L->getw();
     const int d = L->getd();

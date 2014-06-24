@@ -1,6 +1,14 @@
 #ifndef RAW_HPP
 #define RAW_HPP
 
+#include <stdio.h>
+#include <fcntl.h>
+#include <stdint.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/mman.h>
+
+#include <stdexcept>
 #include <string>
 
 extern int errno;
@@ -16,6 +24,78 @@ extern int errno;
 ///      int32_t ... i I
 ///        float ... f F
 ///       double ... d D
+
+//------------------------------------------------------------------------------
+
+class raw_error : public std::runtime_error
+{
+public :
+    raw_error(const std::string& a,
+              const std::string& b) : std::runtime_error(a + ": " + b) { }
+};
+
+//------------------------------------------------------------------------------
+
+class raw
+{
+public:
+    raw(std::string name, size_t h, size_t w, size_t d, size_t s, bool o)
+        : name(name), h(h), w(w), d(d), s(s), f(0), p(0)
+    {
+        size_t n = h * w * d * s;
+
+        int mode = o ? O_RDWR | O_TRUNC | O_CREAT : O_RDONLY;
+        int prot = o ? PROT_READ | PROT_WRITE : PROT_READ;
+
+        if ((f = open(name.c_str(), mode, 0666)) == -1)
+            throw raw_error(name, strerror(errno));
+
+        if (o && ftruncate(f, n) == -1)
+            throw raw_error(name, strerror(errno));
+
+        if ((p = mmap(0, n, prot, MAP_SHARED, f, 0)) == MAP_FAILED)
+            throw raw_error(name, strerror(errno));
+    }
+
+    virtual void   put(int, int, int, double) = 0;
+    virtual double get(int, int, int) const   = 0;
+
+    std::string getname() const { return name; }
+    int         geth()    const { return h;    }
+    int         getw()    const { return w;    }
+    int         getd()    const { return d;    }
+
+    virtual ~raw()
+    {
+        size_t n = h * w * d * s;
+
+        if (munmap(p, n) == -1)
+            throw raw_error(name, strerror(errno));
+
+        if (close(f) == -1)
+            throw raw_error(name, strerror(errno));
+    }
+
+protected:
+
+    const void *data(int i, int j, int k) const
+    {
+        return (const uint8_t *) p + (((i * w) + j) * d + k) * s;
+    }
+    void *data(int i, int j, int k)
+    {
+        return       (uint8_t *) p + (((i * w) + j) * d + k) * s;
+    }
+
+    std::string name;
+
+    size_t h;
+    size_t w;
+    size_t d;
+    size_t s;
+    int    f;
+    void  *p;
+};
 
 //------------------------------------------------------------------------------
 
@@ -108,44 +188,6 @@ static inline double swap(double n)
     swap(uint8_p(&n) + 3, uint8_p(&n) + 4);
     return n;
 }
-
-//------------------------------------------------------------------------------
-
-class raw
-{
-public:
-    raw(std::string, size_t, size_t, size_t, size_t, bool);
-
-    virtual void   put(int, int, int, double) = 0;
-    virtual double get(int, int, int) const   = 0;
-
-    std::string getname() const { return name; }
-    int         geth()    const { return h;    }
-    int         getw()    const { return w;    }
-    int         getd()    const { return d;    }
-
-    virtual ~raw();
-
-protected:
-
-    const void *data(int i, int j, int k) const
-    {
-        return (const uint8_t *) p + (((i * w) + j) * d + k) * s;
-    }
-    void *data(int i, int j, int k)
-    {
-        return       (uint8_t *) p + (((i * w) + j) * d + k) * s;
-    }
-
-    std::string name;
-
-    size_t h;
-    size_t w;
-    size_t d;
-    size_t s;
-    int    f;
-    void  *p;
-};
 
 //------------------------------------------------------------------------------
 
