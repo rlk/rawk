@@ -17,7 +17,6 @@ test0 :
 			scale 2.0 \
 				input megt00n000hb.img 5632 11520 1 S
 
-
 test1 :
 	rawk \
 		sum \
@@ -42,10 +41,9 @@ test1 :
 							paste     0 11520 input MOLA/megt88n090hb.img 5632 11520 1 S \
 							                  input MOLA/megt88n000hb.img 5632 11520 1 S \
 					solid 23040 46080 0.0 \
-			trim 46080 92160 \
-				nearest 46080 92160 \
+			flatten 1.0113 \
 					channel 1 \
-						offset 0 24 2 \
+						offset 0 26 2 \
 								paste 38400 84480 input MOC/moc_256_N-90_330.gray 7680 7680 1 b \
 								paste 38400 76800 input MOC/moc_256_N-90_300.gray 7680 7680 1 b \
 								paste 38400 69120 input MOC/moc_256_N-90_270.gray 7680 7680 1 b \

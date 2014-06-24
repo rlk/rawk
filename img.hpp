@@ -149,6 +149,22 @@ private:
     int w;
 };
 
+/// Sphere flatten / unflatten
+
+class flatten : public image
+{
+public:
+    flatten(double d, image *L) : image(L), value(d) { }
+
+    virtual double get(int, int, int) const;
+    virtual void tweak(int, int);
+
+    virtual std::string doc() const;
+
+private:
+    double value;
+};
+
 /// Trim filter
 
 class trim : public image

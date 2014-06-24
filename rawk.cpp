@@ -502,6 +502,13 @@ image *parse(int& i, char **v)
             return new nearest(h, w, p);
         }
 
+        if (op == "flatten")
+        {
+            double d = strtod(v[i++], 0);
+            image *p = parse(i, v);
+            return new flatten(d, p);
+        }
+
         if (op == "trim")
         {
             int    h = int(strtol(v[i++], 0, 0));

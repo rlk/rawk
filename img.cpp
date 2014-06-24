@@ -275,6 +275,40 @@ std::string nearest::doc() const
 
 //------------------------------------------------------------------------------
 
+double flatten::get(int i, int j, int k) const
+{
+    const int h = L->geth() / 2;
+
+    double lat = M_PI_2 * double(h - i) / h;
+
+    double y = sin(lat) * value;
+    double x = cos(lat);
+    double r = sqrt(x * x + y * y);
+
+    x = x / r;
+    y = y / r;
+
+    lat = asin(y);
+
+    i = -h * (lat - M_PI_2) / M_PI_2;
+
+    return L->get(i, j, k);
+}
+
+void flatten::tweak(int a, int v)
+{
+    if (a == 0) value += 0.0001 * v;
+}
+
+std::string flatten::doc() const
+{
+    std::ostringstream sout;
+    sout << "flatten " << value;
+    return sout.str();
+}
+
+//------------------------------------------------------------------------------
+
 double trim::get(int i, int j, int k) const
 {
     const int hh = L->geth();
