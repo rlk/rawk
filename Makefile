@@ -13,8 +13,7 @@ rawk : rawk.cpp
 
 test0 :
 	rawk \
-		cubic 1024 1024 2 \
-			input 8x8.raw 8 8 3 b
+		input 8x8.raw 8 8 3 b
 
 test1 :
 	rawk \
