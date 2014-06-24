@@ -31,6 +31,8 @@ public:
 
 private:
 
+    std::string title;
+
     GLuint texture;
     GLuint program;
     GLuint vbuffer;
@@ -65,10 +67,10 @@ private:
     void   doU();
     void   doD();
 
-    void refresh();
-    void  select(int);
-    void  center(state *, image *);
-    image *title(image *, bool=false);
+    image *retitle(image *, bool=false);
+    void   refresh();
+    void    select(int);
+    void    center(state *, image *);
 };
 
 //------------------------------------------------------------------------------
@@ -158,20 +160,33 @@ static inline int toint(double d)
     return (c - d < d - f) ? int(c) : int(f);
 }
 
-image *rawk::title(image *p, bool temporary)
+image *rawk::retitle(image *p, bool temporary)
 {
-    std::ostringstream title;
+    std::ostringstream stream;
+
+    // Document the current image. Parentheses indicate temporary selection.
 
     if (temporary)
-        title << "(" << p->doc() << ")";
+        stream << "(" << p->doc() << ")";
     else
-        title <<        p->doc();
+        stream <<        p->doc();
 
-    title << " ... " << p->geth()
-          <<   " x " << p->getw()
-          <<   " x " << p->getd();
+    // Include the size of this image.
 
-    SDL_SetWindowTitle(window, title.str().c_str());
+    stream << " ... " << p->geth()
+           <<   " x " << p->getw()
+           <<   " x " << p->getd();
+
+    // Document the head and tail for ease of navigation.
+
+    stream <<  " ... [ "
+           << (p->getL() ? p->getL()->doc() : "NULL")
+           << " / "
+           << (p->getR() ? p->getR()->doc() : "NULL")
+           << " ]";
+
+    title = stream.str();
+
     return p;
 }
 
@@ -180,9 +195,9 @@ void rawk::select(int i)
     selector = i;
 
     if (selector < 0)
-        title(curr_image, false);
+        retitle(curr_image, false);
     else
-        title(mark_image[i], true);
+        retitle(mark_image[i], true);
 }
 
 void rawk::center(state *s, image *p)
@@ -235,7 +250,7 @@ image *rawk::doL(image *p)
     else if (mod &  KMOD_SHIFT) p->tweak(0, -10);
     else if (mod &  KMOD_GUI && p->getL()) p = p->getL();
 
-    return title(p);
+    return retitle(p);
 }
 
 image *rawk::doR(image *p)
@@ -246,7 +261,7 @@ image *rawk::doR(image *p)
     else if (mod &  KMOD_SHIFT) p->tweak(0, +10);
     else if (mod &  KMOD_GUI && p->getR()) p = p->getR();
 
-    return title(p);
+    return retitle(p);
 }
 
 image *rawk::doU(image *p)
@@ -257,7 +272,7 @@ image *rawk::doU(image *p)
     else if (mod &  KMOD_SHIFT) p->tweak(1, -10);
     else if (mod &  KMOD_GUI && p->getP()) p = p->getP();
 
-    return title(p);
+    return retitle(p);
 }
 
 image *rawk::doD(image *p)
@@ -267,7 +282,7 @@ image *rawk::doD(image *p)
     if      (mod == KMOD_NONE)  p->tweak(1, +1);
     else if (mod &  KMOD_SHIFT) p->tweak(1, +10);
 
-    return title(p);
+    return retitle(p);
 }
 
 //------------------------------------------------------------------------------
@@ -318,6 +333,15 @@ void rawk::draw()
     glUniform2f(u_offset, x, y);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    std::ostringstream stream;
+
+    int px = int(curr_state.x + (point_x - 0.5 * width)  * curr_state.z);
+    int py = int(curr_state.y + (point_y - 0.5 * height) * curr_state.z);
+
+    stream << title << " (" << px << ", " << py << ")";
+
+    SDL_SetWindowTitle(window, stream.str().c_str());
 }
 
 void rawk::motion(int x, int y)
@@ -478,6 +502,14 @@ image *parse(int& i, char **v)
             return new nearest(h, w, p);
         }
 
+        if (op == "trim")
+        {
+            int    h = int(strtol(v[i++], 0, 0));
+            int    w = int(strtol(v[i++], 0, 0));
+            image *p = parse(i, v);
+            return new trim(h, w, p);
+        }
+
         if (op == "channel")
         {
             int    k = int(strtol(v[i++], 0, 0));
@@ -499,6 +531,14 @@ image *parse(int& i, char **v)
             image *L = parse(i, v);
             image *R = parse(i, v);
             return new sum(L, R);
+        }
+
+        if (op == "solid")
+        {
+            int    h = int(strtol(v[i++], 0, 0));
+            int    w = int(strtol(v[i++], 0, 0));
+            double d = strtod(v[i++], 0);
+            return new solid(h, w, d);
         }
 
         if (op == "input")

@@ -259,11 +259,46 @@ double nearest::get(int i, int j, int k) const
                   int((long long) j * ww / (long long) w), k);
 }
 
+void nearest::tweak(int a, int v)
+{
+    if (a == 0) w -= v;
+    if (a == 1) h -= v;
+}
+
 std::string nearest::doc() const
 {
     std::ostringstream sout;
     sout << "nearest " << h
                 << " " << w;
+    return sout.str();
+}
+
+//------------------------------------------------------------------------------
+
+double trim::get(int i, int j, int k) const
+{
+    const int hh = L->geth();
+    const int ww = L->getw();
+
+    if (hh > h) i += (hh - h) / 2;
+    if (h > hh) i -= (h - hh) / 2;
+    if (ww > w) j += (ww - w) / 2;
+    if (w > ww) j -= (w - ww) / 2;
+
+    return L->get(i, j, k);
+}
+
+void trim::tweak(int a, int v)
+{
+    if (a == 0) w += v;
+    if (a == 1) h += v;
+}
+
+std::string trim::doc() const
+{
+    std::ostringstream sout;
+    sout << "trim " << h
+             << " " << w;
     return sout.str();
 }
 
@@ -370,6 +405,22 @@ std::string gradient::doc() const
 
 //------------------------------------------------------------------------------
 
+double solid::get(int i, int j, int k) const
+{
+    return value;
+}
+
+std::string solid::doc() const
+{
+    std::ostringstream sout;
+    sout << "solid " << h <<
+                 " " << w <<
+                 " " << value;
+    return sout.str();
+}
+
+//------------------------------------------------------------------------------
+
 double test::get(int i, int j, int k) const
 {
     if (0 <= i && i < geth() && 0 <= j && j < getw() && 0 <= k && k < getd())
@@ -380,21 +431,6 @@ double test::get(int i, int j, int k) const
             return 0.0;
     }
     return 0.0;
-}
-
-int test::geth() const
-{
-    return 1024;
-}
-
-int test::getw() const
-{
-    return 1024;
-}
-
-int test::getd() const
-{
-    return 3;
 }
 
 std::string test::doc() const

@@ -137,6 +137,27 @@ public:
     nearest(int h, int w, image *L) : image(L), h(h), w(w) { }
 
     virtual double get(int, int, int) const;
+    virtual void tweak(int, int);
+
+    virtual int geth() const { return h; }
+    virtual int getw() const { return w; }
+
+    virtual std::string doc() const;
+
+private:
+    int h;
+    int w;
+};
+
+/// Trim filter
+
+class trim : public image
+{
+public:
+    trim(int h, int w, image *L) : image(L), h(h), w(w) { }
+
+    virtual double get(int, int, int) const;
+    virtual void tweak(int, int);
 
     virtual int geth() const { return h; }
     virtual int getw() const { return w; }
@@ -211,6 +232,26 @@ private:
     int wrap;
 };
 
+/// Solid color generator
+
+class solid : public image
+{
+public:
+    solid(int h, int w, double v) : h(h), w(w), value(v) { }
+
+    virtual double get(int, int, int) const;
+
+    virtual int geth() const { return h; }
+    virtual int getw() const { return w; }
+
+    virtual std::string doc() const;
+
+private:
+    int h;
+    int w;
+    double value;
+};
+
 /// Test pattern generator
 
 class test : public image
@@ -218,9 +259,9 @@ class test : public image
 public:
     virtual double get(int, int, int) const;
 
-    virtual int geth() const;
-    virtual int getw() const;
-    virtual int getd() const;
+    virtual int geth() const { return 1024; }
+    virtual int getw() const { return 1024; }
+    virtual int getd() const { return    3; }
 
     virtual std::string doc() const;
 };
