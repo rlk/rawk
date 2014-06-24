@@ -76,10 +76,15 @@ protected:
 
 //------------------------------------------------------------------------------
 
+static inline int mod(int a, int n)
+{
+    return (a % n < 0) ? (a % n + n) : (a % n);
+}
+
 static inline int wrap(int i, int n, bool w)
 {
-    if      (i <     0) return w ? i + n :     0;
-    else if (i > n - 1) return w ? i - n : n - 1;
+    if      (i <     0) return w ? mod(i, n) :     0;
+    else if (i > n - 1) return w ? mod(i, n) : n - 1;
     else                return i;
 }
 

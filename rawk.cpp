@@ -12,9 +12,11 @@
 
 #include "image_bias.hpp"
 #include "image_channel.hpp"
+#include "image_cubic.hpp"
 #include "image_flatten.hpp"
 #include "image_gradient.hpp"
 #include "image_input.hpp"
+#include "image_linear.hpp"
 #include "image_nearest.hpp"
 #include "image_offset.hpp"
 #include "image_output.hpp"
@@ -480,6 +482,15 @@ image *parse(int& i, char **v)
             return new channel(k, p);
         }
 
+        if (op == "cubic")
+        {
+            int    h = int(strtol(v[i++], 0, 0));
+            int    w = int(strtol(v[i++], 0, 0));
+            int    m = int(strtol(v[i++], 0, 0));
+            image *p = parse(i, v);
+            return new cubic(h, w, m, p);
+        }
+
         if (op == "flatten")
         {
             double d = strtod(v[i++], 0);
@@ -489,9 +500,9 @@ image *parse(int& i, char **v)
 
         if (op == "gradient")
         {
-            int    w = int(strtol(v[i++], 0, 0));
+            int    m = int(strtol(v[i++], 0, 0));
             image *p = parse(i, v);
-            return new gradient(w, p);
+            return new gradient(m, p);
         }
 
         if (op == "input")
@@ -502,6 +513,15 @@ image *parse(int& i, char **v)
             int    d = int(strtol(v[i++], 0, 0));
             char   t = v[i++][0];
             return new input(a, h, w, d, t);
+        }
+
+        if (op == "linear")
+        {
+            int    h = int(strtol(v[i++], 0, 0));
+            int    w = int(strtol(v[i++], 0, 0));
+            int    m = int(strtol(v[i++], 0, 0));
+            image *p = parse(i, v);
+            return new linear(h, w, m, p);
         }
 
         if (op == "nearest")

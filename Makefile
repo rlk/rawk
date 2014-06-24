@@ -13,9 +13,8 @@ rawk : rawk.cpp
 
 test0 :
 	rawk \
-		bias 0.5 \
-			scale 2.0 \
-				input megt00n000hb.img 5632 11520 1 S
+		cubic 1024 1024 2 \
+			input 8x8.raw 8 8 3 b
 
 test1 :
 	rawk \
@@ -116,3 +115,21 @@ test1 :
 								paste     0 15360 input MOC/moc_256_N60_060.gray  7680 7680 1 b \
 								paste     0  7680 input MOC/moc_256_N60_030.gray  7680 7680 1 b \
 								                  input MOC/moc_256_N60_000.gray  7680 7680 1 b
+
+rawk : image.hpp
+rawk : image_bias.hpp
+rawk : image_channel.hpp
+rawk : image_cubic.hpp
+rawk : image_flatten.hpp
+rawk : image_gradient.hpp
+rawk : image_input.hpp
+rawk : image_linear.hpp
+rawk : image_nearest.hpp
+rawk : image_offset.hpp
+rawk : image_output.hpp
+rawk : image_paste.hpp
+rawk : image_scale.hpp
+rawk : image_solid.hpp
+rawk : image_sum.hpp
+rawk : image_trim.hpp
+rawk : raw.hpp
