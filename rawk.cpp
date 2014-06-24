@@ -167,6 +167,10 @@ image *rawk::title(image *p, bool temporary)
     else
         title <<        p->doc();
 
+    title << " ... " << p->geth()
+          <<   " x " << p->getw()
+          <<   " x " << p->getd();
+
     SDL_SetWindowTitle(window, title.str().c_str());
     return p;
 }
@@ -466,13 +470,35 @@ image *parse(int& i, char **v)
             return new gradient(w, p);
         }
 
+        if (op == "nearest")
+        {
+            int    h = int(strtol(v[i++], 0, 0));
+            int    w = int(strtol(v[i++], 0, 0));
+            image *p = parse(i, v);
+            return new nearest(h, w, p);
+        }
+
+        if (op == "channel")
+        {
+            int    k = int(strtol(v[i++], 0, 0));
+            image *p = parse(i, v);
+            return new channel(k, p);
+        }
+
         if (op == "paste")
         {
             int    r = int(strtol(v[i++], 0, 0));
             int    c = int(strtol(v[i++], 0, 0));
             image *L = parse(i, v);
-            image *T = parse(i, v);
-            return new paste(r, c, L, T);
+            image *R = parse(i, v);
+            return new paste(r, c, L, R);
+        }
+
+        if (op == "sum")
+        {
+            image *L = parse(i, v);
+            image *R = parse(i, v);
+            return new sum(L, R);
         }
 
         if (op == "input")

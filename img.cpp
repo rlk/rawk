@@ -57,6 +57,30 @@ image::image(image *L, image *R) : L(L), R(R), P(0)
     if (R) R->setP(this);
 }
 
+int image::geth() const
+{
+    if (L && R) return std::max(L->geth(), R->geth());
+    else if (L) return L->geth();
+    else if (R) return L->geth();
+    else        return 0;
+}
+
+int image::getw() const
+{
+    if (L && R) return std::max(L->getw(), R->getw());
+    else if (L) return L->getw();
+    else if (R) return L->getw();
+    else        return 0;
+}
+
+int image::getd() const
+{
+    if (L && R) return std::max(L->getd(), R->getd());
+    else if (L) return L->getd();
+    else if (R) return L->getd();
+    else        return 0;
+}
+
 //------------------------------------------------------------------------------
 
 input::input(std::string a, int h, int w, int d, char t) : file(0)
@@ -226,6 +250,42 @@ std::string offset::doc() const
 
 //------------------------------------------------------------------------------
 
+double nearest::get(int i, int j, int k) const
+{
+    const long long hh = (long long) L->geth();
+    const long long ww = (long long) L->getw();
+
+    return L->get(int((long long) i * hh / (long long) h),
+                  int((long long) j * ww / (long long) w), k);
+}
+
+std::string nearest::doc() const
+{
+    std::ostringstream sout;
+    sout << "nearest " << h
+                << " " << w;
+    return sout.str();
+}
+
+//------------------------------------------------------------------------------
+
+double channel::get(int i, int j, int k) const
+{
+    if (k == index)
+        return L->get(i, j, 0);
+    else
+        return 0.0;
+}
+
+std::string channel::doc() const
+{
+    std::ostringstream sout;
+    sout << "channel " << index;
+    return sout.str();
+}
+
+//------------------------------------------------------------------------------
+
 double paste::get(int i, int j, int k) const
 {
     if (row <= i && i < row + L->geth() &&
@@ -250,6 +310,21 @@ std::string paste::doc() const
     std::ostringstream sout;
     sout << "paste " << row
               << " " << col;
+    return sout.str();
+}
+
+//------------------------------------------------------------------------------
+
+double sum::get(int i, int j, int k) const
+{
+    return L->get(i, j, k)
+         + R->get(i, j, k);
+}
+
+std::string sum::doc() const
+{
+    std::ostringstream sout;
+    sout << "sum";
     return sout.str();
 }
 

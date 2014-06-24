@@ -16,9 +16,9 @@ public:
 
     virtual double get(int, int, int) const = 0;
 
-    virtual int geth() const { return L ? L->geth() : 0; }
-    virtual int getw() const { return L ? L->getw() : 0; }
-    virtual int getd() const { return L ? L->getd() : 0; }
+    virtual int geth() const;
+    virtual int getw() const;
+    virtual int getd() const;
 
     virtual void tweak(int, int) { }
 
@@ -129,6 +129,42 @@ private:
     int wrap;
 };
 
+/// Nearest up-sample filter
+
+class nearest : public image
+{
+public:
+    nearest(int h, int w, image *L) : image(L), h(h), w(w) { }
+
+    virtual double get(int, int, int) const;
+
+    virtual int geth() const { return h; }
+    virtual int getw() const { return w; }
+
+    virtual std::string doc() const;
+
+private:
+    int h;
+    int w;
+};
+
+/// Channel reassignment filter
+
+class channel : public image
+{
+public:
+    channel(int k, image *L) : image(L), index(k) { }
+
+    virtual double get(int, int, int) const;
+
+    virtual int getd() const { return index + 1; }
+
+    virtual std::string doc() const;
+
+private:
+    int index;
+};
+
 /// Overlay operator
 
 class paste : public image
@@ -146,6 +182,18 @@ public:
 private:
     int row;
     int col;
+};
+
+/// Sum operator
+
+class sum : public image
+{
+public:
+    sum(image *L, image *R) : image(L, R) { }
+
+    virtual double get(int, int, int) const;
+
+    virtual std::string doc() const;
 };
 
 /// Gradient filter
