@@ -1,0 +1,11 @@
+
+preview :
+	rawk \
+		paste 5760 17280 input MDIM/mars45s315.rgb 0 5760 5760 3 b \
+		paste 5760 11520 input MDIM/mars45s225.rgb 0 5760 5760 3 b \
+		paste 5760  5760 input MDIM/mars45s135.rgb 0 5760 5760 3 b \
+		paste 5760     0 input MDIM/mars45s045.rgb 0 5760 5760 3 b \
+		paste    0 17280 input MDIM/mars45n315.rgb 0 5760 5760 3 b \
+		paste    0 11520 input MDIM/mars45n225.rgb 0 5760 5760 3 b \
+		paste    0  5760 input MDIM/mars45n135.rgb 0 5760 5760 3 b \
+		                 input MDIM/mars45n045.rgb 0 5760 5760 3 b \
