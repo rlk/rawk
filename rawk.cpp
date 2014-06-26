@@ -58,6 +58,7 @@ private:
 
     GLint  u_offset;
     GLint  u_scale;
+    GLint  u_recolor;
 
     int    selector;
     bool   dragging;
@@ -89,6 +90,10 @@ private:
     void   refresh();
     void    select(int);
     void    center(state *, image *);
+
+    void showrgb();
+    void showrrr();
+    void showyyy();
 };
 
 //------------------------------------------------------------------------------
@@ -143,8 +148,9 @@ rawk::rawk(image *p) : demonstration("RAWK", 1280, 720)
 
         // Locate the program uniforms.
 
-        u_offset = glGetUniformLocation(program, "offset");
-        u_scale  = glGetUniformLocation(program, "scale");
+        u_offset  = glGetUniformLocation(program, "offset");
+        u_scale   = glGetUniformLocation(program, "scale");
+        u_recolor = glGetUniformLocation(program, "recolor");
     }
 
     dragging =  false;
@@ -159,6 +165,7 @@ rawk::rawk(image *p) : demonstration("RAWK", 1280, 720)
     curr_image = mark_image[0];
     select(-1);
     refresh();
+    showrgb();
 }
 
 rawk::~rawk()
@@ -167,6 +174,29 @@ rawk::~rawk()
     glDeleteBuffers (1, &vbuffer);
     glDeleteTextures(1, &texture);
     glDeleteVertexArrays(1, &varray);
+}
+
+//------------------------------------------------------------------------------
+
+void rawk::showrgb()
+{
+    glUniformMatrix3fv(u_recolor, 1, GL_TRUE, gl::mat3(1, 0, 0,
+                                                       0, 1, 0,
+                                                       0, 0, 1));
+}
+
+void rawk::showrrr()
+{
+    glUniformMatrix3fv(u_recolor, 1, GL_TRUE, gl::mat3(1, 0, 0,
+                                                       1, 0, 0,
+                                                       1, 0, 0));
+}
+
+void rawk::showyyy()
+{
+    glUniformMatrix3fv(u_recolor, 1, GL_TRUE, gl::mat3(0.299, 0.587, 0.114,
+                                                       0.299, 0.587, 0.114,
+                                                       0.299, 0.587, 0.114));
 }
 
 //------------------------------------------------------------------------------
@@ -428,6 +458,10 @@ void rawk::key(int key, bool down, bool repeat)
                         mark_image[selector] = curr_image;
                     }
                     break;
+
+                case SDL_SCANCODE_1: showrrr(); break;
+                case SDL_SCANCODE_2: showyyy(); break;
+                case SDL_SCANCODE_3: showrgb(); break;
             }
         }
 
