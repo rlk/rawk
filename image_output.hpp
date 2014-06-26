@@ -43,20 +43,20 @@ output::output(std::string name, char t, image *H) : image(H), file(0)
 
     switch (t)
     {
-        case 'b': file = new rawb(name, h, w, d, true); break;
-        case 'c': file = new rawc(name, h, w, d, true); break;
-        case 'u': file = new rawu(name, h, w, d, true); break;
-        case 'U': file = new rawU(name, h, w, d, true); break;
-        case 's': file = new raws(name, h, w, d, true); break;
-        case 'S': file = new rawS(name, h, w, d, true); break;
-        case 'l': file = new rawl(name, h, w, d, true); break;
-        case 'L': file = new rawL(name, h, w, d, true); break;
-        case 'i': file = new rawi(name, h, w, d, true); break;
-        case 'I': file = new rawI(name, h, w, d, true); break;
-        case 'f': file = new rawf(name, h, w, d, true); break;
-        case 'F': file = new rawF(name, h, w, d, true); break;
-        case 'd': file = new rawd(name, h, w, d, true); break;
-        case 'D': file = new rawD(name, h, w, d, true); break;
+        case 'b': file = new rawb(name, 0, h, w, d, true); break;
+        case 'c': file = new rawc(name, 0, h, w, d, true); break;
+        case 'u': file = new rawu(name, 0, h, w, d, true); break;
+        case 'U': file = new rawU(name, 0, h, w, d, true); break;
+        case 's': file = new raws(name, 0, h, w, d, true); break;
+        case 'S': file = new rawS(name, 0, h, w, d, true); break;
+        case 'l': file = new rawl(name, 0, h, w, d, true); break;
+        case 'L': file = new rawL(name, 0, h, w, d, true); break;
+        case 'i': file = new rawi(name, 0, h, w, d, true); break;
+        case 'I': file = new rawI(name, 0, h, w, d, true); break;
+        case 'f': file = new rawf(name, 0, h, w, d, true); break;
+        case 'F': file = new rawF(name, 0, h, w, d, true); break;
+        case 'd': file = new rawd(name, 0, h, w, d, true); break;
+        case 'D': file = new rawD(name, 0, h, w, d, true); break;
     }
 }
 
@@ -82,9 +82,17 @@ std::string output::doc() const
 
 void output::go() const
 {
-    for         (int i = 0; i < geth(); ++i)
-        for     (int j = 0; j < getw(); ++j)
-            for (int k = 0; k < getd(); ++k)
+ 	int h = geth();
+ 	int w = getw();
+ 	int d = getd();
+	int i;
+	int j;
+	int k;
+
+	#pragma omp parallel for private(j, k)
+    for         (i = 0; i < h; ++i)
+        for     (j = 0; j < w; ++j)
+            for (k = 0; k < d; ++k)
                 file->put(i, j, k, L->get(i, j, k));
 }
 

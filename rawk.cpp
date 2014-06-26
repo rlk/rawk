@@ -462,7 +462,9 @@ void rawk::key(int key, bool down, bool repeat)
 
 //------------------------------------------------------------------------------
 
-image *parse(int& i, char **v)
+static output *out = 0;
+
+static image *parse(int& i, char **v)
 {
     if (v[i])
     {
@@ -508,11 +510,12 @@ image *parse(int& i, char **v)
         if (op == "input")
         {
             char  *a = v[i++];
+            int    o = int(strtol(v[i++], 0, 0));
             int    h = int(strtol(v[i++], 0, 0));
             int    w = int(strtol(v[i++], 0, 0));
             int    d = int(strtol(v[i++], 0, 0));
             char   t = v[i++][0];
-            return new input(a, h, w, d, t);
+            return new input(a, o, h, w, d, t);
         }
 
         if (op == "linear")
@@ -546,7 +549,7 @@ image *parse(int& i, char **v)
             char  *a = v[i++];
             char   t = v[i++][0];
             image *p = parse(i, v);
-            return new output(a, t, p);
+            return (out = new output(a, t, p));
         }
 
         if (op == "paste")
@@ -600,9 +603,16 @@ int main(int argc, char **argv)
     {
         int argi = 1;
 
-        rawk app(parse(argi, argv));
-        app.run(true);
+        image *in = parse(argi, argv);
 
+        if (out)
+            out->go();
+        else
+        {
+            rawk app(in);
+            app.run(true);
+        }
+        delete in;
         return 0;
     }
     catch (std::exception &e)

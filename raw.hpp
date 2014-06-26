@@ -28,14 +28,27 @@ extern int errno;
 /// The following sample type abbreviations are used consistently throughout.
 /// Capitalization implies non-native byte order.
 ///
-///      uint8_t ... b
 ///       int8_t ... c
-///     uint16_t ... u U
+///      uint8_t ... b
 ///      int16_t ... s S
-///     uint32_t ... l L
+///     uint16_t ... u U
 ///      int32_t ... i I
+///     uint32_t ... l L
 ///        float ... f F
 ///       double ... d D
+
+//------------------------------------------------------------------------------
+
+// C++-style casts for pointers to samples.
+
+typedef  int8_t  * int8_p;
+typedef uint8_t  *uint8_p;
+typedef  int16_t * int16_p;
+typedef uint16_t *uint16_p;
+typedef  int32_t * int32_p;
+typedef uint32_t *uint32_p;
+typedef  float   * float_p;
+typedef double   *double_p;
 
 //------------------------------------------------------------------------------
 
@@ -51,22 +64,24 @@ public :
 class raw
 {
 public:
-    raw(std::string name, size_t h, size_t w, size_t d, size_t s, bool o)
+    raw(std::string name, size_t o, size_t h, size_t w, size_t d, size_t s, bool m)
         : name(name), h(h), w(w), d(d), s(s), f(0), p(0)
     {
         size_t n = h * w * d * s;
 
-        int mode = o ? O_RDWR | O_TRUNC | O_CREAT : O_RDONLY;
-        int prot = o ? PROT_READ | PROT_WRITE : PROT_READ;
+        int mode = m ? O_RDWR | O_TRUNC | O_CREAT : O_RDONLY;
+        int prot = m ? PROT_READ | PROT_WRITE : PROT_READ;
 
         if ((f = open(name.c_str(), mode, 0666)) == -1)
             throw raw_error(name, strerror(errno));
 
-        if (o && ftruncate(f, n) == -1)
+        if (m && ftruncate(f, n) == -1)
             throw raw_error(name, strerror(errno));
 
-        if ((p = mmap(0, n, prot, MAP_SHARED, f, 0)) == MAP_FAILED)
+        if ((q = mmap(0, n + o, prot, MAP_SHARED, f, 0)) == MAP_FAILED)
             throw raw_error(name, strerror(errno));
+
+        p = uint8_p(q) + o;
     }
 
     virtual void   put(int, int, int, double) = 0;
@@ -81,7 +96,7 @@ public:
     {
         size_t n = h * w * d * s;
 
-        if (munmap(p, n) == -1)
+        if (munmap(q, n) == -1)
             throw raw_error(name, strerror(errno));
 
         if (close(f) == -1)
@@ -101,26 +116,15 @@ protected:
 
     std::string name;
 
-    size_t h;
-    size_t w;
-    size_t d;
-    size_t s;
-    int    f;
-    void  *p;
+    size_t h;     // Image height
+    size_t w;     // Image width
+    size_t d;     // Image depth
+    size_t s;     // Image sample size
+    size_t o;     // Offset of first data
+    int    f;     // File descriptor
+    void  *p;     // Pointer to beginning of data
+    void  *q;     // Pointer to beginning of file
 };
-
-//------------------------------------------------------------------------------
-
-// C++-style casts for pointers to samples.
-
-typedef  int8_t  * int8_p;
-typedef uint8_t  *uint8_p;
-typedef  int16_t * int16_p;
-typedef uint16_t *uint16_p;
-typedef  int32_t * int32_p;
-typedef uint32_t *uint32_p;
-typedef  float   * float_p;
-typedef double   *double_p;
 
 //------------------------------------------------------------------------------
 
@@ -201,8 +205,8 @@ static inline double swap(double n)
 class rawc : public raw
 {
 public:
-    rawc(std::string a, size_t h, size_t w, size_t d, bool o)
-        : raw(a, h, w, d, sizeof (int8_t), o) { }
+    rawc(std::string a, size_t o, size_t h, size_t w, size_t d, bool m)
+        : raw(a, o, h, w, d, sizeof (int8_t), m) { }
 
     void put(int i, int j, int k, double d)
     {
@@ -219,8 +223,8 @@ public:
 class rawb : public raw
 {
 public:
-    rawb(std::string a, size_t h, size_t w, size_t d, bool o)
-        : raw(a, h, w, d, sizeof (uint8_t), o) { }
+    rawb(std::string a, size_t o, size_t h, size_t w, size_t d, bool m)
+        : raw(a, o, h, w, d, sizeof (uint8_t), m) { }
 
     void put(int i, int j, int k, double d)
     {
@@ -239,8 +243,8 @@ public:
 class raws : public raw
 {
 public:
-    raws(std::string a, size_t h, size_t w, size_t d, bool o)
-        : raw(a, h, w, d, sizeof (int16_t), o) { }
+    raws(std::string a, size_t o, size_t h, size_t w, size_t d, bool m)
+        : raw(a, o, h, w, d, sizeof (int16_t), m) { }
 
     void put(int i, int j, int k, double d)
     {
@@ -257,8 +261,8 @@ public:
 class rawS : public raw
 {
 public:
-    rawS(std::string a, size_t h, size_t w, size_t d, bool o)
-        : raw(a, h, w, d, sizeof (int16_t), o) { }
+    rawS(std::string a, size_t o, size_t h, size_t w, size_t d, bool m)
+        : raw(a, o, h, w, d, sizeof (int16_t), m) { }
 
     void put(int i, int j, int k, double d)
     {
@@ -277,8 +281,8 @@ public:
 class rawu : public raw
 {
 public:
-    rawu(std::string a, size_t h, size_t w, size_t d, bool o)
-        : raw(a, h, w, d, sizeof (uint16_t), o) { }
+    rawu(std::string a, size_t o, size_t h, size_t w, size_t d, bool m)
+        : raw(a, o, h, w, d, sizeof (uint16_t), m) { }
 
     void put(int i, int j, int k, double d)
     {
@@ -295,8 +299,8 @@ public:
 class rawU : public raw
 {
 public:
-    rawU(std::string a, size_t h, size_t w, size_t d, bool o)
-        : raw(a, h, w, d, sizeof (uint16_t), o) { }
+    rawU(std::string a, size_t o, size_t h, size_t w, size_t d, bool m)
+        : raw(a, o, h, w, d, sizeof (uint16_t), m) { }
 
     void put(int i, int j, int k, double d)
     {
@@ -315,8 +319,8 @@ public:
 class rawi : public raw
 {
 public:
-    rawi(std::string a, size_t h, size_t w, size_t d, bool o)
-        : raw(a, h, w, d, sizeof (int32_t), o) { }
+    rawi(std::string a, size_t o, size_t h, size_t w, size_t d, bool m)
+        : raw(a, o, h, w, d, sizeof (int32_t), m) { }
 
     void put(int i, int j, int k, double d)
     {
@@ -333,8 +337,8 @@ public:
 class rawI : public raw
 {
 public:
-    rawI(std::string a, size_t h, size_t w, size_t d, bool o)
-        : raw(a, h, w, d, sizeof (int32_t), o) { }
+    rawI(std::string a, size_t o, size_t h, size_t w, size_t d, bool m)
+        : raw(a, o, h, w, d, sizeof (int32_t), m) { }
 
     void put(int i, int j, int k, double d)
     {
@@ -353,8 +357,8 @@ public:
 class rawl : public raw
 {
 public:
-    rawl(std::string a, size_t h, size_t w, size_t d, bool o)
-        : raw(a, h, w, d, sizeof (uint32_t), o) { }
+    rawl(std::string a, size_t o, size_t h, size_t w, size_t d, bool m)
+        : raw(a, o, h, w, d, sizeof (uint32_t), m) { }
 
     void put(int i, int j, int k, double d)
     {
@@ -371,8 +375,8 @@ public:
 class rawL : public raw
 {
 public:
-    rawL(std::string a, size_t h, size_t w, size_t d, bool o)
-        : raw(a, h, w, d, sizeof (uint32_t), o) { }
+    rawL(std::string a, size_t o, size_t h, size_t w, size_t d, bool m)
+        : raw(a, o, h, w, d, sizeof (uint32_t), m) { }
 
     void put(int i, int j, int k, double d)
     {
@@ -391,8 +395,8 @@ public:
 class rawf : public raw
 {
 public:
-    rawf(std::string a, size_t h, size_t w, size_t d, bool o)
-        : raw(a, h, w, d, sizeof (float), o) { }
+    rawf(std::string a, size_t o, size_t h, size_t w, size_t d, bool m)
+        : raw(a, o, h, w, d, sizeof (float), m) { }
 
     void put(int i, int j, int k, double d)
     {
@@ -409,8 +413,8 @@ public:
 class rawF : public raw
 {
 public:
-    rawF(std::string a, size_t h, size_t w, size_t d, bool o)
-        : raw(a, h, w, d, sizeof (float), o) { }
+    rawF(std::string a, size_t o, size_t h, size_t w, size_t d, bool m)
+        : raw(a, o, h, w, d, sizeof (float), m) { }
 
     void put(int i, int j, int k, double d)
     {
@@ -429,8 +433,8 @@ public:
 class rawd : public raw
 {
 public:
-    rawd(std::string a, size_t h, size_t w, size_t d, bool o)
-        : raw(a, h, w, d, sizeof (double), o) { }
+    rawd(std::string a, size_t o, size_t h, size_t w, size_t d, bool m)
+        : raw(a, o, h, w, d, sizeof (double), m) { }
 
     void put(int i, int j, int k, double d)
     {
@@ -447,8 +451,8 @@ public:
 class rawD : public raw
 {
 public:
-    rawD(std::string a, size_t h, size_t w, size_t d, bool o)
-        : raw(a, h, w, d, sizeof (double), o) { }
+    rawD(std::string a, size_t o, size_t h, size_t w, size_t d, bool m)
+        : raw(a, o, h, w, d, sizeof (double), m) { }
 
     void put(int i, int j, int k, double d)
     {

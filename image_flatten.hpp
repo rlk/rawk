@@ -33,6 +33,13 @@ private:
 
 //------------------------------------------------------------------------------
 
+// Account for differences in the flatness of the ellipses used to project
+// spherical data.
+//
+// This function takes integer pixel locations as both input and output and
+// performs no interpolation. This is preferable (for now) as it preserves
+// the identity of data dropouts.
+
 double flatten::get(int i, int j, int k) const
 {
     const int h = L->geth() / 2;

@@ -20,7 +20,7 @@
 class input : public image
 {
 public:
-    input(std::string, int, int, int, char);
+    input(std::string, int, int, int, int, char);
    ~input();
 
     virtual double get(int, int, int) const;
@@ -35,24 +35,24 @@ private:
     raw *file;
 };
 
-input::input(std::string a, int h, int w, int d, char t) : file(0)
+input::input(std::string a, int o, int h, int w, int d, char t) : file(0)
 {
     switch (t)
     {
-        case 'b': file = new rawb(a, h, w, d, false); break;
-        case 'c': file = new rawc(a, h, w, d, false); break;
-        case 'u': file = new rawu(a, h, w, d, false); break;
-        case 'U': file = new rawU(a, h, w, d, false); break;
-        case 's': file = new raws(a, h, w, d, false); break;
-        case 'S': file = new rawS(a, h, w, d, false); break;
-        case 'l': file = new rawl(a, h, w, d, false); break;
-        case 'L': file = new rawL(a, h, w, d, false); break;
-        case 'i': file = new rawi(a, h, w, d, false); break;
-        case 'I': file = new rawI(a, h, w, d, false); break;
-        case 'f': file = new rawf(a, h, w, d, false); break;
-        case 'F': file = new rawF(a, h, w, d, false); break;
-        case 'd': file = new rawd(a, h, w, d, false); break;
-        case 'D': file = new rawD(a, h, w, d, false); break;
+        case 'b': file = new rawb(a, o, h, w, d, false); break;
+        case 'c': file = new rawc(a, o, h, w, d, false); break;
+        case 'u': file = new rawu(a, o, h, w, d, false); break;
+        case 'U': file = new rawU(a, o, h, w, d, false); break;
+        case 's': file = new raws(a, o, h, w, d, false); break;
+        case 'S': file = new rawS(a, o, h, w, d, false); break;
+        case 'l': file = new rawl(a, o, h, w, d, false); break;
+        case 'L': file = new rawL(a, o, h, w, d, false); break;
+        case 'i': file = new rawi(a, o, h, w, d, false); break;
+        case 'I': file = new rawI(a, o, h, w, d, false); break;
+        case 'f': file = new rawf(a, o, h, w, d, false); break;
+        case 'F': file = new rawF(a, o, h, w, d, false); break;
+        case 'd': file = new rawd(a, o, h, w, d, false); break;
+        case 'D': file = new rawD(a, o, h, w, d, false); break;
     }
 }
 
