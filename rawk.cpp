@@ -18,6 +18,9 @@
 #include "image_gradient.hpp"
 #include "image_input.hpp"
 #include "image_linear.hpp"
+#include "image_median.hpp"
+//#include "image_median_h.hpp"
+//#include "image_median_v.hpp"
 #include "image_nearest.hpp"
 #include "image_offset.hpp"
 #include "image_output.hpp"
@@ -601,6 +604,30 @@ static image *parse(int& i, char **v)
             int    m = int(strtol(v[i++], 0, 0));
             image *p = parse(i, v);
             return new linear(h, w, m, p);
+        }
+
+        if (op == "median")
+        {
+            int    r = int(strtol(v[i++], 0, 0));
+            int    m = int(strtol(v[i++], 0, 0));
+            image *p = parse(i, v);
+            return new median(r, m, p);
+        }
+
+        if (op == "medianh")
+        {
+            int    r = int(strtol(v[i++], 0, 0));
+            int    m = int(strtol(v[i++], 0, 0));
+            image *p = parse(i, v);
+            return new medianh(r, m, p);
+        }
+
+        if (op == "medianv")
+        {
+            int    r = int(strtol(v[i++], 0, 0));
+            int    m = int(strtol(v[i++], 0, 0));
+            image *p = parse(i, v);
+            return new medianv(r, m, p);
         }
 
         if (op == "nearest")

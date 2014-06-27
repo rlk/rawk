@@ -1,13 +1,11 @@
 # RAWK
 
 Todo:
-- median filter
-	- with NS and EW kernels
 - gauss blur
 - value test
 - blend
+	- be certain to skip any value with zero mask
 - relief shader
-	- shader path environment variable
 - normalize
 - 2x2 downsample
 - show the pixel value under the cursor
