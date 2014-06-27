@@ -63,7 +63,6 @@ private:
 
     GLint  u_offset;
     GLint  u_scale;
-    GLint  u_recolor;
 
     // Interaction state
 
@@ -97,10 +96,6 @@ private:
 
     void   refresh();
     void   retitle();
-
-    void showrgb();
-    void showrrr();
-    void showyyy();
 };
 
 //------------------------------------------------------------------------------
@@ -112,7 +107,7 @@ rawk::rawk(image *p) : demonstration("RAWK", 1280, 720), program(0)
     glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
 
     init_vbuffer();
-    init_program("rawk.vert", "rawk.frag");
+    init_program("rawk.vert", "rawk_rgb.frag");
     init_texture();
 
     // Initialize the application state.
@@ -217,9 +212,6 @@ void rawk::init_program(std::string vert, std::string frag)
 
         u_offset  = glGetUniformLocation(program, "offset");
         u_scale   = glGetUniformLocation(program, "scale");
-        u_recolor = glGetUniformLocation(program, "recolor");
-
-        showrgb();
     }
 }
 
@@ -235,29 +227,6 @@ void rawk::init_texture()
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, width, height, 0,
                                    GL_RGB, GL_FLOAT, 0);
-}
-
-//------------------------------------------------------------------------------
-
-void rawk::showrgb()
-{
-    glUniformMatrix3fv(u_recolor, 1, GL_TRUE, gl::mat3(1, 0, 0,
-                                                       0, 1, 0,
-                                                       0, 0, 1));
-}
-
-void rawk::showrrr()
-{
-    glUniformMatrix3fv(u_recolor, 1, GL_TRUE, gl::mat3(1, 0, 0,
-                                                       1, 0, 0,
-                                                       1, 0, 0));
-}
-
-void rawk::showyyy()
-{
-    glUniformMatrix3fv(u_recolor, 1, GL_TRUE, gl::mat3(0.299, 0.587, 0.114,
-                                                       0.299, 0.587, 0.114,
-                                                       0.299, 0.587, 0.114));
 }
 
 //------------------------------------------------------------------------------
@@ -435,9 +404,15 @@ void rawk::key(int key, bool down, bool repeat)
                     }
                     break;
 
-                case SDL_SCANCODE_1: showrrr(); break;
-                case SDL_SCANCODE_2: showyyy(); break;
-                case SDL_SCANCODE_3: showrgb(); break;
+                case SDL_SCANCODE_1:
+                    init_program("rawk.vert", "rawk_gray.frag");
+                    break;
+                case SDL_SCANCODE_2:
+                    init_program("rawk.vert", "rawk_luma.frag");
+                    break;
+                case SDL_SCANCODE_3:
+                    init_program("rawk.vert", "rawk_rgb.frag");
+                    break;
             }
         }
 
