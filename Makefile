@@ -1,12 +1,15 @@
 FLAGS  = -Wall
 
-ifeq ($(DEBUG), 1)
-	CXX=c++
-	FLAGS += -g
-else
-	CXX= /usr/local/bin/g++
-	FLAGS += -O2 -fopenmp
-endif
+CXX = c++
+FLAGS += -g
+
+# ifeq ($(DEBUG), 1)
+#	CXX = c++
+#	FLAGS += -g
+# else
+# 	CXX = /usr/local/bin/g++
+# 	FLAGS += -O2 -fopenmp
+# endif
 
 FLAGS +=$(shell /usr/local/bin/sdl2-config --cflags --libs)
 FLAGS +=-framework OpenGL
