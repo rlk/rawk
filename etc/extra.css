@@ -2,35 +2,44 @@
 /* Open up the margins. */
 
 div.contents {
-	margin-left:  4em;
-	margin-right: 4em;
+	margin-left:  32px;
+	margin-right: 32px;
 }
 
-/* Replace gradient images with flat colors. */
+/* The default fonts are inconsistent. */
 
-.tabs, .tabs2, .tabs3 {
-	background-image: none;
-	background-color: #E2E8F2;
+#projectname
+{
+	font: inherit;
+	font-size: 300%;
+	font-weight: 500;
+	margin: 0.5em 8px 8px 8px;
 }
 
-.tablist li {
-	background-image: none;
-	background-color: #E2E8F2;
+#projectbrief
+{
+	font: inherit;
+	font-size: 120%;
+	margin: 8px;
 }
 
-.tablist a {
-	background-image: none;
-	background-color: #E2E8F2;
+#projectnumber
+{
+	font: inherit;
+	font-size: 50%;
+	margin: 8px;
 }
 
-.tablist li.current {
-	background-image: none;
+/* The default directory border does not follow the Doxyfile hue. */
+
+div.directory
+{
+	border-top:    1px solid #D9D9D9;
+	border-bottom: 1px solid #D9D9D9;
 }
 
-.tablist a:hover {
-	background-image: none;
-	background-color: #EBEFF6;
-}
+
+/* Replace doxygen.css gradient images with flat colors. */
 
 .memproto, dl.reflist dt {
 	background-image: none;
@@ -38,4 +47,37 @@ div.contents {
 
 .memdoc, dl.reflist dd {
 	background-image: none;
+}
+
+.tabsearch {
+	background-image: none;
+}
+
+.navpath ul {
+	background-image: none;
+}
+
+/* Replace tabs.css gradient images with flat colors. */
+
+.tablist li {
+	background-image: none;
+}
+
+.tablist a {
+	background-image: none;
+}
+
+.tabs, .tabs2, .tabs3 {
+	background-image: none;
+	background-color: #F7F4ED; /* From .memproto */
+}
+
+.tablist a:hover {
+	background-image: none;
+	background-color: #F9F8F2; /* From div.navtab */
+}
+
+.tablist li.current a {
+	background-image: none;
+	background-color: #BAA462; /* From a */
 }
