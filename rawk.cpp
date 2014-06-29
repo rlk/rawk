@@ -47,21 +47,75 @@ Planetary Data System, the primary motivator of RAWK. Both Photoshop and
 Imagemagick are capable of transforming image into and out of raw format (for
 limited file sizes) enabling interoperability with off-the-shelf tools.
 
+An image process is represented by a *tree* of ::image objects. Each object acts
+as a source of pixels with a specific height, width, and depth. Each samples its
+own input data from zero, one, or two source image objects.
+
+This tree of objects is specified on the command line. The various ::image
+objects and their parameters are itemized below. Examples of their use are given
+toward the end of this page.
+
 ## Interaction
 
-## Structure
+### Basic Usage
 
-An image process is represented by a tree of ::image objects.
+On execution, RAWK displays an OpenGL window showing a *cache* of the
+result of the image process.
 
-Each ::image acts as a source of pixels and may have zero, one, or two child
-objects. A zero-child object, such as an ::input, acts as a source. A one-child
-object, such an ::offset, behaves as a filter. A two-child object, such as a
-::sum, is a binary operator.
+- Click and drag with the left mouse button to pan the cache.
+- Rotate the mouse wheel to zoom the cache.
+- **Press Space** to update the cache with the modified view configuration.
 
-This hierarchy of objects is given on the command line. The list of image object
-types follows. Examples of their use are given toward the end.
+The window title updates to reflect the current position of the mouse pointer
+within the image, as well as the sample value beneath the pointer.
 
-### Type
+### Exploring the tree
+
+By default, the view displays the root of the image process tree, but image
+objects deeper in the tree may also be explored.
+
+- Press Alt-Left to jump to the first child of the current image.
+- Press Alt-Right to jump to the second child of the current image.
+- Press Alt-Up to jump to the parent of the current image.
+- As before, **press Space** to update the cache to display the modified view.
+
+The window title bar changes to reflect the current image.
+
+### Modifying parameters
+
+The parameters of many image objects may be tuned interactively.
+
+- Press Left to decrease the first parameter of the current image.
+- Press Right to increase the first parameter of the current image.
+- Press Down to decrease the second parameter of the current image.
+- Press Up to increase the second parameter of the current image.
+- Again, **press Space** to update the cache to display the modified process.
+
+Hold the Shift key to magnify the increase or decrease by a factor of 10. The
+window title bar changes to reflect the current parameters.
+
+### Storing views
+
+The Function keys allow up to 12 view configurations to be stored and recalled.
+This includes both the position and zoom of the view as well as the current image.
+
+- Hold Function-n and press Enter to store the current view in slot *n*.
+- Hold Function-n and press Space to restore the view stored in slot *n*.
+
+Parameter tuning works along side the view storage and recall mechanism:
+
+- Hold Function-n and press Left or Right to decrease and increase the first
+  parameter of the image stored in slot *n*.
+- Hold Function-n and press Up or Down to decrease and increase the first
+  parameter of the image stored in slot *n*.
+
+This capability allows the user to view the output of one image while
+manipulating the parameters of another. For example, tweak an ::offset to bring
+the results of two separate processes into alignment before summing thing.
+
+## Data Issues
+
+### Sample Type
 
 A variety of sample formats are supported. The following single-character
 tags are used to indicate sample type in both the API and on the command line.
@@ -108,6 +162,11 @@ Mode | Behavior
 
 ## Image Objects
 
+The image objects and their parameters are itemized here. The command line
+argument language that builds the tree of image object is a direct reflection of
+the API, so this section documents both. The parse() function makes this one-
+to-one mapping explicit.
+
 ### File I/O
 
 - ::input *name* *height* *width* *depth* *type*
@@ -126,8 +185,8 @@ Mode | Behavior
 
 - ::solid *height* *width* *value*
 
-    Generate a block of pixels with the given height and width, with depth one,
-    with constant *value*.
+    Generate a block of pixels of constant *value* with the given height and
+    width and depth of one.
 
 ### Basic Filters
 
