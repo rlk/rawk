@@ -15,7 +15,7 @@
 
 //------------------------------------------------------------------------------
 
-/// RAW file reader
+/// Image file reader
 
 class input : public image
 {

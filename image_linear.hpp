@@ -15,7 +15,7 @@
 
 //------------------------------------------------------------------------------
 
-/// Linear filter
+/// Linearly-interpolated resampling filter
 
 class linear : public image
 {

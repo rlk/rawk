@@ -15,7 +15,7 @@
 
 //------------------------------------------------------------------------------
 
-/// Base class for all image data sources
+/// Base class for all image operators and filters
 
 class image
 {

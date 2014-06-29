@@ -3,6 +3,7 @@
 Todo:
 - gauss blur
 - value test
+- crop
 - blend
 	- be certain to skip any value with zero mask
 - relief shader

@@ -15,7 +15,7 @@
 
 //------------------------------------------------------------------------------
 
-/// RAW file writer with pass-through
+/// Image file writer
 
 class output : public image
 {

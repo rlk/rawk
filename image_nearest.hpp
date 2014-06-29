@@ -15,7 +15,7 @@
 
 //------------------------------------------------------------------------------
 
-/// Nearest filter
+/// Nearest value resampling filter
 
 class nearest : public image
 {

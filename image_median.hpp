@@ -15,7 +15,7 @@
 
 //------------------------------------------------------------------------------
 
-/// Median filter with a square kernel
+/// Median filter
 
 class median : public image
 {

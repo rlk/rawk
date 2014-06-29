@@ -1,7 +1,7 @@
 FLAGS  = -Wall
 
 CXX = c++
-FLAGS += -g
+FLAGS += -O2
 
 # ifeq ($(DEBUG), 1)
 #	CXX = c++

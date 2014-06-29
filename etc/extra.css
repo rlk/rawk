@@ -78,3 +78,19 @@ div.directory
 	border-top:    1px solid #FFE599;
 	border-bottom: 1px solid #FFE599;
 }
+
+/* Some of the other choices are just ugly or unhelpful. */
+
+pre.fragment
+{
+	background-color: #FFFCF5;
+	font-size: inherit;
+	margin: 1em 1em;
+}
+
+table.doxtable th
+{
+	background-color: #FFE599;
+	color: inherit;
+	font-size: inherit;
+}

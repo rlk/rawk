@@ -39,7 +39,7 @@ extern int errno;
 
 //------------------------------------------------------------------------------
 
-// C++-style casts for pointers to samples.
+/// C++-style casts for pointers to samples
 
 typedef  int8_t  * int8_p;
 typedef uint8_t  *uint8_p;
@@ -52,6 +52,8 @@ typedef double   *double_p;
 
 //------------------------------------------------------------------------------
 
+/// RAW image file I/O error
+
 class raw_error : public std::runtime_error
 {
 public :
@@ -60,6 +62,8 @@ public :
 };
 
 //------------------------------------------------------------------------------
+
+/// RAW image file
 
 class raw
 {

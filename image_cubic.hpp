@@ -15,7 +15,7 @@
 
 //------------------------------------------------------------------------------
 
-/// Nearest filter
+/// Cubic-interpolated resampling filter
 
 class cubic : public image
 {
