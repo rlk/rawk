@@ -19,8 +19,6 @@
 #include "image_input.hpp"
 #include "image_linear.hpp"
 #include "image_median.hpp"
-//#include "image_median_h.hpp"
-//#include "image_median_v.hpp"
 #include "image_nearest.hpp"
 #include "image_offset.hpp"
 #include "image_output.hpp"
@@ -32,12 +30,16 @@
 
 //------------------------------------------------------------------------------
 
+/// View position and zoom
+
 struct state
 {
     double x;
     double y;
     double z;
 };
+
+/// RAWK application
 
 class rawk : public gl::demonstration
 {

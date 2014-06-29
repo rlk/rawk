@@ -30,16 +30,7 @@ div.contents {
 	margin: 8px;
 }
 
-/* The default directory border does not follow the Doxyfile hue. */
-
-div.directory
-{
-	border-top:    1px solid #D9D9D9;
-	border-bottom: 1px solid #D9D9D9;
-}
-
-
-/* Replace doxygen.css gradient images with flat colors. */
+/* Replace gradient images with flat colors. */
 
 .memproto, dl.reflist dt {
 	background-image: none;
@@ -57,8 +48,6 @@ div.directory
 	background-image: none;
 }
 
-/* Replace tabs.css gradient images with flat colors. */
-
 .tablist li {
 	background-image: none;
 }
@@ -69,15 +58,23 @@ div.directory
 
 .tabs, .tabs2, .tabs3 {
 	background-image: none;
-	background-color: #F7F4ED; /* From .memproto */
+	background-color: #FEF2CD;
 }
 
 .tablist a:hover {
 	background-image: none;
-	background-color: #F9F8F2; /* From div.navtab */
+	background-color: #FFE599;
 }
 
 .tablist li.current a {
 	background-image: none;
-	background-color: #BAA462; /* From a */
+	background-color: #FFC000;
+}
+
+/* The default directory border does not follow the Doxyfile hue. */
+
+div.directory
+{
+	border-top:    1px solid #FFE599;
+	border-bottom: 1px solid #FFE599;
 }
