@@ -30,6 +30,7 @@
 #include "image_offset.hpp"
 #include "image_output.hpp"
 #include "image_paste.hpp"
+#include "image_reduce.hpp"
 #include "image_scale.hpp"
 #include "image_solid.hpp"
 #include "image_sum.hpp"
@@ -744,6 +745,12 @@ static image *parse(int& i, char **v)
             image *L = parse(i, v);
             image *R = parse(i, v);
             return new paste(r, c, L, R);
+        }
+
+        if (op == "reduce")
+        {
+            image *L = parse(i, v);
+            return new reduce(L);
         }
 
         if (op == "rgb2yuv")

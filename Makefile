@@ -34,6 +34,7 @@ rawk : image_nearest.hpp
 rawk : image_offset.hpp
 rawk : image_output.hpp
 rawk : image_paste.hpp
+rawk : image_reduce.hpp
 rawk : image_scale.hpp
 rawk : image_solid.hpp
 rawk : image_sum.hpp
