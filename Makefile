@@ -21,6 +21,7 @@ rawk : image.hpp
 rawk : image_append.hpp
 rawk : image_bias.hpp
 rawk : image_blend.hpp
+rawk : image_convolve.hpp
 rawk : image_cubic.hpp
 rawk : image_flatten.hpp
 rawk : image_gradient.hpp

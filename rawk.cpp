@@ -8,6 +8,8 @@
 #include <string>
 #include <vector>
 
+#include <sys/time.h>
+
 #include "raw.hpp"
 #include "rawk.hpp"
 #include "image.hpp"
@@ -15,6 +17,7 @@
 #include "image_append.hpp"
 #include "image_bias.hpp"
 #include "image_blend.hpp"
+#include "image_convolve.hpp"
 #include "image_cubic.hpp"
 #include "image_flatten.hpp"
 #include "image_gradient.hpp"
@@ -396,42 +399,55 @@ void rawk::key(int key, bool down, bool repeat)
     {
         if (down)
         {
-            switch (key)
-            {
-                case SDL_SCANCODE_SPACE:
-                    if (selector >= 0)
-                    {
-                        curr_state = mark_state[selector];
-                        curr_image = mark_image[selector];
-                    }
-                    refresh();
-                    break;
+            if (SDL_GetModState() & KMOD_SHIFT)
+                switch (key)
+                {
+                    case SDL_SCANCODE_1:
+                        init_program("rawk.vert", "rawk_gray.frag");
+                        break;
+                    case SDL_SCANCODE_2:
+                        init_program("rawk.vert", "rawk_luma.frag");
+                        break;
+                    case SDL_SCANCODE_3:
+                        init_program("rawk.vert", "rawk_rgb.frag");
+                        break;
+                    case SDL_SCANCODE_4:
+                        init_program("rawk.vert", "rawk_relief.frag");
+                        break;
+                }
+            else
+                switch (key)
+                {
+                    case SDL_SCANCODE_SPACE:
+                        if (selector >= 0)
+                        {
+                            curr_state = mark_state[selector];
+                            curr_image = mark_image[selector];
+                        }
+                        refresh();
+                        break;
 
-                case SDL_SCANCODE_RETURN:
-                    if (selector >= 0)
-                    {
-                        mark_state[selector] = curr_state;
-                        mark_image[selector] = curr_image;
-                    }
-                    break;
+                    case SDL_SCANCODE_RETURN:
+                        if (selector >= 0)
+                        {
+                            mark_state[selector] = curr_state;
+                            mark_image[selector] = curr_image;
+                        }
+                        break;
 
-                case SDL_SCANCODE_EQUALS:
-                    curr_state.z = 1.0;
-                    break;
+                    case SDL_SCANCODE_EQUALS:
+                        break;
 
-                case SDL_SCANCODE_1:
-                    init_program("rawk.vert", "rawk_gray.frag");
-                    break;
-                case SDL_SCANCODE_2:
-                    init_program("rawk.vert", "rawk_luma.frag");
-                    break;
-                case SDL_SCANCODE_3:
-                    init_program("rawk.vert", "rawk_rgb.frag");
-                    break;
-                case SDL_SCANCODE_4:
-                    init_program("rawk.vert", "rawk_relief.frag");
-                    break;
-            }
+                    case SDL_SCANCODE_1: curr_state.z =   1; break;
+                    case SDL_SCANCODE_2: curr_state.z =   2; break;
+                    case SDL_SCANCODE_3: curr_state.z =   4; break;
+                    case SDL_SCANCODE_4: curr_state.z =   8; break;
+                    case SDL_SCANCODE_5: curr_state.z =  16; break;
+                    case SDL_SCANCODE_6: curr_state.z =  32; break;
+                    case SDL_SCANCODE_7: curr_state.z =  64; break;
+                    case SDL_SCANCODE_8: curr_state.z = 128; break;
+                    case SDL_SCANCODE_9: curr_state.z = 256; break;
+                }
         }
 
         switch (key)
@@ -512,6 +528,9 @@ void rawk::retitle()
 
 void rawk::refresh()
 {
+    struct timeval t0;
+    struct timeval t1;
+
     std::vector<GLfloat> pixel(width * height * 3, 0);
 
     const int depth = std::min(curr_image->get_depth(), 3);
@@ -519,6 +538,8 @@ void rawk::refresh()
     int r;
     int c;
     int k;
+
+    gettimeofday(&t0, 0);
 
     #pragma omp parallel for private(c, k)
     for         (r = 0; r < height; ++r)
@@ -530,10 +551,15 @@ void rawk::refresh()
                 pixel[(r * width + c) * 3 + k] = curr_image->get(i, j, k);
             }
 
+    gettimeofday(&t1, 0);
+
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height,
                     GL_RGB, GL_FLOAT, &pixel.front());
 
     cache_state = curr_state;
+
+    std::cout << double(t1.tv_sec  - t0.tv_sec) +
+                 double(t1.tv_usec - t0.tv_usec) / 1000000.0 << std::endl;
 }
 
 /// Render the contents of the image cache to the screen.
@@ -600,6 +626,14 @@ static image *parse(int& i, char **v)
             double d = strtod(v[i++], 0);
             image *L = parse(i, v);
             return new flatten(d, L);
+        }
+
+        if (op == "gaussian")
+        {
+            double d = strtod(v[i++], 0);
+            int    m = int(strtol(v[i++], 0, 0));
+            image *L = parse(i, v);
+            return new gaussian(d, m, L);
         }
 
         if (op == "gradient")

@@ -57,6 +57,8 @@ protected:
     int mode;
 };
 
+//------------------------------------------------------------------------------
+
 /// Median filter with a vertical kernel
 
 class medianv : public median
@@ -85,6 +87,8 @@ public:
         return out.str();
     }
 };
+
+//------------------------------------------------------------------------------
 
 /// Median filter with a horizontal kernel
 

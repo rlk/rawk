@@ -1,6 +1,6 @@
 
 preview :
-	rawk \
+	rawk gaussian 3.0 2 \
 		paste 5760 17280 input MDIM/mars45s315.rgb 0 5760 5760 3 b \
 		paste 5760 11520 input MDIM/mars45s225.rgb 0 5760 5760 3 b \
 		paste 5760  5760 input MDIM/mars45s135.rgb 0 5760 5760 3 b \

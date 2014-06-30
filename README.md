@@ -1,13 +1,12 @@
 # RAWK
 
 Todo:
-- gauss blur
 - value test
 - crop
-- relief shader
 - normalize
 - 2x2 downsample
 - mark node
+
 - better error messages
 - BMP example
 
