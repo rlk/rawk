@@ -72,6 +72,7 @@ private:
 
     GLint  u_offset;               ///< Offset uniform location
     GLint  u_scale;                ///< Scale uniform location
+    GLint  u_zoom;                 ///< Zoom uniform location
 
     // Interaction state
 
@@ -221,6 +222,7 @@ void rawk::init_program(std::string vert, std::string frag)
 
         u_offset  = glGetUniformLocation(program, "offset");
         u_scale   = glGetUniformLocation(program, "scale");
+        u_zoom    = glGetUniformLocation(program, "zoom");
     }
 }
 
@@ -413,6 +415,10 @@ void rawk::key(int key, bool down, bool repeat)
                     }
                     break;
 
+                case SDL_SCANCODE_EQUALS:
+                    curr_state.z = 1.0;
+                    break;
+
                 case SDL_SCANCODE_1:
                     init_program("rawk.vert", "rawk_gray.frag");
                     break;
@@ -421,6 +427,9 @@ void rawk::key(int key, bool down, bool repeat)
                     break;
                 case SDL_SCANCODE_3:
                     init_program("rawk.vert", "rawk_rgb.frag");
+                    break;
+                case SDL_SCANCODE_4:
+                    init_program("rawk.vert", "rawk_relief.frag");
                     break;
             }
         }
@@ -537,6 +546,7 @@ void rawk::draw()
     double y = 2.0 * (cache_state.y - curr_state.y) / cache_state.z / height;
     double z =        cache_state.z / curr_state.z;
 
+    glUniform1f(u_zoom, cache_state.z);
     glUniform1f(u_scale,  z);
     glUniform2f(u_offset, x, y);
 

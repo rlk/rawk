@@ -36,7 +36,6 @@ public:
             for (int l = 0; l < d; l++)
                 if (double w = values[k * columns + l])
                     v += w * L->get(i, j, l);
-
         return v;
     }
 

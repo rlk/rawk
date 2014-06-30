@@ -7,7 +7,6 @@ Todo:
 - relief shader
 - normalize
 - 2x2 downsample
-- RGB-YUV
 - mark node
 - better error messages
 - BMP example
