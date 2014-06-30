@@ -26,6 +26,7 @@ rawk : image_flatten.hpp
 rawk : image_gradient.hpp
 rawk : image_input.hpp
 rawk : image_linear.hpp
+rawk : image_matrix.hpp
 rawk : image_median.hpp
 rawk : image_nearest.hpp
 rawk : image_offset.hpp
@@ -34,5 +35,6 @@ rawk : image_paste.hpp
 rawk : image_scale.hpp
 rawk : image_solid.hpp
 rawk : image_sum.hpp
+rawk : image_swizzle.hpp
 rawk : image_trim.hpp
 rawk : raw.hpp

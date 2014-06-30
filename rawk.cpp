@@ -20,6 +20,7 @@
 #include "image_gradient.hpp"
 #include "image_input.hpp"
 #include "image_linear.hpp"
+#include "image_matrix.hpp"
 #include "image_median.hpp"
 #include "image_nearest.hpp"
 #include "image_offset.hpp"
@@ -28,6 +29,7 @@
 #include "image_scale.hpp"
 #include "image_solid.hpp"
 #include "image_sum.hpp"
+#include "image_swizzle.hpp"
 #include "image_trim.hpp"
 
 //------------------------------------------------------------------------------
@@ -625,6 +627,19 @@ static image *parse(int& i, char **v)
             return new median(r, m, L);
         }
 
+        if (op == "matrix")
+        {
+            int    r = int(strtol(v[i++], 0, 0));
+            int    c = int(strtol(v[i++], 0, 0));
+
+            std::vector<double> k(r * c);
+            for (int j = 0; j < r * c; j++)
+                k.push_back(strtod(v[i++], 0));
+
+            image *L = parse(i, v);
+            return new matrix(r, c, k, L);
+        }
+
         if (op == "medianh")
         {
             int    r = int(strtol(v[i++], 0, 0));
@@ -675,6 +690,12 @@ static image *parse(int& i, char **v)
             return new paste(r, c, L, R);
         }
 
+        if (op == "rgb2yuv")
+        {
+            image *L = parse(i, v);
+            return new rgb2yuv(L);
+        }
+
         if (op == "scale")
         {
             double d = strtod(v[i++], 0);
@@ -697,12 +718,25 @@ static image *parse(int& i, char **v)
             return new sum(L, R);
         }
 
+        if (op == "swizzle")
+        {
+            char  *m = v[i++];
+            image *L = parse(i, v);
+            return new swizzle(m, L);
+        }
+
         if (op == "trim")
         {
             int    h = int(strtol(v[i++], 0, 0));
             int    w = int(strtol(v[i++], 0, 0));
             image *L = parse(i, v);
             return new trim(h, w, L);
+        }
+
+        if (op == "yuv2rgb")
+        {
+            image *L = parse(i, v);
+            return new yuv2rgb(L);
         }
     }
     throw std::runtime_error("Expected image argument");
