@@ -37,5 +37,6 @@ rawk : image_scale.hpp
 rawk : image_solid.hpp
 rawk : image_sum.hpp
 rawk : image_swizzle.hpp
+rawk : image_threshold.hpp
 rawk : image_trim.hpp
 rawk : raw.hpp

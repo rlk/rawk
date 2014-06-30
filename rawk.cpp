@@ -33,6 +33,7 @@
 #include "image_solid.hpp"
 #include "image_sum.hpp"
 #include "image_swizzle.hpp"
+#include "image_threshold.hpp"
 #include "image_trim.hpp"
 
 //------------------------------------------------------------------------------
@@ -767,6 +768,13 @@ static image *parse(int& i, char **v)
             char  *m = v[i++];
             image *L = parse(i, v);
             return new swizzle(m, L);
+        }
+
+        if (op == "threshold")
+        {
+            double d = strtod(v[i++], 0);
+            image *L = parse(i, v);
+            return new threshold(d, L);
         }
 
         if (op == "trim")

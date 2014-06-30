@@ -57,7 +57,7 @@ view :
 
 preview :
 	rawk \
-		sum \
+		append \
 			paste 512 0 \
 				scale 20.0 \
 					gradient 2 \
@@ -79,36 +79,35 @@ preview :
 							paste     0 11520 input MOLA/megt88n090hb.img 0 5632 11520 1 S \
 							                  input MOLA/megt88n000hb.img 0 5632 11520 1 S \
 				solid 23040 46080 0.0 \
-			channel 1 \
-				flatten $(FLATTEN) \
-					offset $(OFFSET) \
-						paste 39680     0 input MC/mc30-256.img 92160 6400 92160 1 b \
-						paste 30720 76800 input MC/mc29-256.img 15360 7680 15360 1 b \
-						paste 30720 61440 input MC/mc28-256.img 15360 7680 15360 1 b \
-						paste 30720 46080 input MC/mc27-256.img 15360 7680 15360 1 b \
-						paste 30720 30720 input MC/mc26-256.img 15360 7680 15360 1 b \
-						paste 30720 15360 input MC/mc25-256.img 15360 7680 15360 1 b \
-						paste 30720     0 input MC/mc24-256.img 15360 7680 15360 1 b \
-						paste 23040 80640 input MC/mc23-256.img 11520 7680 11520 1 b \
-						paste 23040 69120 input MC/mc22-256.img 11520 7680 11520 1 b \
-						paste 23040 57600 input MC/mc21-256.img 11520 7680 11520 1 b \
-						paste 23040 46080 input MC/mc20-256.img 11520 7680 11520 1 b \
-						paste 23040 34560 input MC/mc19-256.img 11520 7680 11520 1 b \
-						paste 23040 23040 input MC/mc18-256.img 11520 7680 11520 1 b \
-						paste 23040 11520 input MC/mc17-256.img 11520 7680 11520 1 b \
-						paste 23040     0 input MC/mc16-256.img 11520 7680 11520 1 b \
-						paste 15360 80640 input MC/mc15-256.img 11520 7680 11520 1 b \
-						paste 15360 69120 input MC/mc14-256.img 11520 7680 11520 1 b \
-						paste 15360 57600 input MC/mc13-256.img 11520 7680 11520 1 b \
-						paste 15360 46080 input MC/mc12-256.img 11520 7680 11520 1 b \
-						paste 15360 34560 input MC/mc11-256.img 11520 7680 11520 1 b \
-						paste 15360 23040 input MC/mc10-256.img 11520 7680 11520 1 b \
-						paste 15360 11520 input MC/mc09-256.img 11520 7680 11520 1 b \
-						paste 15360     0 input MC/mc08-256.img 11520 7680 11520 1 b \
-						paste  6400 76800 input MC/mc07-256.img 15360 8960 15360 1 b \
-						paste  6400 61440 input MC/mc06-256.img 15360 8960 15360 1 b \
-						paste  6400 46080 input MC/mc05-256.img 15360 8960 15360 1 b \
-						paste  6400 30720 input MC/mc04-256.img 15360 8960 15360 1 b \
-						paste  6400 15360 input MC/mc03-256.img 15360 8960 15360 1 b \
-						paste  6400     0 input MC/mc02-256.img 15360 8960 15360 1 b \
-						                  input MC/mc01-256.img 92160 6400 92160 1 b
+			flatten $(FLATTEN) \
+				offset $(OFFSET) \
+					paste 39680     0 input MC/mc30-256.img 92160 6400 92160 1 b \
+					paste 30720 76800 input MC/mc29-256.img 15360 7680 15360 1 b \
+					paste 30720 61440 input MC/mc28-256.img 15360 7680 15360 1 b \
+					paste 30720 46080 input MC/mc27-256.img 15360 7680 15360 1 b \
+					paste 30720 30720 input MC/mc26-256.img 15360 7680 15360 1 b \
+					paste 30720 15360 input MC/mc25-256.img 15360 7680 15360 1 b \
+					paste 30720     0 input MC/mc24-256.img 15360 7680 15360 1 b \
+					paste 23040 80640 input MC/mc23-256.img 11520 7680 11520 1 b \
+					paste 23040 69120 input MC/mc22-256.img 11520 7680 11520 1 b \
+					paste 23040 57600 input MC/mc21-256.img 11520 7680 11520 1 b \
+					paste 23040 46080 input MC/mc20-256.img 11520 7680 11520 1 b \
+					paste 23040 34560 input MC/mc19-256.img 11520 7680 11520 1 b \
+					paste 23040 23040 input MC/mc18-256.img 11520 7680 11520 1 b \
+					paste 23040 11520 input MC/mc17-256.img 11520 7680 11520 1 b \
+					paste 23040     0 input MC/mc16-256.img 11520 7680 11520 1 b \
+					paste 15360 80640 input MC/mc15-256.img 11520 7680 11520 1 b \
+					paste 15360 69120 input MC/mc14-256.img 11520 7680 11520 1 b \
+					paste 15360 57600 input MC/mc13-256.img 11520 7680 11520 1 b \
+					paste 15360 46080 input MC/mc12-256.img 11520 7680 11520 1 b \
+					paste 15360 34560 input MC/mc11-256.img 11520 7680 11520 1 b \
+					paste 15360 23040 input MC/mc10-256.img 11520 7680 11520 1 b \
+					paste 15360 11520 input MC/mc09-256.img 11520 7680 11520 1 b \
+					paste 15360     0 input MC/mc08-256.img 11520 7680 11520 1 b \
+					paste  6400 76800 input MC/mc07-256.img 15360 8960 15360 1 b \
+					paste  6400 61440 input MC/mc06-256.img 15360 8960 15360 1 b \
+					paste  6400 46080 input MC/mc05-256.img 15360 8960 15360 1 b \
+					paste  6400 30720 input MC/mc04-256.img 15360 8960 15360 1 b \
+					paste  6400 15360 input MC/mc03-256.img 15360 8960 15360 1 b \
+					paste  6400     0 input MC/mc02-256.img 15360 8960 15360 1 b \
+					                  input MC/mc01-256.img 92160 6400 92160 1 b

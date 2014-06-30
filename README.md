@@ -1,7 +1,6 @@
 # RAWK
 
 Todo:
-- value test
 - crop
 - normalize
 - 2x2 downsample
