@@ -20,48 +20,35 @@
 class offset : public image
 {
 public:
-    offset(int r, int c, int m, image *L) : image(L), row(r), col(c), mode(m) { }
+    offset(int rows, int columns, int m, image *L)
+        : image(L), rows(rows), columns(columns), mode(m) { }
 
-    virtual double get(int, int, int) const;
-    virtual void tweak(int, int);
+    virtual double get(int i, int j, int k) const
+    {
+        return L->get(wrap(i - rows,    L->get_height(), mode & 1),
+                      wrap(j - columns, L->get_width (), mode & 2), k);
+    }
 
-    virtual std::string doc() const;
+    virtual void tweak(int a, int v)
+    {
+        if (a == 0) columns += v;
+        if (a == 1) rows    += v;
+    }
+
+    virtual std::string doc() const
+    {
+        std::ostringstream out;
+        out << "offset " << rows
+                   << " " << columns
+                   << " " << mode;
+        return out.str();
+    }
 
 private:
-    int row;
-    int col;
+    int rows;
+    int columns;
     int mode;
 };
-
-//------------------------------------------------------------------------------
-
-double offset::get(int i, int j, int k) const
-{
-    const int h = L->geth();
-    const int w = L->getw();
-    const int d = L->getd();
-
-    if (0 <= i && i < h && 0 <= j && j < w && 0 <= k && k < d)
-        return L->get(wrap(i - row, h, mode & 1),
-                      wrap(j - col, w, mode & 2), k);
-    else
-        return 0.0;
-}
-
-void offset::tweak(int a, int v)
-{
-    if (a == 0) col += v;
-    if (a == 1) row += v;
-}
-
-std::string offset::doc() const
-{
-    std::ostringstream sout;
-    sout << "offset " << row
-               << " " << col
-               << " " << mode;
-    return sout.str();
-}
 
 //------------------------------------------------------------------------------
 

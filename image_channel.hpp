@@ -24,7 +24,7 @@ public:
 
     virtual double get(int, int, int) const;
 
-    virtual int getd() const { return index + 1; }
+    virtual int get_depth() const { return index + 1; }
 
     virtual std::string doc() const;
 
@@ -44,9 +44,9 @@ double channel::get(int i, int j, int k) const
 
 std::string channel::doc() const
 {
-    std::ostringstream sout;
-    sout << "channel " << index;
-    return sout.str();
+    std::ostringstream out;
+    out << "channel " << index;
+    return out.str();
 }
 
 //------------------------------------------------------------------------------

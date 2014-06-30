@@ -22,25 +22,19 @@ class sum : public image
 public:
     sum(image *L, image *R) : image(L, R) { }
 
-    virtual double get(int, int, int) const;
+    virtual double get(int i, int j, int k) const
+    {
+        return L->get(i, j, k)
+             + R->get(i, j, k);
+    }
 
-    virtual std::string doc() const;
+    virtual std::string doc() const
+    {
+        std::ostringstream out;
+        out << "sum";
+        return out.str();
+    }
 };
-
-//------------------------------------------------------------------------------
-
-double sum::get(int i, int j, int k) const
-{
-    return L->get(i, j, k)
-         + R->get(i, j, k);
-}
-
-std::string sum::doc() const
-{
-    std::ostringstream sout;
-    sout << "sum";
-    return sout.str();
-}
 
 //------------------------------------------------------------------------------
 

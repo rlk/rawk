@@ -20,81 +20,67 @@
 class output : public image
 {
 public:
-    output(std::string, char, image *);
-   ~output();
+    output(std::string name, char type, image *L) : image(L), file(0)
+    {
+        const int height = L->get_height();
+        const int width  = L->get_width ();
+        const int depth  = L->get_depth ();
 
-    virtual double get(int, int, int) const;
+        switch (type)
+        {
+            case 'b': file = new rawb(name, 0, height, width, depth, true); break;
+            case 'c': file = new rawc(name, 0, height, width, depth, true); break;
+            case 'u': file = new rawu(name, 0, height, width, depth, true); break;
+            case 'U': file = new rawU(name, 0, height, width, depth, true); break;
+            case 's': file = new raws(name, 0, height, width, depth, true); break;
+            case 'S': file = new rawS(name, 0, height, width, depth, true); break;
+            case 'l': file = new rawl(name, 0, height, width, depth, true); break;
+            case 'L': file = new rawL(name, 0, height, width, depth, true); break;
+            case 'i': file = new rawi(name, 0, height, width, depth, true); break;
+            case 'I': file = new rawI(name, 0, height, width, depth, true); break;
+            case 'f': file = new rawf(name, 0, height, width, depth, true); break;
+            case 'F': file = new rawF(name, 0, height, width, depth, true); break;
+            case 'd': file = new rawd(name, 0, height, width, depth, true); break;
+            case 'D': file = new rawD(name, 0, height, width, depth, true); break;
+        }
+    }
 
-    virtual std::string doc() const;
+   ~output()
+    {
+        delete file;
+    }
 
-    void go() const;
+    virtual double get(int i, int j, int k) const
+    {
+        return L->get(i, j, k);
+    }
+
+    virtual std::string doc() const
+    {
+        std::ostringstream out;
+        out << "output " << file->get_name  ()
+                  << " " << file->get_height()
+                  << " " << file->get_width ()
+                  << " " << file->get_depth ();
+        return out.str();
+    }
+
+    void go() const
+    {
+     	int i, h = get_height();
+     	int j, w = get_width();
+     	int k, d = get_depth();
+
+    	#pragma omp parallel for private(j, k)
+        for         (i = 0; i < h; ++i)
+            for     (j = 0; j < w; ++j)
+                for (k = 0; k < d; ++k)
+                    file->put(i, j, k, L->get(i, j, k));
+    }
 
 private:
     raw *file;
 };
-
-//------------------------------------------------------------------------------
-
-output::output(std::string name, char t, image *H) : image(H), file(0)
-{
-    const int h = L->geth();
-    const int w = L->getw();
-    const int d = L->getd();
-
-    switch (t)
-    {
-        case 'b': file = new rawb(name, 0, h, w, d, true); break;
-        case 'c': file = new rawc(name, 0, h, w, d, true); break;
-        case 'u': file = new rawu(name, 0, h, w, d, true); break;
-        case 'U': file = new rawU(name, 0, h, w, d, true); break;
-        case 's': file = new raws(name, 0, h, w, d, true); break;
-        case 'S': file = new rawS(name, 0, h, w, d, true); break;
-        case 'l': file = new rawl(name, 0, h, w, d, true); break;
-        case 'L': file = new rawL(name, 0, h, w, d, true); break;
-        case 'i': file = new rawi(name, 0, h, w, d, true); break;
-        case 'I': file = new rawI(name, 0, h, w, d, true); break;
-        case 'f': file = new rawf(name, 0, h, w, d, true); break;
-        case 'F': file = new rawF(name, 0, h, w, d, true); break;
-        case 'd': file = new rawd(name, 0, h, w, d, true); break;
-        case 'D': file = new rawD(name, 0, h, w, d, true); break;
-    }
-}
-
-output::~output()
-{
-    delete file;
-}
-
-double output::get(int i, int j, int k) const
-{
-    return L->get(i, j, k);
-}
-
-std::string output::doc() const
-{
-    std::ostringstream sout;
-    sout << "output " << file->getname()
-               << " " << file->geth()
-               << " " << file->getw()
-               << " " << file->getd();
-    return sout.str();
-}
-
-void output::go() const
-{
- 	int h = geth();
- 	int w = getw();
- 	int d = getd();
-	int i;
-	int j;
-	int k;
-
-	#pragma omp parallel for private(j, k)
-    for         (i = 0; i < h; ++i)
-        for     (j = 0; j < w; ++j)
-            for (k = 0; k < d; ++k)
-                file->put(i, j, k, L->get(i, j, k));
-}
 
 //------------------------------------------------------------------------------
 

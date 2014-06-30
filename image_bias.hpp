@@ -20,35 +20,28 @@
 class bias : public image
 {
 public:
-    bias(double d, image *L) : image(L), value(d) { }
+    bias(double value, image *L) : image(L), value(value) { }
 
-    virtual double get(int, int, int) const;
-    virtual void tweak(int, int);
+    virtual double get(int i, int j, int k) const
+    {
+        return L->get(i, j, k) + value;
+    }
 
-    virtual std::string doc() const;
+    virtual void tweak(int a, int v)
+    {
+        if (a == 0) value += 0.1 * v;
+    }
+
+    virtual std::string doc() const
+    {
+        std::ostringstream out;
+        out << "bias " << value;
+        return out.str();
+    }
 
 private:
     double value;
 };
-
-//------------------------------------------------------------------------------
-
-double bias::get(int i, int j, int k) const
-{
-    return L->get(i, j, k) + value;
-}
-
-void bias::tweak(int a, int v)
-{
-    if (a == 0) value += 0.1 * v;
-}
-
-std::string bias::doc() const
-{
-    std::ostringstream sout;
-    sout << "bias " << value;
-    return sout.str();
-}
 
 //------------------------------------------------------------------------------
 

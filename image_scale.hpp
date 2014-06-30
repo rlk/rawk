@@ -20,12 +20,24 @@
 class scale : public image
 {
 public:
-    scale(double d, image *L) : image(L), value(d) { }
+    scale(double value, image *L) : image(L), value(value) { }
 
-    virtual double get(int, int, int) const;
-    virtual void tweak(int, int);
+    virtual double get(int i, int j, int k) const
+    {
+        return L->get(i, j, k) * value;
+    }
 
-    virtual std::string doc() const;
+    virtual void tweak(int a, int v)
+    {
+        if (a == 0) value += 0.1 * v;
+    }
+
+    virtual std::string doc() const
+    {
+        std::ostringstream out;
+        out << "scale " << value;
+        return out.str();
+    }
 
 private:
     double value;
@@ -33,22 +45,6 @@ private:
 
 //------------------------------------------------------------------------------
 
-double scale::get(int i, int j, int k) const
-{
-    return L->get(i, j, k) * value;
-}
-
-void scale::tweak(int a, int v)
-{
-    if (a == 0) value += 0.1 * v;
-}
-
-std::string scale::doc() const
-{
-    std::ostringstream sout;
-    sout << "scale " << value;
-    return sout.str();
-}
 
 //------------------------------------------------------------------------------
 

@@ -20,49 +20,45 @@
 class trim : public image
 {
 public:
-    trim(int h, int w, image *L) : image(L), h(h), w(w) { }
+    trim(int height, int width, image *L)
+        : image(L), height(height), width(width) { }
 
-    virtual double get(int, int, int) const;
-    virtual void tweak(int, int);
+    virtual double get(int i, int j, int k) const
+    {
+        const int h = L->get_height();
+        const int w = L->get_width ();
 
-    virtual int geth() const { return h; }
-    virtual int getw() const { return w; }
+        if (h > height) i += (h - height) / 2;
+        if (height > h) i -= (height - h) / 2;
+        if (w >  width) j += (w -  width) / 2;
+        if (width  > w) j -= (width  - w) / 2;
 
-    virtual std::string doc() const;
+        return L->get(i, j, k);
+    }
+
+    virtual int get_height() const { return height; }
+    virtual int get_width () const { return width;  }
+
+    virtual void tweak(int a, int v)
+    {
+        if (a == 0) width  += v;
+        if (a == 1) height += v;
+    }
+
+    virtual std::string doc() const
+    {
+        std::ostringstream out;
+        out << "trim " << height << " " << width;
+        return out.str();
+    }
 
 private:
-    int h;
-    int w;
+    int height;
+    int width;
 };
 
 //------------------------------------------------------------------------------
 
-double trim::get(int i, int j, int k) const
-{
-    const int hh = L->geth();
-    const int ww = L->getw();
-
-    if (hh > h) i += (hh - h) / 2;
-    if (h > hh) i -= (h - hh) / 2;
-    if (ww > w) j += (ww - w) / 2;
-    if (w > ww) j -= (w - ww) / 2;
-
-    return L->get(i, j, k);
-}
-
-void trim::tweak(int a, int v)
-{
-    if (a == 0) w += v;
-    if (a == 1) h += v;
-}
-
-std::string trim::doc() const
-{
-    std::ostringstream sout;
-    sout << "trim " << h
-             << " " << w;
-    return sout.str();
-}
 
 //------------------------------------------------------------------------------
 

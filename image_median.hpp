@@ -20,15 +20,40 @@
 class median : public image
 {
 public:
-    median(int r, int m, image *L) : image(L), rad(r), mode(m) { }
+    median(int radius, int mode, image *L)
+        : image(L), radius(radius), mode(mode) { }
 
-    virtual double get(int, int, int) const;
-    virtual void tweak(int, int);
+    virtual double get(int i, int j, int k) const
+    {
+        const int h = L->get_height();
+        const int w = L->get_height();
 
-    virtual std::string doc() const;
+        std::vector<double> v((2 * radius + 1) * (2 * radius + 1));
+
+        for     (int ii = i - radius; ii <= i + radius; ii++)
+            for (int jj = j - radius; jj <= j + radius; jj++)
+
+                v.push_back(L->get(int(wrap(ii, h, mode & 1)),
+                                   int(wrap(jj, w, mode & 2)), k));
+
+        std::nth_element(v.begin(), v.begin() + v.size() / 2, v.end());
+        return v[v.size() / 2];
+    }
+
+    virtual void tweak(int a, int v)
+    {
+        if (a == 0) radius += v;
+    }
+
+    virtual std::string doc() const
+    {
+        std::ostringstream out;
+        out << "median " << radius;
+        return out.str();
+    }
 
 protected:
-    int rad;
+    int radius;
     int mode;
 };
 
@@ -38,11 +63,27 @@ class medianv : public median
 {
 public:
 
-    medianv(int r, int m, image *L) : median(r, m, L) { }
+    medianv(int radius, int mode, image *L) : median(radius, mode, L) { }
 
-    virtual double get(int, int, int) const;
+    virtual double get(int i, int j, int k) const
+    {
+        const int h = L->get_height();
 
-    virtual std::string doc() const;
+        std::vector<double> v(2 * radius + 1);
+
+        for (int ii = i - radius; ii <= i + radius; ii++)
+            v.push_back(L->get(int(wrap(ii, h, mode & 1)), j, k));
+
+        std::nth_element(v.begin(), v.begin() + v.size() / 2, v.end());
+        return v[v.size() / 2];
+    }
+
+    virtual std::string doc() const
+    {
+        std::ostringstream out;
+        out << "medianv " << radius;
+        return out.str();
+    }
 };
 
 /// Median filter with a horizontal kernel
@@ -51,86 +92,28 @@ class medianh : public median
 {
 public:
 
-    medianh(int r, int m, image *L) : median(r, m, L) { }
+    medianh(int radius, int mode, image *L) : median(radius, mode, L) { }
 
-    virtual double get(int, int, int) const;
+    virtual double get(int i, int j, int k) const
+    {
+        const int w = L->get_width();
 
-    virtual std::string doc() const;
+        std::vector<double> v(2 * radius + 1);
+
+        for (int jj = j - radius; jj <= j + radius; jj++)
+            v.push_back(L->get(i, int(wrap(jj, w, mode & 1)), k));
+
+        std::nth_element(v.begin(), v.begin() + v.size() / 2, v.end());
+        return v[v.size() / 2];
+    }
+
+    virtual std::string doc() const
+    {
+        std::ostringstream out;
+        out << "medianh " << radius;
+        return out.str();
+    }
 };
-
-//------------------------------------------------------------------------------
-
-double median::get(int i, int j, int k) const
-{
-    const int h = L->geth();
-    const int w = L->geth();
-
-    std::vector<double> v((2 * rad + 1) * (2 * rad + 1));
-
-    for     (int ii = i - rad; ii <= i + rad; ii++)
-        for (int jj = j - rad; jj <= j + rad; jj++)
-            v.push_back(L->get(int(wrap(ii, h, mode & 1)),
-                               int(wrap(jj, w, mode & 2)), k));
-
-    std::nth_element(v.begin(), v.begin() + v.size() / 2, v.end());
-    return v[v.size() / 2];
-}
-
-void median::tweak(int a, int v)
-{
-    if (a == 0) rad += v;
-}
-
-std::string median::doc() const
-{
-    std::ostringstream sout;
-    sout << "median " << rad;
-    return sout.str();
-}
-
-//------------------------------------------------------------------------------
-
-double medianv::get(int i, int j, int k) const
-{
-    const int h = L->geth();
-
-    std::vector<double> v(2 * rad + 1);
-
-    for (int ii = i - rad; ii <= i + rad; ii++)
-        v.push_back(L->get(int(wrap(ii, h, mode & 1)), j, k));
-
-    std::nth_element(v.begin(), v.begin() + v.size() / 2, v.end());
-    return v[v.size() / 2];
-}
-
-std::string medianv::doc() const
-{
-    std::ostringstream sout;
-    sout << "medianv " << rad;
-    return sout.str();
-}
-
-//------------------------------------------------------------------------------
-
-double medianh::get(int i, int j, int k) const
-{
-    const int w = L->getw();
-
-    std::vector<double> v(2 * rad + 1);
-
-    for (int jj = j - rad; jj <= j + rad; jj++)
-        v.push_back(L->get(i, int(wrap(jj, w, mode & 1)), k));
-
-    std::nth_element(v.begin(), v.begin() + v.size() / 2, v.end());
-    return v[v.size() / 2];
-}
-
-std::string medianh::doc() const
-{
-    std::ostringstream sout;
-    sout << "medianh " << rad;
-    return sout.str();
-}
 
 //------------------------------------------------------------------------------
 

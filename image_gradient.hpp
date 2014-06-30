@@ -20,30 +20,14 @@
 class gradient : public image
 {
 public:
-    gradient(int w, image *L) : image(L), mode(w) { }
+    gradient(int mode, image *L) : image(L), mode(mode) { }
 
-    virtual double get(int, int, int) const;
-
-    virtual std::string doc() const;
-
-private:
-    int mode;
-};
-
-//------------------------------------------------------------------------------
-
-double gradient::get(int ic, int jc, int k) const
-{
-    const int h = L->geth();
-    const int w = L->getw();
-    const int d = L->getd();
-
-    if (0 <= ic && ic < h && 0 <= jc && jc < w && 0 <= k && k < d)
+    virtual double get(int ic, int jc, int k) const
     {
-        const int in = wrap(ic - 1, L->geth(), mode & 1);
-        const int is = wrap(ic + 1, L->geth(), mode & 1);
-        const int jw = wrap(jc - 1, L->getw(), mode & 2);
-        const int je = wrap(jc + 1, L->getw(), mode & 2);
+        const int in = wrap(ic - 1, L->get_height(), mode & 1);
+        const int is = wrap(ic + 1, L->get_height(), mode & 1);
+        const int jw = wrap(jc - 1, L->get_width (), mode & 2);
+        const int je = wrap(jc + 1, L->get_width (), mode & 2);
 
         double d1 = L->get(in, jw, k);
         double d2 = L->get(in, jc, k);
@@ -60,15 +44,21 @@ double gradient::get(int ic, int jc, int k) const
 
         return sqrt(Lx * Lx + Ly * Ly);
     }
-    return 0.0;
-}
 
-std::string gradient::doc() const
-{
-    std::ostringstream sout;
-    sout << "gradient " << mode;
-    return sout.str();
-}
+    virtual std::string doc() const
+    {
+        std::ostringstream out;
+        out << "gradient " << mode;
+        return out.str();
+    }
+
+private:
+    int mode;
+};
+
+//------------------------------------------------------------------------------
+
+
 
 //------------------------------------------------------------------------------
 

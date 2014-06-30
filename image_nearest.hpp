@@ -20,45 +20,38 @@
 class nearest : public image
 {
 public:
-    nearest(int h, int w, image *L) : image(L), h(h), w(w) { }
+    nearest(int height, int width, image *L)
+        : image(L), height(height), width(width) { }
 
-    virtual double get(int, int, int) const;
-    virtual void tweak(int, int);
+    virtual double get(int i, int j, int k) const
+    {
+        const long long hh = (long long) L->get_height();
+        const long long ww = (long long) L->get_width();
 
-    virtual int geth() const { return h; }
-    virtual int getw() const { return w; }
+        return L->get(int((long long) i * hh / (long long) height),
+                      int((long long) j * ww / (long long) width), k);
+    }
 
-    virtual std::string doc() const;
+    virtual int get_height() const { return height; }
+    virtual int get_width () const { return width;  }
+
+    virtual void tweak(int a, int v)
+    {
+        if (a == 0) width -= v;
+        if (a == 1) height -= v;
+    }
+
+    virtual std::string doc() const
+    {
+        std::ostringstream out;
+        out << "nearest " << height << " " << width;
+        return out.str();
+    }
 
 private:
-    int h;
-    int w;
+    int height;
+    int width;
 };
-
-//------------------------------------------------------------------------------
-
-double nearest::get(int i, int j, int k) const
-{
-    const long long hh = (long long) L->geth();
-    const long long ww = (long long) L->getw();
-
-    return L->get(int((long long) i * hh / (long long) h),
-                  int((long long) j * ww / (long long) w), k);
-}
-
-void nearest::tweak(int a, int v)
-{
-    if (a == 0) w -= v;
-    if (a == 1) h -= v;
-}
-
-std::string nearest::doc() const
-{
-    std::ostringstream sout;
-    sout << "nearest " << h
-                << " " << w;
-    return sout.str();
-}
 
 //------------------------------------------------------------------------------
 

@@ -68,42 +68,50 @@ public :
 class raw
 {
 public:
-    raw(std::string name, size_t o, size_t h, size_t w, size_t d, size_t s, bool m)
-        : name(name), h(h), w(w), d(d), s(s), f(0), p(0)
+    raw(std::string name, size_t start, size_t height, size_t width, size_t depth, size_t size, bool write) :
+        name(name),
+        start(start),
+        height(height),
+        width(width),
+        depth(depth),
+        size(size),
+        file(0),
+        buffer(0),
+        pixels(0)
     {
-        size_t n = h * w * d * s;
+        size_t length = start + height * width * depth * size;
 
-        int mode = m ? O_RDWR | O_TRUNC | O_CREAT : O_RDONLY;
-        int prot = m ? PROT_READ | PROT_WRITE : PROT_READ;
+        int mode = write ? O_RDWR | O_TRUNC | O_CREAT : O_RDONLY;
+        int prot = write ? PROT_READ | PROT_WRITE : PROT_READ;
 
-        if ((f = open(name.c_str(), mode, 0666)) == -1)
+        if ((file = open(name.c_str(), mode, 0666)) == -1)
             throw raw_error(name, strerror(errno));
 
-        if (m && ftruncate(f, n) == -1)
+        if (write && ftruncate(file, length) == -1)
             throw raw_error(name, strerror(errno));
 
-        if ((q = mmap(0, n + o, prot, MAP_SHARED, f, 0)) == MAP_FAILED)
+        if ((buffer = mmap(0, length, prot, MAP_SHARED, file, 0)) == MAP_FAILED)
             throw raw_error(name, strerror(errno));
 
-        p = uint8_p(q) + o;
+        pixels = uint8_p(buffer) + start;
     }
 
     virtual void   put(int, int, int, double) = 0;
     virtual double get(int, int, int) const   = 0;
 
-    std::string getname() const { return name; }
-    int         geth()    const { return h;    }
-    int         getw()    const { return w;    }
-    int         getd()    const { return d;    }
+    std::string get_name()   const { return name;   }
+    int         get_height() const { return height; }
+    int         get_width()  const { return width;  }
+    int         get_depth()  const { return depth;  }
 
     virtual ~raw()
     {
-        size_t n = h * w * d * s;
+        size_t length = start + height * width * depth * size;
 
-        if (munmap(q, n) == -1)
+        if (munmap(buffer, length) == -1)
             throw raw_error(name, strerror(errno));
 
-        if (close(f) == -1)
+        if (close(file) == -1)
             throw raw_error(name, strerror(errno));
     }
 
@@ -111,23 +119,23 @@ protected:
 
     const void *data(int i, int j, int k) const
     {
-        return (const uint8_t *) p + (((i * w) + j) * d + k) * s;
+        return (const uint8_t *) pixels + (((i * width) + j) * depth + k) * size;
     }
     void *data(int i, int j, int k)
     {
-        return       (uint8_t *) p + (((i * w) + j) * d + k) * s;
+        return       (uint8_t *) pixels + (((i * width) + j) * depth + k) * size;
     }
 
     std::string name;
 
-    size_t h;     // Image height
-    size_t w;     // Image width
-    size_t d;     // Image depth
-    size_t s;     // Image sample size
-    size_t o;     // Offset of first data
-    int    f;     // File descriptor
-    void  *p;     // Pointer to beginning of data
-    void  *q;     // Pointer to beginning of file
+    size_t start;
+    size_t height;
+    size_t width;
+    size_t depth;
+    size_t size;
+    int    file;
+    void  *buffer;
+    void  *pixels;
 };
 
 //------------------------------------------------------------------------------

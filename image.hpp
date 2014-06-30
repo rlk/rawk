@@ -15,7 +15,7 @@
 
 //------------------------------------------------------------------------------
 
-/// Base class for all image operators and filters
+/// Base class for all image sources, filters, and operators
 
 class image
 {
@@ -27,29 +27,32 @@ public:
     }
 
     virtual double get(int, int, int) const = 0;
-    virtual void tweak(int, int) { }
 
-    virtual int geth() const
+    virtual int get_height() const
     {
-        if (L && R) return std::max(L->geth(), R->geth());
-        else if (L) return L->geth();
-        else if (R) return L->geth();
+        if (L && R) return std::max(L->get_height(), R->get_height());
+        else if (L) return L->get_height();
+        else if (R) return L->get_height();
         else        return 0;
     }
-    virtual int getw() const
+    virtual int get_width() const
     {
-        if (L && R) return std::max(L->getw(), R->getw());
-        else if (L) return L->getw();
-        else if (R) return L->getw();
+        if (L && R) return std::max(L->get_width(), R->get_width());
+        else if (L) return L->get_width();
+        else if (R) return L->get_width();
         else        return 0;
     }
-    virtual int getd() const
+    virtual int get_depth() const
     {
-        if (L && R) return std::max(L->getd(), R->getd());
-        else if (L) return L->getd();
-        else if (R) return L->getd();
+        if (L && R) return std::max(L->get_depth(), R->get_depth());
+        else if (L) return L->get_depth();
+        else if (R) return L->get_depth();
         else        return 0;
     }
+
+    image *getL() { return L; }
+    image *getR() { return R; }
+    image *getP() { return P; }
 
     virtual ~image()
     {
@@ -57,21 +60,21 @@ public:
         if (L) delete L;
     }
 
+    virtual void tweak(int, int)
+    {
+    }
+
     virtual std::string doc() const
     {
         return std::string("undocumented");
     }
 
-    image *getL() { return L; }
-    image *getR() { return R; }
-    image *getP() { return P; }
-
-    void setP(image *p) { P = p; }
-
 protected:
     image *L;
     image *R;
     image *P;
+
+    void setP(image *p) { P = p; }
 };
 
 //------------------------------------------------------------------------------

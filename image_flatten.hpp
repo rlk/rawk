@@ -16,61 +16,45 @@
 //------------------------------------------------------------------------------
 
 /// Spherical flatten
+///
+/// Account for variation in the flatness of the ellipse used to project
+/// spherical data. This function takes integer pixel locations as both input
+/// and output and performs no interpolation. This is preferable (for now) as
+/// it preserves the identity of data dropouts.
 
 class flatten : public image
 {
 public:
-    flatten(double d, image *L) : image(L), value(d) { }
+    flatten(double value, image *L) : image(L), value(value) { }
 
-    virtual double get(int, int, int) const;
-    virtual void tweak(int, int);
+    virtual double get(int i, int j, int k) const
+    {
+        const int h = L->get_height() / 2;
 
-    virtual std::string doc() const;
+        double l = M_PI_2 * double(h - i) / h;
+
+        double y = sin(l) * value;
+        double x = cos(l);
+        double r = sqrt(x * x + y * y);
+
+        return L->get(-h * (asin(y / r) - M_PI_2) / M_PI_2, j, k);
+    }
+
+    virtual void tweak(int a, int v)
+    {
+        if (a == 0) value += 0.0001 * v;
+    }
+
+    virtual std::string doc() const
+    {
+        std::ostringstream out;
+        out << "flatten " << value;
+        return out.str();
+    }
 
 private:
     double value;
 };
-
-//------------------------------------------------------------------------------
-
-// Account for differences in the flatness of the ellipses used to project
-// spherical data.
-//
-// This function takes integer pixel locations as both input and output and
-// performs no interpolation. This is preferable (for now) as it preserves
-// the identity of data dropouts.
-
-double flatten::get(int i, int j, int k) const
-{
-    const int h = L->geth() / 2;
-
-    double lat = M_PI_2 * double(h - i) / h;
-
-    double y = sin(lat) * value;
-    double x = cos(lat);
-    double r = sqrt(x * x + y * y);
-
-    x = x / r;
-    y = y / r;
-
-    lat = asin(y);
-
-    i = -h * (lat - M_PI_2) / M_PI_2;
-
-    return L->get(i, j, k);
-}
-
-void flatten::tweak(int a, int v)
-{
-    if (a == 0) value += 0.0001 * v;
-}
-
-std::string flatten::doc() const
-{
-    std::ostringstream sout;
-    sout << "flatten " << value;
-    return sout.str();
-}
 
 //------------------------------------------------------------------------------
 

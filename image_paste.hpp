@@ -20,48 +20,40 @@
 class paste : public image
 {
 public:
-    paste(int r, int c, image *L, image *R) : image(L, R), row(r), col(c) { }
+    paste(int row, int column, image *L, image *R)
+        : image(L, R), row(row), column(column) { }
 
-    virtual double get(int, int, int) const;
+    virtual double get(int i, int j, int k) const
+    {
+        if (row    <= i && i < row    + L->get_height() &&
+            column <= j && j < column + L->get_width())
 
-    virtual int geth() const;
-    virtual int getw() const;
+            return L->get(i - row, j - column, k);
+        else
+            return R->get(i, j, k);
+    }
 
-    virtual std::string doc() const;
+    virtual int get_height() const
+    {
+        return std::max(L->get_height() + row,    R->get_height());
+    }
+
+    virtual int get_width () const
+    {
+        return std::max(L->get_width()  + column, R->get_width());
+    }
+
+    virtual std::string doc() const
+    {
+        std::ostringstream out;
+        out << "paste " << row << " " << column;
+        return out.str();
+    }
 
 private:
     int row;
-    int col;
+    int column;
 };
-
-//------------------------------------------------------------------------------
-
-double paste::get(int i, int j, int k) const
-{
-    if (row <= i && i < row + L->geth() &&
-        col <= j && j < col + L->getw())
-        return L->get(i - row, j - col, k);
-    else
-        return R->get(i, j, k);
-}
-
-int paste::geth() const
-{
-    return std::max(L->geth() + row, R->geth());
-}
-
-int paste::getw() const
-{
-    return std::max(L->getw() + col, R->getw());
-}
-
-std::string paste::doc() const
-{
-    std::ostringstream sout;
-    sout << "paste " << row
-              << " " << col;
-    return sout.str();
-}
 
 //------------------------------------------------------------------------------
 

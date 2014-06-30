@@ -15,72 +15,67 @@
 
 //------------------------------------------------------------------------------
 
+static inline double lerp(double a, double b, double t)
+{
+    return b * t + a * (1 - t);
+}
+
+//------------------------------------------------------------------------------
+
 /// Linearly-interpolated resampling filter
 
 class linear : public image
 {
 public:
-    linear(int h, int w, int m, image *L) : image(L), h(h), w(w), mode(m) { }
+    linear(int height, int width, int m, image *L)
+        : image(L), height(height), width(width), mode(m) { }
 
-    virtual double get(int, int, int) const;
-    virtual void tweak(int, int);
+    virtual double get(int i, int j, int k) const
+    {
+        int hh = L->get_height();
+        int ww = L->get_width();
 
-    virtual int geth() const { return h; }
-    virtual int getw() const { return w; }
+        double ii = double(i) * double(hh) / double(height);
+        double jj = double(j) * double(ww) / double(width);
 
-    virtual std::string doc() const;
+        double s = ii - floor(ii);
+        double t = jj - floor(jj);
+
+        int ia = wrap(int(floor(ii)), hh, mode & 1);
+        int ib = wrap(int( ceil(ii)), hh, mode & 1);
+        int ja = wrap(int(floor(jj)), ww, mode & 2);
+        int jb = wrap(int( ceil(jj)), ww, mode & 2);
+
+        double aa = L->get(ia, ja, k);
+        double ab = L->get(ia, jb, k);
+        double ba = L->get(ib, ja, k);
+        double bb = L->get(ib, jb, k);
+
+        return lerp(lerp(aa, ab, t),
+                    lerp(ba, bb, t), s);
+    }
+
+    virtual int get_height() const { return height; }
+    virtual int get_width () const { return width;  }
+
+    virtual void tweak(int a, int v)
+    {
+        if (a == 0) width -= v;
+        if (a == 1) height -= v;
+    }
+
+    virtual std::string doc() const
+    {
+        std::ostringstream out;
+        out << "linear " << height << " " << width;
+        return out.str();
+    }
 
 private:
-    int h;
-    int w;
+    int height;
+    int width;
     int mode;
 };
-
-//------------------------------------------------------------------------------
-
-static inline double interp(double a, double b, double t)
-{
-    return b * t + a * (1 - t);
-}
-
-double linear::get(int i, int j, int k) const
-{
-    int hh = L->geth();
-    int ww = L->getw();
-
-    double ii = double(i) * double(hh) / double(h);
-    double jj = double(j) * double(ww) / double(w);
-
-    double s = ii - floor(ii);
-    double t = jj - floor(jj);
-
-    int ia = wrap(int(floor(ii)), hh, mode & 1);
-    int ib = wrap(int( ceil(ii)), hh, mode & 1);
-    int ja = wrap(int(floor(jj)), ww, mode & 2);
-    int jb = wrap(int( ceil(jj)), ww, mode & 2);
-
-    double aa = L->get(ia, ja, k);
-    double ab = L->get(ia, jb, k);
-    double ba = L->get(ib, ja, k);
-    double bb = L->get(ib, jb, k);
-
-    return interp(interp(aa, ab, t),
-                  interp(ba, bb, t), s);
-}
-
-void linear::tweak(int a, int v)
-{
-    if (a == 0) w -= v;
-    if (a == 1) h -= v;
-}
-
-std::string linear::doc() const
-{
-    std::ostringstream sout;
-    sout << "linear " << h
-                << " " << w;
-    return sout.str();
-}
 
 //------------------------------------------------------------------------------
 

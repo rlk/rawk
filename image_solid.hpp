@@ -20,36 +20,29 @@
 class solid : public image
 {
 public:
-    solid(int h, int w, double v) : h(h), w(w), value(v) { }
+    solid(int height, int width, double value)
+        : height(height), width(width), value(value) { }
 
-    virtual double get(int, int, int) const;
+    virtual double get(int i, int j, int k) const
+    {
+        return value;
+    }
 
-    virtual int geth() const { return h; }
-    virtual int getw() const { return w; }
+    virtual int get_height() const { return height; }
+    virtual int get_width () const { return width;  }
 
-    virtual std::string doc() const;
+    virtual std::string doc() const
+    {
+        std::ostringstream out;
+        out << "solid " << height << " " << width << " " << value;
+        return out.str();
+    }
 
 private:
-    int h;
-    int w;
+    int    height;
+    int    width;
     double value;
 };
-
-//------------------------------------------------------------------------------
-
-double solid::get(int i, int j, int k) const
-{
-    return value;
-}
-
-std::string solid::doc() const
-{
-    std::ostringstream sout;
-    sout << "solid " << h <<
-                 " " << w <<
-                 " " << value;
-    return sout.str();
-}
 
 //------------------------------------------------------------------------------
 
