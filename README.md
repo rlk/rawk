@@ -1,7 +1,6 @@
 # RAWK
 
 Todo:
-- crop
 - normalize
 - 2x2 downsample
 - mark node

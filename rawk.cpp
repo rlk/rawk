@@ -18,6 +18,7 @@
 #include "image_bias.hpp"
 #include "image_blend.hpp"
 #include "image_convolve.hpp"
+#include "image_crop.hpp"
 #include "image_cubic.hpp"
 #include "image_flatten.hpp"
 #include "image_gradient.hpp"
@@ -611,6 +612,16 @@ static image *parse(int& i, char **v)
             image *L = parse(i, v);
             image *R = parse(i, v);
             return new blend(L, R);
+        }
+
+        if (op == "crop")
+        {
+            int    r = int(strtol(v[i++], 0, 0));
+            int    c = int(strtol(v[i++], 0, 0));
+            int    h = int(strtol(v[i++], 0, 0));
+            int    w = int(strtol(v[i++], 0, 0));
+            image *L = parse(i, v);
+            return new crop(r, c, h, w, L);
         }
 
         if (op == "cubic")
