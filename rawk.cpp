@@ -48,6 +48,20 @@ struct state
     double x;      ///< Position of the pixel at the center of the view
     double y;      ///< Position of the pixel at the center of the view
     double z;      ///< View zoom factor
+
+    void center(image *p, int width, int height)
+    {
+        const int h = p->get_height();
+        const int w = p->get_width();
+
+        if (double(width) / double(height) < double(w) / double(h))
+            z = double(w) / double(width);
+        else
+            z = double(h) / double(height);
+
+        x = w * 0.5 - 0.5;
+        y = h * 0.5 - 0.5;
+    }
 };
 
 /// RAWK application
@@ -55,7 +69,7 @@ struct state
 class rawk : public gl::demonstration
 {
 public:
-    rawk(image *);
+    rawk(int, char **);
    ~rawk();
 
     void   draw();
@@ -93,6 +107,7 @@ private:
 
     // Current and stored view configurations
 
+    image *root_image;
     state  curr_state;
     image *curr_image;
     state  mark_state[12];
@@ -111,13 +126,15 @@ private:
     void   doU();
     void   doD();
 
-    void   refresh();
-    void   retitle();
+    void refresh();
+    void retitle();
+
+    image *parse(int&, char **);
 };
 
 //------------------------------------------------------------------------------
 
-rawk::rawk(image *p) : demonstration("RAWK", 1280, 720), program(0)
+rawk::rawk(int argc, char **argv) : demonstration("RAWK", 1280, 720), program(0)
 {
     // Initialize the OpenGL state.
 
@@ -134,26 +151,29 @@ rawk::rawk(image *p) : demonstration("RAWK", 1280, 720), program(0)
     point_x  =  0;
     point_y  =  0;
 
-    // Compute the default view state.
+    // Parse the command line arguments.
 
-    const int h = p->get_height();
-    const int w = p->get_width();
+    int argi = 1;
 
-    if (double(width) / double(height) < double(w) / double(h))
-        curr_state.z = double(w) / double(width);
-    else
-        curr_state.z = double(h) / double(height);
+    memset(mark_image, 0, sizeof (mark_image));
 
-    curr_state.x = w * 0.5 - 0.5;
-    curr_state.y = h * 0.5 - 0.5;
-    curr_image   = p;
-
-    // Copy the default state to all state registers.
-
-    for (int i = 0; i < 12; i++)
+    if ((root_image = parse(argi, argv)))
     {
-        mark_state[i] = curr_state;
-        mark_image[i] = curr_image;
+        // Initialize the stored view and image states.
+
+        for (int i = 0; i < 12; i++)
+            if (mark_image[i])
+                mark_state[i].center(mark_image[i], width, height);
+            else
+            {
+                mark_state[i].center(root_image,    width, height);
+                mark_image[i] = root_image;
+            }
+
+        // Initialize the current view and image state.
+
+        curr_state = mark_state[0];
+        curr_image = mark_image[0];
     }
 
     // Initialize the cache.
@@ -163,6 +183,8 @@ rawk::rawk(image *p) : demonstration("RAWK", 1280, 720), program(0)
 
 rawk::~rawk()
 {
+    delete root_image;
+
     glDeleteProgram(program);
 
     glDeleteBuffers     (1, &vbuffer);
@@ -532,38 +554,41 @@ void rawk::retitle()
 
 void rawk::refresh()
 {
-    struct timeval t0;
-    struct timeval t1;
+    if (curr_image)
+    {
+        struct timeval t0;
+        struct timeval t1;
 
-    std::vector<GLfloat> pixel(width * height * 3, 0);
+        std::vector<GLfloat> pixel(width * height * 3, 0);
 
-    const int depth = std::min(curr_image->get_depth(), 3);
+        const int depth = std::min(curr_image->get_depth(), 3);
 
-    int r;
-    int c;
-    int k;
+        int r;
+        int c;
+        int k;
 
-    gettimeofday(&t0, 0);
+        gettimeofday(&t0, 0);
 
-    #pragma omp parallel for private(c, k)
-    for         (r = 0; r < height; ++r)
-        for     (c = 0; c < width;  ++c)
-            for (k = 0; k < depth;  ++k)
-            {
-                int i = toint(curr_state.y + (r - height / 2) * curr_state.z);
-                int j = toint(curr_state.x + (c - width  / 2) * curr_state.z);
-                pixel[(r * width + c) * 3 + k] = curr_image->get(i, j, k);
-            }
+        #pragma omp parallel for private(c, k)
+        for         (r = 0; r < height; ++r)
+            for     (c = 0; c < width;  ++c)
+                for (k = 0; k < depth;  ++k)
+                {
+                    int i = toint(curr_state.y + (r - height / 2) * curr_state.z);
+                    int j = toint(curr_state.x + (c - width  / 2) * curr_state.z);
+                    pixel[(r * width + c) * 3 + k] = curr_image->get(i, j, k);
+                }
 
-    gettimeofday(&t1, 0);
+        gettimeofday(&t1, 0);
 
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height,
-                    GL_RGB, GL_FLOAT, &pixel.front());
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height,
+                        GL_RGB, GL_FLOAT, &pixel.front());
 
-    cache_state = curr_state;
+        cache_state = curr_state;
 
-    std::cout << double(t1.tv_sec  - t0.tv_sec) +
-                 double(t1.tv_usec - t0.tv_usec) / 1000000.0 << std::endl;
+        std::cout << double(t1.tv_sec  - t0.tv_sec) +
+                     double(t1.tv_usec - t0.tv_usec) / 1000000.0 << std::endl;
+    }
 }
 
 /// Render the contents of the image cache to the screen.
@@ -587,9 +612,7 @@ void rawk::draw()
 
 //------------------------------------------------------------------------------
 
-static output *out = 0;
-
-static image *parse(int& i, char **v)
+image *rawk::parse(int& i, char **v)
 {
     if (v[i])
     {
@@ -677,12 +700,13 @@ static image *parse(int& i, char **v)
             return new linear(h, w, m, L);
         }
 
-        if (op == "median")
+        if (op == "mark")
         {
-            int    r = int(strtol(v[i++], 0, 0));
-            int    m = int(strtol(v[i++], 0, 0));
+            int    n = int(strtol(v[i++], 0, 0)) - 1;
             image *L = parse(i, v);
-            return new median(r, m, L);
+            if (0 <= n && n < 12)
+                mark_image[n] = L;
+            return L;
         }
 
         if (op == "matrix")
@@ -696,6 +720,14 @@ static image *parse(int& i, char **v)
 
             image *L = parse(i, v);
             return new matrix(r, c, k, L);
+        }
+
+        if (op == "median")
+        {
+            int    r = int(strtol(v[i++], 0, 0));
+            int    m = int(strtol(v[i++], 0, 0));
+            image *L = parse(i, v);
+            return new median(r, m, L);
         }
 
         if (op == "medianh")
@@ -742,7 +774,7 @@ static image *parse(int& i, char **v)
             char  *a = v[i++];
             char   t = v[i++][0];
             image *L = parse(i, v);
-            return (out = new output(a, t, L));
+            return new output(a, t, L);
         }
 
         if (op == "paste")
@@ -824,18 +856,8 @@ int main(int argc, char **argv)
 {
     try
     {
-        int argi = 1;
-
-        image *in = parse(argi, argv);
-
-        if (out)
-            out->go();
-        else
-        {
-            rawk app(in);
-            app.run(true);
-        }
-        delete in;
+        rawk app(argc, argv);
+        app.run(true);
         return 0;
     }
     catch (std::exception &e)

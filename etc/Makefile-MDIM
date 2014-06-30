@@ -1,11 +1,11 @@
 
 preview :
-	rawk normalize \
-		paste 5760 17280 input MDIM/mars45s315.rgb 0 5760 5760 3 b \
-		paste 5760 11520 input MDIM/mars45s225.rgb 0 5760 5760 3 b \
-		paste 5760  5760 input MDIM/mars45s135.rgb 0 5760 5760 3 b \
-		paste 5760     0 input MDIM/mars45s045.rgb 0 5760 5760 3 b \
-		paste    0 17280 input MDIM/mars45n315.rgb 0 5760 5760 3 b \
-		paste    0 11520 input MDIM/mars45n225.rgb 0 5760 5760 3 b \
-		paste    0  5760 input MDIM/mars45n135.rgb 0 5760 5760 3 b \
-		                 input MDIM/mars45n045.rgb 0 5760 5760 3 b \
+	rawk \
+		paste 5760 17280 mark 2 input MDIM/mars45s315.rgb 0 5760 5760 3 b \
+		paste 5760 11520 mark 3 input MDIM/mars45s225.rgb 0 5760 5760 3 b \
+		paste 5760  5760 mark 4 input MDIM/mars45s135.rgb 0 5760 5760 3 b \
+		paste 5760     0 mark 5 input MDIM/mars45s045.rgb 0 5760 5760 3 b \
+		paste    0 17280 mark 6 input MDIM/mars45n315.rgb 0 5760 5760 3 b \
+		paste    0 11520 mark 7 input MDIM/mars45n225.rgb 0 5760 5760 3 b \
+		paste    0  5760 mark 8 input MDIM/mars45n135.rgb 0 5760 5760 3 b \
+		                 mark 9 input MDIM/mars45n045.rgb 0 5760 5760 3 b \
