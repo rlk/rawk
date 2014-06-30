@@ -10,44 +10,38 @@
 // FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
 // more details.
 
-#ifndef IMAGE_CHANNEL_HPP
-#define IMAGE_CHANNEL_HPP
+#ifndef IMAGE_APPEND_HPP
+#define IMAGE_APPEND_HPP
 
 //------------------------------------------------------------------------------
 
-/// Channel reassignment filter
+/// Channel append
 
-class channel : public image
+class append : public image
 {
 public:
-    channel(int k, image *L) : image(L), index(k) { }
+    append(image *L, image *R) : image(L, R) { }
 
-    virtual double get(int, int, int) const;
+    virtual double get(int i, int j, int k) const
+    {
+        const int d = L->get_depth();
 
-    virtual int get_depth() const { return index + 1; }
+        if (k < d)
+            return L->get(i, j, k);
+        else
+            return R->get(i, j, k - d);
+    }
 
-    virtual std::string doc() const;
+    virtual int get_depth() const
+    {
+        return L->get_depth() + R->get_depth();
+    }
 
-private:
-    int index;
+    virtual std::string doc() const
+    {
+        return "append";
+    }
 };
-
-//------------------------------------------------------------------------------
-
-double channel::get(int i, int j, int k) const
-{
-    if (k == index)
-        return L->get(i, j, 0);
-    else
-        return 0.0;
-}
-
-std::string channel::doc() const
-{
-    std::ostringstream out;
-    out << "channel " << index;
-    return out.str();
-}
 
 //------------------------------------------------------------------------------
 

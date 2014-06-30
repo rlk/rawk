@@ -10,27 +10,36 @@
 // FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
 // more details.
 
-#ifndef IMAGE_SUM_HPP
-#define IMAGE_SUM_HPP
+#ifndef IMAGE_BLEND_HPP
+#define IMAGE_BLEND_HPP
 
 //------------------------------------------------------------------------------
 
-/// Sum operator
+/// Blend operator
 
-class sum : public image
+class blend : public image
 {
 public:
-    sum(image *L, image *R) : image(L, R) { }
+    blend(image *L, image *R) : image(L, R) { }
 
     virtual double get(int i, int j, int k) const
     {
-        return L->get(i, j, k)
-             + R->get(i, j, k);
+        double a = L->get(i, j, L->get_depth() - 1);
+
+        if (a == 1.0) return L->get(i, j, k);
+        if (a == 0.0) return R->get(i, j, k);
+
+        return a * L->get(i, j, k) + (1.0 - a) * R->get(i, j, k);
+    }
+
+    virtual int get_depth() const
+    {
+        return std::max(L->get_depth() - 1, R->get_depth());
     }
 
     virtual std::string doc() const
     {
-        return "sum";
+        return "blend";
     }
 };
 

@@ -12,8 +12,9 @@
 #include "rawk.hpp"
 #include "image.hpp"
 
+#include "image_append.hpp"
 #include "image_bias.hpp"
-#include "image_channel.hpp"
+#include "image_blend.hpp"
 #include "image_cubic.hpp"
 #include "image_flatten.hpp"
 #include "image_gradient.hpp"
@@ -48,11 +49,11 @@ public:
     rawk(image *);
    ~rawk();
 
-    void    draw();
-    void   wheel(int, int);
-    void  motion(int, int);
-    void  button(int, bool);
-    void     key(int, bool, bool);
+    void   draw();
+    void  wheel(int, int);
+    void motion(int, int);
+    void button(int, bool);
+    void    key(int, bool, bool);
 
 private:
 
@@ -62,23 +63,23 @@ private:
     void init_program(std::string, std::string);
     void init_texture();
 
-    GLuint varray;
-    GLuint vbuffer;
-    GLuint program;
-    GLuint texture;
+    GLuint varray;                 ///< GL vertex array object
+    GLuint vbuffer;                ///< GL vertex buffer object
+    GLuint program;                ///< GL program object
+    GLuint texture;                ///< GL texture object
 
-    GLint  u_offset;
-    GLint  u_scale;
+    GLint  u_offset;               ///< Offset uniform location
+    GLint  u_scale;                ///< Scale uniform location
 
     // Interaction state
 
-    int    selector;
-    bool   dragging;
+    int    selector;               ///< Currently-held Function key (-1 if none)
+    bool   dragging;               ///< Mouse drag in progress?
 
-    int    point_x;
-    int    point_y;
-    int    click_x;
-    int    click_y;
+    int    point_x;                ///< Pointer position at last mouse motion
+    int    point_y;                ///< Pointer position at last mouse motion
+    int    click_x;                ///< Pointer position at last mouse click
+    int    click_y;                ///< Pointer position at last mouse click
 
     // Current and stored view configurations
 
@@ -552,18 +553,25 @@ static image *parse(int& i, char **v)
     {
         std::string op(v[i++]);
 
+        if (op == "append")
+        {
+            image *L = parse(i, v);
+            image *R = parse(i, v);
+            return new append(L, R);
+        }
+
         if (op == "bias")
         {
             double d = strtod(v[i++], 0);
-            image *p = parse(i, v);
-            return new bias(d, p);
+            image *L = parse(i, v);
+            return new bias(d, L);
         }
 
-        if (op == "channel")
+        if (op == "blend")
         {
-            int    k = int(strtol(v[i++], 0, 0));
-            image *p = parse(i, v);
-            return new channel(k, p);
+            image *L = parse(i, v);
+            image *R = parse(i, v);
+            return new blend(L, R);
         }
 
         if (op == "cubic")
@@ -571,22 +579,22 @@ static image *parse(int& i, char **v)
             int    h = int(strtol(v[i++], 0, 0));
             int    w = int(strtol(v[i++], 0, 0));
             int    m = int(strtol(v[i++], 0, 0));
-            image *p = parse(i, v);
-            return new cubic(h, w, m, p);
+            image *L = parse(i, v);
+            return new cubic(h, w, m, L);
         }
 
         if (op == "flatten")
         {
             double d = strtod(v[i++], 0);
-            image *p = parse(i, v);
-            return new flatten(d, p);
+            image *L = parse(i, v);
+            return new flatten(d, L);
         }
 
         if (op == "gradient")
         {
             int    m = int(strtol(v[i++], 0, 0));
-            image *p = parse(i, v);
-            return new gradient(m, p);
+            image *L = parse(i, v);
+            return new gradient(m, L);
         }
 
         if (op == "input")
@@ -605,40 +613,40 @@ static image *parse(int& i, char **v)
             int    h = int(strtol(v[i++], 0, 0));
             int    w = int(strtol(v[i++], 0, 0));
             int    m = int(strtol(v[i++], 0, 0));
-            image *p = parse(i, v);
-            return new linear(h, w, m, p);
+            image *L = parse(i, v);
+            return new linear(h, w, m, L);
         }
 
         if (op == "median")
         {
             int    r = int(strtol(v[i++], 0, 0));
             int    m = int(strtol(v[i++], 0, 0));
-            image *p = parse(i, v);
-            return new median(r, m, p);
+            image *L = parse(i, v);
+            return new median(r, m, L);
         }
 
         if (op == "medianh")
         {
             int    r = int(strtol(v[i++], 0, 0));
             int    m = int(strtol(v[i++], 0, 0));
-            image *p = parse(i, v);
-            return new medianh(r, m, p);
+            image *L = parse(i, v);
+            return new medianh(r, m, L);
         }
 
         if (op == "medianv")
         {
             int    r = int(strtol(v[i++], 0, 0));
             int    m = int(strtol(v[i++], 0, 0));
-            image *p = parse(i, v);
-            return new medianv(r, m, p);
+            image *L = parse(i, v);
+            return new medianv(r, m, L);
         }
 
         if (op == "nearest")
         {
             int    h = int(strtol(v[i++], 0, 0));
             int    w = int(strtol(v[i++], 0, 0));
-            image *p = parse(i, v);
-            return new nearest(h, w, p);
+            image *L = parse(i, v);
+            return new nearest(h, w, L);
         }
 
         if (op == "offset")
@@ -646,16 +654,16 @@ static image *parse(int& i, char **v)
             int    r = int(strtol(v[i++], 0, 0));
             int    c = int(strtol(v[i++], 0, 0));
             int    w = int(strtol(v[i++], 0, 0));
-            image *p = parse(i, v);
-            return new offset(r, c, w, p);
+            image *L = parse(i, v);
+            return new offset(r, c, w, L);
         }
 
         if (op == "output")
         {
             char  *a = v[i++];
             char   t = v[i++][0];
-            image *p = parse(i, v);
-            return (out = new output(a, t, p));
+            image *L = parse(i, v);
+            return (out = new output(a, t, L));
         }
 
         if (op == "paste")
@@ -670,8 +678,8 @@ static image *parse(int& i, char **v)
         if (op == "scale")
         {
             double d = strtod(v[i++], 0);
-            image *p = parse(i, v);
-            return new scale(d, p);
+            image *L = parse(i, v);
+            return new scale(d, L);
         }
 
         if (op == "solid")
@@ -693,8 +701,8 @@ static image *parse(int& i, char **v)
         {
             int    h = int(strtol(v[i++], 0, 0));
             int    w = int(strtol(v[i++], 0, 0));
-            image *p = parse(i, v);
-            return new trim(h, w, p);
+            image *L = parse(i, v);
+            return new trim(h, w, L);
         }
     }
     throw std::runtime_error("Expected image argument");
