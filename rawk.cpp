@@ -27,6 +27,7 @@
 #include "image_matrix.hpp"
 #include "image_median.hpp"
 #include "image_nearest.hpp"
+#include "image_normalize.hpp"
 #include "image_offset.hpp"
 #include "image_output.hpp"
 #include "image_paste.hpp"
@@ -719,6 +720,12 @@ static image *parse(int& i, char **v)
             int    w = int(strtol(v[i++], 0, 0));
             image *L = parse(i, v);
             return new nearest(h, w, L);
+        }
+
+        if (op == "normalize")
+        {
+            image *L = parse(i, v);
+            return new normalize(L);
         }
 
         if (op == "offset")
