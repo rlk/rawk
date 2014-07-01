@@ -15,7 +15,7 @@
 
 //------------------------------------------------------------------------------
 
-// Convolution filter
+/// Convolution filter
 
 class convolve : public image
 {
@@ -51,7 +51,7 @@ protected:
 
 //------------------------------------------------------------------------------
 
-// Gaussian convolution filter
+/// Gaussian convolution filter
 
 class gaussian : public convolve
 {

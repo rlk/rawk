@@ -15,7 +15,7 @@
 
 //------------------------------------------------------------------------------
 
-// Dilation filter
+/// Dilation filter
 
 class dilate : public image
 {
@@ -51,7 +51,7 @@ protected:
 
 //------------------------------------------------------------------------------
 
-// Erosion filter
+/// Erosion filter
 
 class erode : public image
 {

@@ -10,17 +10,17 @@
 // FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
 // more details.
 
-#ifndef IMAGE_SCALE_HPP
-#define IMAGE_SCALE_HPP
+#ifndef IMAGE_GAIN_HPP
+#define IMAGE_GAIN_HPP
 
 //------------------------------------------------------------------------------
 
-/// Scale filter
+/// Gain filter
 
-class scale : public image
+class gain : public image
 {
 public:
-    scale(double value, image *L) : image(L), value(value) { }
+    gain(double value, image *L) : image(L), value(value) { }
 
     virtual double get(int i, int j, int k) const
     {
@@ -34,7 +34,7 @@ public:
 
     virtual void doc(std::ostream& out) const
     {
-        out << "scale " << value;
+        out << "gain " << value;
     }
 
 private:

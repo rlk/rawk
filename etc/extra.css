@@ -6,7 +6,21 @@ div.contents {
 	margin-right: 32px;
 }
 
-/* The default fonts are inconsistent. */
+/* Distinguish headers from body text in textblocks. */
+
+div.textblock {
+	margin-left:  30px;
+}
+
+div.textblock>h2 {
+	margin-left: -30px;
+}
+
+div.textblock>h3 {
+	margin-left: -15px;
+}
+
+/* More consistent font usage. */
 
 #projectname
 {

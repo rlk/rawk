@@ -1,7 +1,7 @@
 FLAGS  = -Wall
 
 CXX = c++
-FLAGS += -O2
+FLAGS += -g
 
 # ifeq ($(DEBUG), 1)
 #	CXX = c++
@@ -25,6 +25,7 @@ rawk : image_blend.hpp
 rawk : image_convolve.hpp
 rawk : image_crop.hpp
 rawk : image_flatten.hpp
+rawk : image_gain.hpp
 rawk : image_gradient.hpp
 rawk : image_input.hpp
 rawk : image_matrix.hpp
@@ -36,7 +37,6 @@ rawk : image_output.hpp
 rawk : image_paste.hpp
 rawk : image_reduce.hpp
 rawk : image_resample.hpp
-rawk : image_scale.hpp
 rawk : image_solid.hpp
 rawk : image_swizzle.hpp
 rawk : image_threshold.hpp

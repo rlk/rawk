@@ -21,6 +21,7 @@
 #include "image_convolve.hpp"
 #include "image_crop.hpp"
 #include "image_flatten.hpp"
+#include "image_gain.hpp"
 #include "image_gradient.hpp"
 #include "image_input.hpp"
 #include "image_matrix.hpp"
@@ -32,7 +33,6 @@
 #include "image_paste.hpp"
 #include "image_reduce.hpp"
 #include "image_resample.hpp"
-#include "image_scale.hpp"
 #include "image_solid.hpp"
 #include "image_swizzle.hpp"
 #include "image_threshold.hpp"
@@ -588,9 +588,10 @@ void rawk::refresh()
                         GL_RGB, GL_FLOAT, &pixel.front());
 
         cache_state = curr_state;
-
+#if 0
         std::cout << double(t1.tv_sec  - t0.tv_sec) +
                      double(t1.tv_usec - t0.tv_usec) / 1000000.0 << std::endl;
+#endif
     }
 }
 
@@ -689,6 +690,13 @@ image *rawk::parse(int& i, char **v)
             double d = strtod(v[i++], 0);
             image *L = parse(i, v);
             return new flatten(d, L);
+        }
+
+        if (op == "gain")
+        {
+            double d = strtod(v[i++], 0);
+            image *L = parse(i, v);
+            return new gain(d, L);
         }
 
         if (op == "gaussian")
@@ -822,13 +830,6 @@ image *rawk::parse(int& i, char **v)
         {
             image *L = parse(i, v);
             return new rgb2yuv(L);
-        }
-
-        if (op == "scale")
-        {
-            double d = strtod(v[i++], 0);
-            image *L = parse(i, v);
-            return new scale(d, L);
         }
 
         if (op == "solid")
