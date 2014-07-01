@@ -1,8 +1,6 @@
 # RAWK
 
 Todo:
-- subtract
-
 - better error messages
 - BMP example
 

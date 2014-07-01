@@ -10,10 +10,19 @@
 // FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
 // more details.
 
-#ifndef IMAGE_CUBIC_HPP
-#define IMAGE_CUBIC_HPP
+#ifndef IMAGE_RESAMPLE_HPP
+#define IMAGE_RESAMPLE_HPP
 
 //------------------------------------------------------------------------------
+
+/// Linear interpolation
+
+static inline double lerp(double a, double b, double t)
+{
+    return b * t + a * (1 - t);
+}
+
+/// Cubic interpolation
 
 static inline double cerp(double a, double b, double c, double d, double t)
 {
@@ -24,13 +33,103 @@ static inline double cerp(double a, double b, double c, double d, double t)
 
 //------------------------------------------------------------------------------
 
+/// Resampling filter base class
+
+class resample : public image
+{
+public:
+    resample(int height, int width, int mode, image *L)
+        : image(L), height(height), width(width), mode(mode) { }
+
+    virtual int get_height() const { return height; }
+    virtual int get_width () const { return width;  }
+
+    virtual void tweak(int a, int v)
+    {
+        if (a == 0) width  -= v;
+        if (a == 1) height -= v;
+    }
+
+protected:
+    int height;
+    int width;
+    int mode;
+};
+
+//------------------------------------------------------------------------------
+
+/// Nearest value resampling filter
+
+class nearest : public resample
+{
+public:
+    nearest(int height, int width, image *L) : resample(height, width, 0, L) { }
+
+    virtual double get(int i, int j, int k) const
+    {
+        const long long hh = (long long) L->get_height();
+        const long long ww = (long long) L->get_width();
+
+        return L->get(int((long long) i * hh / (long long) height),
+                      int((long long) j * ww / (long long) width), k);
+    }
+
+    virtual void doc(std::ostream& out) const
+    {
+        out << "nearest " << height << " " << width;
+    }
+};
+
+//------------------------------------------------------------------------------
+
+/// Linearly-interpolated resampling filter
+
+class linear : public resample
+{
+public:
+    linear(int height, int width, int mode, image *L)
+        : resample(height, width, mode, L) { }
+
+    virtual double get(int i, int j, int k) const
+    {
+        int hh = L->get_height();
+        int ww = L->get_width();
+
+        double ii = double(i) * double(hh) / double(height);
+        double jj = double(j) * double(ww) / double(width);
+
+        double s = ii - floor(ii);
+        double t = jj - floor(jj);
+
+        int ia = wrap(int(floor(ii)), hh, mode & 1);
+        int ib = wrap(int( ceil(ii)), hh, mode & 1);
+        int ja = wrap(int(floor(jj)), ww, mode & 2);
+        int jb = wrap(int( ceil(jj)), ww, mode & 2);
+
+        double aa = L->get(ia, ja, k);
+        double ab = L->get(ia, jb, k);
+        double ba = L->get(ib, ja, k);
+        double bb = L->get(ib, jb, k);
+
+        return lerp(lerp(aa, ab, t),
+                    lerp(ba, bb, t), s);
+    }
+
+    virtual void doc(std::ostream& out) const
+    {
+        out << "linear " << height << " " << width << " " << mode;
+    }
+};
+
+//------------------------------------------------------------------------------
+
 /// Cubic-interpolated resampling filter
 
-class cubic : public image
+class cubic : public resample
 {
 public:
     cubic(int height, int width, int mode, image *L)
-        : image(L), height(height), width(width), mode(mode) { }
+        : resample(height, width, mode, L) { }
 
     virtual double get(int i, int j, int k) const
     {
@@ -76,24 +175,10 @@ public:
                     cerp(da, db, dc, dd, t), s);
     }
 
-    virtual int get_height() const { return height; }
-    virtual int get_width () const { return width;  }
-
-    virtual void tweak(int a, int v)
-    {
-        if (a == 0) width  -= v;
-        if (a == 1) height -= v;
-    }
-
     virtual void doc(std::ostream& out) const
     {
-        out << "cubic " << height << " " << width;
+        out << "cubic " << height << " " << width << " " << mode;
     }
-
-private:
-    int height;
-    int width;
-    int mode;
 };
 
 //------------------------------------------------------------------------------
