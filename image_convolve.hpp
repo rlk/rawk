@@ -42,11 +42,6 @@ public:
         return t / total;
     }
 
-    virtual std::string doc() const
-    {
-        return "convolve";
-    }
-
 protected:
     int    radius;
     int    mode;
@@ -73,6 +68,13 @@ public:
                 kernel[z] = t;
                 total    += t;
             }
+    }
+
+    virtual std::string doc() const
+    {
+        std::ostringstream out;
+        out << "gaussian " << radius << " " << mode;
+        return out.str();
     }
 };
 
