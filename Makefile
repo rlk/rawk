@@ -30,6 +30,7 @@ rawk : image_input.hpp
 rawk : image_linear.hpp
 rawk : image_matrix.hpp
 rawk : image_median.hpp
+rawk : image_morphology.hpp
 rawk : image_nearest.hpp
 rawk : image_normalize.hpp
 rawk : image_offset.hpp

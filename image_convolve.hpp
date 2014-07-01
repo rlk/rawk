@@ -10,8 +10,8 @@
 // FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
 // more details.
 
-#ifndef IMAGE_GAUSSIAN_HPP
-#define IMAGE_GAUSSIAN_HPP
+#ifndef IMAGE_CONVOLVE_HPP
+#define IMAGE_CONVOLVE_HPP
 
 //------------------------------------------------------------------------------
 

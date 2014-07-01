@@ -1,8 +1,9 @@
 # RAWK
 
 Todo:
-- normalize
-- mark node
+- dilate
+- erode
+- subtract
 
 - better error messages
 - BMP example

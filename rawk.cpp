@@ -26,6 +26,7 @@
 #include "image_linear.hpp"
 #include "image_matrix.hpp"
 #include "image_median.hpp"
+#include "image_morphology.hpp"
 #include "image_nearest.hpp"
 #include "image_normalize.hpp"
 #include "image_offset.hpp"
@@ -656,6 +657,22 @@ image *rawk::parse(int& i, char **v)
             int    m = int(strtol(v[i++], 0, 0));
             image *L = parse(i, v);
             return new cubic(h, w, m, L);
+        }
+
+        if (op == "dilate")
+        {
+            int    r = int(strtol(v[i++], 0, 0));
+            int    m = int(strtol(v[i++], 0, 0));
+            image *L = parse(i, v);
+            return new dilate(r, m, L);
+        }
+
+        if (op == "erode")
+        {
+            int    r = int(strtol(v[i++], 0, 0));
+            int    m = int(strtol(v[i++], 0, 0));
+            image *L = parse(i, v);
+            return new erode(r, m, L);
         }
 
         if (op == "flatten")
