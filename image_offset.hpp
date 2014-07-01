@@ -35,13 +35,11 @@ public:
         if (a == 1) rows    += v;
     }
 
-    virtual std::string doc() const
+    virtual void doc(std::ostream& out) const
     {
-        std::ostringstream out;
         out << "offset " << rows
                    << " " << columns
                    << " " << mode;
-        return out.str();
     }
 
 private:

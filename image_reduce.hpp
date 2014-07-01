@@ -33,9 +33,9 @@ public:
     virtual int get_height() const { return L->get_height() / 2; }
     virtual int get_width () const { return L->get_width () / 2; }
 
-    virtual std::string doc() const
+    virtual void doc(std::ostream& out) const
     {
-        return "reduce";
+        out << "reduce";
     }
 };
 

@@ -64,9 +64,9 @@ public:
     {
     }
 
-    virtual std::string doc() const
+    virtual void doc(std::ostream& out) const
     {
-        return std::string("undocumented");
+        out << "undocumented";
     }
 
 protected:

@@ -36,11 +36,9 @@ public:
     virtual int get_height() const { return height; }
     virtual int get_width () const { return width;  }
 
-    virtual std::string doc() const
+    virtual void doc(std::ostream& out) const
     {
-        std::ostringstream out;
         out << "crop " << row << " " << column << " " << height << " " << width;
-        return out.str();
     }
 
 private:

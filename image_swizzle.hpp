@@ -43,11 +43,9 @@ public:
         return index.size();
     }
 
-    virtual std::string doc() const
+    virtual void doc(std::ostream& out) const
     {
-        std::ostringstream out;
         out << "swizzle " << mode;
-        return out.str();
     }
 
 private:

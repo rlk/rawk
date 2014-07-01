@@ -45,11 +45,9 @@ public:
         if (a == 0) value += 0.0001 * v;
     }
 
-    virtual std::string doc() const
+    virtual void doc(std::ostream& out) const
     {
-        std::ostringstream out;
         out << "flatten " << value;
-        return out.str();
     }
 
 private:

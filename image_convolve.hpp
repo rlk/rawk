@@ -70,11 +70,9 @@ public:
             }
     }
 
-    virtual std::string doc() const
+    virtual void doc(std::ostream& out) const
     {
-        std::ostringstream out;
         out << "gaussian " << radius << " " << mode;
-        return out.str();
     }
 };
 

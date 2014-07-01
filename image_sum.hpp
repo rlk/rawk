@@ -28,9 +28,9 @@ public:
              + R->get(i, j, k);
     }
 
-    virtual std::string doc() const
+    virtual void doc(std::ostream& out) const
     {
-        return "sum";
+        out << "sum";
     }
 };
 

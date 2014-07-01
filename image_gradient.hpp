@@ -45,11 +45,9 @@ public:
         return sqrt(Lx * Lx + Ly * Ly);
     }
 
-    virtual std::string doc() const
+    virtual void doc(std::ostream& out) const
     {
-        std::ostringstream out;
         out << "gradient " << mode;
-        return out.str();
     }
 
 private:

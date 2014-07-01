@@ -528,9 +528,13 @@ void rawk::retitle()
     // Document the current image. Parentheses indicate temporary selection.
 
     if (selector < 0)
-        stream        << p->doc();
+        p->doc(stream);
     else
-        stream << "(" << p->doc() << ")";
+    {
+        stream << "(";
+        p->doc(stream);
+        stream << ")";
+    }
 
     // Include the current pointer position.
 

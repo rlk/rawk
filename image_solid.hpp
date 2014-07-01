@@ -31,11 +31,9 @@ public:
     virtual int get_height() const { return height; }
     virtual int get_width () const { return width;  }
 
-    virtual std::string doc() const
+    virtual void doc(std::ostream& out) const
     {
-        std::ostringstream out;
         out << "solid " << height << " " << width << " " << value;
-        return out.str();
     }
 
 private:

@@ -85,11 +85,9 @@ public:
         if (a == 1) height -= v;
     }
 
-    virtual std::string doc() const
+    virtual void doc(std::ostream& out) const
     {
-        std::ostringstream out;
         out << "cubic " << height << " " << width;
-        return out.str();
     }
 
 private:

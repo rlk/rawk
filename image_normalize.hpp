@@ -42,9 +42,9 @@ public:
         return (v / sqrt(r) + 1.0) / 2.0;
     }
 
-    virtual std::string doc() const
+    virtual void doc(std::ostream& out) const
     {
-        return "normalize";
+        out << "normalize";
     }
 };
 

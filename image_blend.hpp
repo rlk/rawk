@@ -37,9 +37,9 @@ public:
         return std::max(L->get_depth() - 1, R->get_depth());
     }
 
-    virtual std::string doc() const
+    virtual void doc(std::ostream& out) const
     {
-        return "blend";
+        out << "blend";
     }
 };
 

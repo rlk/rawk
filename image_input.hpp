@@ -61,14 +61,12 @@ public:
     virtual int get_width () const { return file->get_width (); }
     virtual int get_depth () const { return file->get_depth (); }
 
-    virtual std::string doc() const
+    virtual void doc(std::ostream& out) const
     {
-        std::ostringstream out;
         out << "input " << file->get_name  ()
                  << " " << file->get_height()
                  << " " << file->get_width ()
                  << " " << file->get_depth ();
-        return out.str();
     }
 
 private:

@@ -39,11 +39,9 @@ public:
         return v;
     }
 
-    virtual std::string doc() const
+    virtual void doc(std::ostream& out) const
     {
-        std::ostringstream out;
         out << "dilate " << radius << " " << mode;
-        return out.str();
     }
 
 protected:
@@ -77,11 +75,9 @@ public:
         return v;
     }
 
-    virtual std::string doc() const
+    virtual void doc(std::ostream& out) const
     {
-        std::ostringstream out;
         out << "erode " << radius << " " << mode;
-        return out.str();
     }
 
 protected:

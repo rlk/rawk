@@ -37,7 +37,7 @@ public:
         return L->get_depth() + R->get_depth();
     }
 
-    virtual std::string doc() const
+    virtual std::string describe() const
     {
         return "append";
     }

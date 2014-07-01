@@ -55,14 +55,12 @@ public:
         return L->get(i, j, k);
     }
 
-    virtual std::string doc() const
+    virtual void doc(std::ostream& out) const
     {
-        std::ostringstream out;
         out << "output " << file->get_name  ()
                   << " " << file->get_height()
                   << " " << file->get_width ()
                   << " " << file->get_depth ();
-        return out.str();
     }
 
     void go() const

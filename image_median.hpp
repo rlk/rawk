@@ -45,11 +45,9 @@ public:
         if (a == 0) radius += v;
     }
 
-    virtual std::string doc() const
+    virtual void doc(std::ostream& out) const
     {
-        std::ostringstream out;
         out << "median " << radius;
-        return out.str();
     }
 
 protected:
@@ -80,11 +78,9 @@ public:
         return v[v.size() / 2];
     }
 
-    virtual std::string doc() const
+    virtual void doc(std::ostream& out) const
     {
-        std::ostringstream out;
         out << "medianv " << radius;
-        return out.str();
     }
 };
 
@@ -111,11 +107,9 @@ public:
         return v[v.size() / 2];
     }
 
-    virtual std::string doc() const
+    virtual void doc(std::ostream& out) const
     {
-        std::ostringstream out;
         out << "medianh " << radius;
-        return out.str();
     }
 };
 

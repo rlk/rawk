@@ -44,11 +44,9 @@ public:
         return rows;
     }
 
-    virtual std::string doc() const
+    virtual void doc(std::ostream& out) const
     {
-        std::ostringstream out;
         out << "matrix " << rows << " " << columns;
-        return out.str();
     }
 
 private:

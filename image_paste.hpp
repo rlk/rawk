@@ -43,11 +43,9 @@ public:
         return std::max(L->get_width()  + column, R->get_width());
     }
 
-    virtual std::string doc() const
+    virtual void doc(std::ostream& out) const
     {
-        std::ostringstream out;
         out << "paste " << row << " " << column;
-        return out.str();
     }
 
 private:
