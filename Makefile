@@ -19,6 +19,7 @@ rawk : rawk.cpp
 
 rawk : image.hpp
 rawk : image_append.hpp
+rawk : image_arithmetic.hpp
 rawk : image_bias.hpp
 rawk : image_blend.hpp
 rawk : image_convolve.hpp
@@ -39,7 +40,6 @@ rawk : image_paste.hpp
 rawk : image_reduce.hpp
 rawk : image_scale.hpp
 rawk : image_solid.hpp
-rawk : image_sum.hpp
 rawk : image_swizzle.hpp
 rawk : image_threshold.hpp
 rawk : image_trim.hpp

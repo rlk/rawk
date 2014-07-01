@@ -15,6 +15,7 @@
 #include "image.hpp"
 
 #include "image_append.hpp"
+#include "image_arithmetic.hpp"
 #include "image_bias.hpp"
 #include "image_blend.hpp"
 #include "image_convolve.hpp"
@@ -35,7 +36,6 @@
 #include "image_reduce.hpp"
 #include "image_scale.hpp"
 #include "image_solid.hpp"
-#include "image_sum.hpp"
 #include "image_swizzle.hpp"
 #include "image_threshold.hpp"
 #include "image_trim.hpp"
@@ -661,6 +661,13 @@ image *rawk::parse(int& i, char **v)
             int    m = int(strtol(v[i++], 0, 0));
             image *L = parse(i, v);
             return new cubic(h, w, m, L);
+        }
+
+        if (op == "difference")
+        {
+            image *L = parse(i, v);
+            image *R = parse(i, v);
+            return new difference(L, R);
         }
 
         if (op == "dilate")

@@ -10,8 +10,8 @@
 // FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
 // more details.
 
-#ifndef IMAGE_SUM_HPP
-#define IMAGE_SUM_HPP
+#ifndef IMAGE_ARITHMETIC_HPP
+#define IMAGE_ARITHMETIC_HPP
 
 //------------------------------------------------------------------------------
 
@@ -31,6 +31,27 @@ public:
     virtual void doc(std::ostream& out) const
     {
         out << "sum";
+    }
+};
+
+//------------------------------------------------------------------------------
+
+/// Difference operator
+
+class difference : public image
+{
+public:
+    difference(image *L, image *R) : image(L, R) { }
+
+    virtual double get(int i, int j, int k) const
+    {
+        return L->get(i, j, k)
+             - R->get(i, j, k);
+    }
+
+    virtual void doc(std::ostream& out) const
+    {
+        out << "difference";
     }
 };
 

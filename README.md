@@ -1,8 +1,6 @@
 # RAWK
 
 Todo:
-- dilate
-- erode
 - subtract
 
 - better error messages
