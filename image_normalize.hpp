@@ -15,11 +15,21 @@
 
 //------------------------------------------------------------------------------
 
-/// 3D vector renormalization filter
+/// Vector renormalization filter
 
 class normalize : public image
 {
 public:
+    /// Renormalize a normal map. This filter has an extremely limited usage...
+    /// A normal map encodes a unit-length vector N in an unsigned pixel P where
+    /// P = (N + 1) / 2, effectively remapping from the range [-1,+1] to the
+    /// range [0,1]. Most filters ignore the unit-length invariant so the vector
+    /// length drifts as a normal map is operated upon (resampled, scaled, etc).
+    /// This filter corrects this drift. It convert a pixel to a vector,
+    /// normalizes it, and converts it back to a pixel. This should be the last
+    /// filter applied to any normal map process, and is not relevant to any
+    /// other type of process.
+
     normalize(image *L) : image(L) { }
 
     virtual double get(int i, int j, int k) const

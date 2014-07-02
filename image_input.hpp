@@ -16,14 +16,16 @@
 //------------------------------------------------------------------------------
 
 /// Image file reader
-///
-/// Read a raw-formatted data file named *name*. *Height*, *width*, and *depth*
-/// are integers giving the size and channel count of this input. *Type*
-/// is a character giving the sample type.
+
 
 class input : public image
 {
 public:
+    /// Read a raw-formatted data file named *name*. *Start* gives the offset
+    /// into the file where the pixel data begins. *Height*, *width*, and
+    /// *depth* give the size and channel count of this input. *Type* is a
+    /// character giving the @ref type "sample type".
+
     input(std::string name, int start, int height, int width, int depth, char type)
     {
         switch (type)

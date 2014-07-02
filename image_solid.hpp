@@ -15,11 +15,14 @@
 
 //------------------------------------------------------------------------------
 
-/// Solid color generator
+/// Solid value generator
 
 class solid : public image
 {
 public:
+    /// Generate a block of pixels with the given *width* and *height*, a
+    /// depth of one, and a constant *value*.
+
     solid(int height, int width, double value)
         : height(height), width(width), value(value) { }
 

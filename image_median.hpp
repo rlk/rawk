@@ -20,6 +20,11 @@
 class median : public image
 {
 public:
+    /// Find the median over a square of neighboring pixels within *radius*,
+    /// wrapped with the given @ref wrap "wrapping mode". This eliminates
+    /// outliers and noise such as erroneous black or white pixels (aka salt and
+    /// pepper). At high radius, this can be a very expensive filter.
+
     median(int radius, int mode, image *L)
         : image(L), radius(radius), mode(mode) { }
 
@@ -47,7 +52,7 @@ public:
 
     virtual void doc(std::ostream& out) const
     {
-        out << "median " << radius;
+        out << "median " << radius << " " << mode;
     }
 
 protected:
@@ -62,6 +67,8 @@ protected:
 class medianv : public median
 {
 public:
+    /// Find the median over a vertical line of neighboring pixels within
+    /// *radius*, wrapped with the given @ref wrap "wrapping mode".
 
     medianv(int radius, int mode, image *L) : median(radius, mode, L) { }
 
@@ -88,9 +95,12 @@ public:
 
 /// Median filter with a horizontal kernel
 
+
 class medianh : public median
 {
 public:
+    /// Find the median over a horizontal line of neighboring pixels within
+    /// *radius*, wrapped with the given @ref wrap "wrapping mode".
 
     medianh(int radius, int mode, image *L) : median(radius, mode, L) { }
 

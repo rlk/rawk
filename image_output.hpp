@@ -20,6 +20,12 @@
 class output : public image
 {
 public:
+    /// Write a raw-formatted data file named *name*. *Type* is a character
+    /// giving the output @ref type "sample type". The image height, width, and
+    /// depth are given by the *L* image object. Unsigned samples are clamped to
+    /// the range [0,1] and signed samples to the range [-1,+1] before being
+    /// cast to the destination data type.
+
     output(std::string name, char type, image *L) : image(L), file(0)
     {
         const int height = L->get_height();

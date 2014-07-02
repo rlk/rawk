@@ -20,6 +20,12 @@
 class append : public image
 {
 public:
+    /// Append the channels of image *R* to those of image *L*. This can be used
+    /// to assemble a multichannel image from grayscale inputs, or to attach an
+    /// alpha channel for use by ::blend. The width, height, and depth of the
+    /// result are the larger of the widths, heights, and depths of the two
+    /// inputs.
+
     append(image *L, image *R) : image(L, R) { }
 
     virtual double get(int i, int j, int k) const

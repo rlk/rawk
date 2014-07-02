@@ -20,8 +20,11 @@
 class offset : public image
 {
 public:
-    offset(int rows, int columns, int m, image *L)
-        : image(L), rows(rows), columns(columns), mode(m) { }
+    /// Offset the pixels of *L*. *Rows* gives the vertical distance. *Columns*
+    /// gives the horizontal distance. *Mode* is the @ref wrap "wrapping mode".
+
+    offset(int rows, int columns, int mode, image *L)
+        : image(L), rows(rows), columns(columns), mode(mode) { }
 
     virtual double get(int i, int j, int k) const
     {
@@ -37,9 +40,7 @@ public:
 
     virtual void doc(std::ostream& out) const
     {
-        out << "offset " << rows
-                   << " " << columns
-                   << " " << mode;
+        out << "offset " << rows << " " << columns << " " << mode;
     }
 
 private:

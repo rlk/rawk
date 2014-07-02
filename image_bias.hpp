@@ -20,6 +20,9 @@
 class bias : public image
 {
 public:
+    /// Add *value* to all samples of image *L*. This alters the brightness of
+    /// *L*.
+
     bias(double value, image *L) : image(L), value(value) { }
 
     virtual double get(int i, int j, int k) const

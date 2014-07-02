@@ -15,16 +15,18 @@
 
 /** @mainpage RAWK : Gigapixel Raw Image Processing Toolkit
 
+@section manual Manual
+
 RAWK is a command-line tool capable of performing a variety of image processing
 operations on very large raw binary image files. It provides a pannable,
 zoomable preview of the result of the process and enables image process
 parameters to be tuned interactively regardless of the scale of the input and
 output.
 
-The speed and capability of RAWK is lies in its reliance upon the raw binary
-image format, as such images may be read and written without the overhead of
-coding and compression, and may be many times larger than available RAM without
-added code complexity.
+The speed and capability of RAWK lies in its reliance upon the raw binary image
+format, as such images may be read and written without the overhead of coding
+and compression, and may be many times larger than available RAM without added
+algorithmic complexity.
 
 The simplicity of raw binary makes it the recommended format for the NASA
 Planetary Data System, the primary motivator of RAWK. Both Photoshop and
@@ -40,35 +42,51 @@ This tree of objects is specified on the command line. The various ::image
 objects and their parameters are itemized below. Real-world examples of their use are given
 toward the end of this page.
 
-## Introductory Example
+@subsection image_objects Image Objects
 
-Here is a straightforward RAWK process. It reads an image, resizes it, and
-writes it to a new file.
+There is a direct mapping between an image object's constructor and its command
+line arguments, so see the documentation of each individual object for usage.
 
-    ./rawk output result.rgb b cubic 100 100 0 input mandrill.rgb 0 512 512 3 b
+@subsubsection image_sources Image Sources
 
-There are three stages. The first is an ::output object that stores its input
-in a file named "result.rgb" with 8-bit unsigned sample type.
+::input ---
+::solid
 
-    ./rawk output result.rgb b ...
+@subsubsection image_filters Image Filters
 
-The second provides that input, a ::cubic resampling to 100 by 100 with no pixel
-wrap-around.
+::bias ---
+::crop ---
+::cubic ---
+::dilate ---
+::erode ---
+::flatten ---
+::gain ---
+::gaussian ---
+::gradient ---
+::linear ---
+::median ---
+::medianh ---
+::medianv ---
+::nearest ---
+::normalize ---
+::offset ---
+::output ---
+::reduce ---
+::rgb2yuv ---
+::swizzle ---
+::threshold ---
+::trim ---
+::yuv2rgb
 
-    ... cubic 100 100 0 ...
+@subsubsection image_operators Image Operators
 
-The third provides data to the resampler by reading ::input from the file
-system. Because it's raw data, the image offset, height, width, channel count,
-and data type must be specified manually.
+::append ---
+::blend ---
+::difference ---
+::paste ---
+::sum
 
-    ... input mandrill.rgb 0 512 512 3 b
-
-This example is trivial, but the scalability of these building blocks is
-limited only by available disk space.
-
-## Interaction
-
-### Basic Usage
+@subsection interaction Interaction
 
 On execution, RAWK displays an OpenGL window showing a *cache* of the
 result of the image process.
@@ -80,7 +98,7 @@ result of the image process.
 The window title updates to reflect the current position of the mouse pointer
 within the image, as well as the sample value beneath the pointer.
 
-### Exploring the tree
+@subsubsection exploring_the_tree Exploring the tree
 
 By default, the view displays the root of the image process tree, but image
 objects deeper in the tree may also be explored.
@@ -92,7 +110,7 @@ objects deeper in the tree may also be explored.
 
 The window title bar changes to reflect the current image.
 
-### Modifying parameters
+@subsubsection modifying_parameters Modifying parameters
 
 The parameters of many image objects may be tuned interactively.
 
@@ -103,7 +121,7 @@ The parameters of many image objects may be tuned interactively.
 Hold the Shift key to magnify the increase or decrease by a factor of 10. The
 window title bar changes to reflect the current parameters.
 
-### Storing Views
+@subsubsection storing_views Storing Views
 
 The Function keys allow up to 12 view configurations to be stored and recalled.
 This includes both the position and zoom of the view as well as the current image.
@@ -122,7 +140,7 @@ This capability allows the user to view the output of one image while
 manipulating the parameters of another. For example, tweak an ::offset to bring
 the results of two separate processes into alignment before summing thing.
 
-### Display Modes
+@subsubsection display_modes Display Modes
 
 A variety of different data types are supported, but their interpretation must
 be selected manually.
@@ -130,10 +148,11 @@ be selected manually.
 - Press 1 to display one channel as a grayscale image.
 - Press 2 to display the luminance of an RGB image.
 - Press 3 to display three channels as an RGB image.
+- Press 4 to display one channel as a relief-shaded height map.
 
-## Data Issues
+@subsection data Data Issues
 
-### Sample Type
+@subsubsection type Sample Type
 
 A variety of sample formats are supported. The following single-character
 tags are used to indicate sample type in both the API and on the command line.
@@ -149,7 +168,7 @@ Char | Type
 `f`  | 32-bit floating point
 `d`  | 64-bit floating point
 
-Upper-case indicates non-native (byte-swapped) order data.
+Upper-case indicates non-native (byte-swapped) data order.
 
 Char | Type
 ---- | ----
@@ -160,16 +179,16 @@ Char | Type
 `F`  | 32-bit floating point in non-native byte order
 `D`  | 64-bit floating point in non-native byte order
 
-### Out-of-bounds Sampling
+@subsubsection wrap Out-of-bounds Sampling
 
 As an image object samples and processes the pixels of its source image,
-accesses to of neighboring pixels ofter occur. At the image edges, such neighbor
-samples may fall outside the source image. In many cases, an out-of- bounds
-sample results in a zero value. However, it is often preferable to treat the
-source as a repeating pattern and *wrap* out-of-bounds references to the
-opposite edge. Furthermore, it is sometimes necessary to clamp sample positions
-to ensure they fall within the source. In cases where the distinction is
-important, a *mode* parameter is defined like so:
+accesses to neighboring pixels often occur. At the image edges, such neighbor
+samples may fall outside the source image. Generally, an out-of-bounds sample
+results in a zero value. However, it is often preferable to treat the source as
+a repeating pattern and *wrap* out-of-bounds references to the opposite edge. In
+other cases, it is sometimes necessary to clamp sample positions to ensure they
+fall within the source. In circumstances where this distinction is important, a
+*mode* parameter is defined like so:
 
 Mode | Behavior
 ---- | --------
@@ -178,135 +197,11 @@ Mode | Behavior
 2    | Wrap horizontally
 3    | Wrap both vertically and horizontally
 
-## Image Objects
+@section examples Examples
 
-The image objects and their parameters are itemized here. The command line
-argument language that builds the tree of image object is a direct reflection of
-the API, so this section documents both. The parse() function makes this one-
-to-one mapping explicit.
+@subsection pds Planetary Data System
 
-### File I/O
-
-- ::input *name* *height* *width* *depth* *type*
-
-    Read a raw-formatted data file named *name*. *Height*, *width*, and *depth*
-    are integers giving the size and channel count of this input. *Type*
-    is a character giving the sample type, as above.
-
-- ::output *name* *type* *source*
-
-    Write a raw-formatted data file named *name*. *Type* is a character giving
-    the output sample type, as above. The image height, width, and depth are
-    determined by the format of the *source* image object.
-
-### Pixel Sources
-
-- ::solid *height* *width* *value*
-
-    Generate a block of pixels of constant *value* with the given height and
-    width and depth of one.
-
-### Basic Filters
-
-- ::bias *value* *source*
-
-    Add *value* to all samples of *source*. This alters the brightness of
-    *source*.
-
-- ::gain *value* *source*
-
-    Multiply *value* by all samples of *source*. This alters the contrast of
-    *source*.
-
-- ::gradient *mode* *source*
-
-    Compute the magnitude of the gradient of *source*, wrapped with *mode*. This
-    is the value of the greatest rate of change in that image. It's basically an
-    edge detection.
-
-- ::median *radius* *mode* *source*
-
-    Find the median over a square of neighboring *source* pixels within
-    *radius*, wrapped with *mode*. This eliminates outliers and noise, such as
-    erroneous black or white pixels (aka salt and pepper). At high radius, this
-    can be a very expensive filter.
-
-- ::medianh *radius* *mode* *source*
-
-    Find the median over a vertical line of neighboring *source* pixels within
-    *radius*, wrapped with *mode*. This eliminates erroneous horizontal lines.
-
-- ::medianv *radius* *mode* *source*
-
-    Find the median over a horizontal line of neighboring *source* pixels within
-    *radius*, wrapped with *mode*. This eliminates erroneous vertical lines.
-
-- ::offset *rows* *columns* *mode* *source*
-
-    Offset the pixels of *source*, wrapped with *mode*. *Rows* gives the
-    vertical distance. *Columns* gives the horizontal distance.
-
-- ::trim *height* *width* *source*
-
-    Add or subtroct equal amounts of the top and bottom or left and right edges
-    of *source* to give a result with size *height* and *width*. This is akin to
-    a crop filter that automatically calculates the row and column to favor the
-    center of an image. If *height* and *width* are larger than *source*, the
-    result will depend upon how *source* is configured to handle out-of-bounds
-    sampling.
-
-### Resampling Filters
-
-- ::nearest *height* *width* *mode* *source*
-
-    Resample *source* to the given *height* and *width* using nearest-neighbor
-    sampling. *Mode* gives the wrap mode, documented above.
-
-- ::linear *height* *width* *mode* *source*
-
-    Resample *source* to the given *height* and *width* using linearly-
-    interpolated sampling. *Mode* gives the wrap mode, documented above.
-
-- ::cubic *height* *width* *mode* *source*
-
-    Resample *source* to the given *height* and *width* using cubic-interpolated
-    sampling. *Mode* gives the wrap mode, documented above.
-
-### Operators
-
-- ::append *first *second*
-
-    Append the channels of the *second* image to those of the *first* image.
-    This can be used to assemble a multichannel image from grayscale inputs, or
-    to attach an alpha channel for use by ::blend. The width, height, and depth
-    of the result are the larger of the widths, heights, and depths of the two
-    inputs.
-
-- ::blend *first* *second*
-
-    Blend the *first* image with the *second* image using the alpha channel of
-    the *first*. The alpha channel is taken to be the last channel, regardless
-    of actual channel count. The width, height, and depth of the result are the
-    larger of the widths, heights, and depths of the two inputs, with the
-    last channel of the *first* image discarded.
-
-- ::paste *row* *column* *top* *bottom*
-
-    Paste the *top* image over the *bottom* image. *Row* and *column* give the
-    position of the top-left corner of the pasted image within the underlying
-    image. This is useful for reconstructing tiled or sub-divided image files.
-    The width and height of the result expand to accommodate the sizes of both
-    source images .
-
-- ::sum *first* *second*
-
-    Add all samples of the *first* image with the *second* image. The width,
-    height, and depth of the result are the larger of the widths, heights, and
-    depths of the two inputs.
-
-## Examples
-
-The following examples demonstrate procesing of the [Mars Orbiter Laser
+The following examples demonstrate processing of the [Mars Orbiter Laser
 Altimeter](http://pds-geosciences.wustl.edu/missions/mgs/megdr.html) data set,
 a 46080 &times; 23040 terrain map of the planet Mars distributed in the form
 of sixteen raw image tiles.
@@ -367,7 +262,7 @@ the north and south poles. For this reason, the wrap mode for a planetary
 surface map is usually 2. Finally, as the slope of the Martian terrain is quite
 gradual, we'll scale the magnitude by 10 to make it visible.
 
-    rawk scale 10.0 \
+    rawk gain 10.0 \
             gradient 2 \
                 paste 16896 34560 input megt44s270hb.img 0 5632 11520 1 S \
                 paste 16896 23040 input megt44s180hb.img 0 5632 11520 1 S \
@@ -391,7 +286,7 @@ an output node giving the file name. There's no reason to store magnitudes as
 signed values, so `b` is a reasonable type tag.
 
     rawk output megt-gradient.raw b \
-            scale 10.0 \
+            gain 10.0 \
                 gradient 2 \
                     paste 16896 34560 input megt44s270hb.img 0 5632 11520 1 S \
                     paste 16896 23040 input megt44s180hb.img 0 5632 11520 1 S \
@@ -411,8 +306,7 @@ signed values, so `b` is a reasonable type tag.
                                       input megt88n000hb.img 0 5632 11520 1 S
 
 This might take a minute or two, depending on the number of processor cores
-available. The resulting raw image file is suitable for further conversion using
-Photoshop or ImageMagick.
+available.
 
 */
 #endif

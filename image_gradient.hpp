@@ -20,23 +20,27 @@
 class gradient : public image
 {
 public:
+    /// Compute the magnitude of the gradient of image *L*. This is the value of
+    /// the greatest rate of change in that image. This behaves as an edge
+    /// detect. *Mode* gives the @ref wrap "wrapping mode".
+
     gradient(int mode, image *L) : image(L), mode(mode) { }
 
-    virtual double get(int ic, int jc, int k) const
+    virtual double get(int i, int j, int k) const
     {
-        const int in = wrap(ic - 1, L->get_height(), mode & 1);
-        const int is = wrap(ic + 1, L->get_height(), mode & 1);
-        const int jw = wrap(jc - 1, L->get_width (), mode & 2);
-        const int je = wrap(jc + 1, L->get_width (), mode & 2);
+        const int in = wrap(i - 1, L->get_height(), mode & 1);
+        const int is = wrap(i + 1, L->get_height(), mode & 1);
+        const int jw = wrap(j - 1, L->get_width (), mode & 2);
+        const int je = wrap(j + 1, L->get_width (), mode & 2);
 
         double d1 = L->get(in, jw, k);
-        double d2 = L->get(in, jc, k);
+        double d2 = L->get(in, j,  k);
         double d3 = L->get(in, je, k);
-        double d4 = L->get(ic, jw, k);
+        double d4 = L->get(i,  jw, k);
 
-        double d6 = L->get(ic, je, k);
+        double d6 = L->get(i,  je, k);
         double d7 = L->get(is, jw, k);
-        double d8 = L->get(is, jc, k);
+        double d8 = L->get(is, j,  k);
         double d9 = L->get(is, je, k);
 
         double Lx = d3 - d1 + 2.0 * (d6 - d4) + d9 - d7;
@@ -53,10 +57,6 @@ public:
 private:
     int mode;
 };
-
-//------------------------------------------------------------------------------
-
-
 
 //------------------------------------------------------------------------------
 

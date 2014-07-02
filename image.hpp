@@ -20,13 +20,28 @@
 class image
 {
 public:
+    /// Create a new image object with left child *L* and right child *R*.
+    /// The parents *L* and *R* are set to *this*.
+
     image(image *L=0, image *R=0) : L(L), R(R), P(0)
     {
         if (L) L->setP(this);
         if (R) R->setP(this);
     }
 
-    virtual double get(int, int, int) const = 0;
+    /// Finalize this image object by deleting any children.
+
+    virtual ~image()
+    {
+        if (R) delete R;
+        if (L) delete L;
+    }
+
+    /// Return the value of the sample at row *i*, column *j*, channel *k*.
+
+    virtual double get(int i, int j, int k) const = 0;
+
+    /// Return the height of this image.
 
     virtual int get_height() const
     {
@@ -35,6 +50,9 @@ public:
         else if (R) return L->get_height();
         else        return 0;
     }
+
+    /// Return the height of this image.
+
     virtual int get_width() const
     {
         if (L && R) return std::max(L->get_width(), R->get_width());
@@ -42,6 +60,9 @@ public:
         else if (R) return L->get_width();
         else        return 0;
     }
+
+    /// Return the depth of this image.
+
     virtual int get_depth() const
     {
         if (L && R) return std::max(L->get_depth(), R->get_depth());
@@ -50,19 +71,34 @@ public:
         else        return 0;
     }
 
-    image *getL() { return L; }
-    image *getR() { return R; }
-    image *getP() { return P; }
+    /// Return the left child
 
-    virtual ~image()
+    image *getL()
     {
-        if (R) delete R;
-        if (L) delete L;
+        return L;
     }
 
-    virtual void tweak(int, int)
+    /// Return the right child
+
+    image *getR()
+    {
+        return R;
+    }
+
+    /// Return the parent
+
+    image *getP()
+    {
+        return P;
+    }
+
+    /// Tweak image parameter *a*, changing the value by a factor of *v*.
+
+    virtual void tweak(int a, int v)
     {
     }
+
+    /// Produce a string documenting the function of this object.
 
     virtual void doc(std::ostream& out) const
     {
@@ -70,10 +106,11 @@ public:
     }
 
 protected:
-    image *L;
-    image *R;
-    image *P;
+    image *L;    ///< Left child
+    image *R;    ///< Right child
+    image *P;    ///< Parent
 
+private:
     void setP(image *p) { P = p; }
 };
 

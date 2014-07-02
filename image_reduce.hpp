@@ -15,11 +15,16 @@
 
 //------------------------------------------------------------------------------
 
-/// 50% downsample filter
+/// 50% down-sample filter
 
 class reduce : public image
 {
 public:
+    /// Apply a 2-by-2 box-filtered down-sampling to image *L*. The height and
+    /// width of the result will be exactly half that of the input. Reduction is
+    /// often preferable to linear or even cubic downsampling as all samples of
+    /// the input are guaranteed to have equal influence on the output.
+
     reduce(image *L) : image(L) { }
 
     virtual double get(int i, int j, int k) const

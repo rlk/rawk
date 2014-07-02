@@ -20,14 +20,31 @@
 class swizzle : public image
 {
 public:
-    swizzle(std::string mode, image *L) : image(L), mode(mode)
-    {
-        for (int i = 0; i < mode.size(); i++)
-        {
-            int s = mode[i] - '0';
+    /// Reorder, replicate, or remove channels of *L*. *Element* is a string of
+    /// digits used as channel indices. The height and width of the output match
+    /// those of the input, but the depth of the output equals the length of the
+    /// element string.
+    ///
+    /// For example `210` would produce a BGR output from an RGB input. `1`
+    /// would isolate the green channel. `000` would route the red channel to
+    /// all three channels. `0121` would duplicate the green channel as an alpha
+    /// channel.
+    ///
+    /// Elements indices are base 36, which allows inputs of up to 36 channels:
+    /// 0 1 2 3 4 5 6 7 8 9 A B C D E F G H I J K L M N O P Q R S T U V W X Y Z.
 
-            if (0 <= s && s < L->get_depth())
-                index.push_back(s);
+    swizzle(std::string element, image *L) : image(L), element(element)
+    {
+        for (int i = 0; i < element.size(); i++)
+        {
+            char c = element[i];
+            int  k = 0;
+
+            if ('0' <= c && c <= '9') k = c - '0';
+            if ('A' <= c && c <= 'Z') k = c - 'A' + 10;
+
+            if (0 <= k && k < L->get_depth())
+                index.push_back(k);
             else
                 throw std::runtime_error("Swizzle index out of range");
         }
@@ -45,11 +62,11 @@ public:
 
     virtual void doc(std::ostream& out) const
     {
-        out << "swizzle " << mode;
+        out << "swizzle " << element;
     }
 
 private:
-    std::string      mode;
+    std::string      element;
     std::vector<int> index;
 };
 

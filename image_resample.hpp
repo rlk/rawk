@@ -63,6 +63,9 @@ protected:
 class nearest : public resample
 {
 public:
+    /// Resample *L* to the given *height* and *width* using nearest-neighbor
+    /// sampling. The wrap mode for neast sampling is naturally zero.
+
     nearest(int height, int width, image *L) : resample(height, width, 0, L) { }
 
     virtual double get(int i, int j, int k) const
@@ -87,6 +90,9 @@ public:
 class linear : public resample
 {
 public:
+    /// Resample *L* to the given *height* and *width* using linearly-
+    /// interpolated sampling. *Mode* gives the @ref wrap "wrap mode".
+
     linear(int height, int width, int mode, image *L)
         : resample(height, width, mode, L) { }
 
@@ -128,6 +134,9 @@ public:
 class cubic : public resample
 {
 public:
+    /// Resample *L* to the given *height* and *width* using cubic-interpolated
+    /// sampling. *Mode* gives the @ref wrap "wrap mode".
+
     cubic(int height, int width, int mode, image *L)
         : resample(height, width, mode, L) { }
 

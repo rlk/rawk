@@ -20,6 +20,11 @@
 class threshold : public image
 {
 public:
+    /// Compare the values of each sample of image *L* with *value*. Give 1
+    /// where *L* is greater than *value* and 0 elsewhere. Thresholding with
+    /// a *value* of zero distinguishes samples of exactly zero, regardless of
+    /// source data type.
+
     threshold(double value, image *L) : image(L), value(value) { }
 
     virtual double get(int i, int j, int k) const

@@ -20,6 +20,12 @@
 class paste : public image
 {
 public:
+    /// Paste image *L* over image *R*. *Row* and *column* give the position of
+    /// the top-left corner of the pasted image within the underlying image.
+    /// This is useful for reconstructing tiled or sub-divided image files. The
+    /// width and height of the result expand to accommodate the sizes of both
+    /// source images.
+
     paste(int row, int column, image *L, image *R)
         : image(L, R), row(row), column(column) { }
 

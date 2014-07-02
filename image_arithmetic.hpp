@@ -20,6 +20,10 @@
 class sum : public image
 {
 public:
+    /// Add all samples of image *L* and image *R*. The width, height, and depth
+    /// of the result are the larger of the widths, heights, and depths of the
+    /// inputs.
+
     sum(image *L, image *R) : image(L, R) { }
 
     virtual double get(int i, int j, int k) const
@@ -41,6 +45,10 @@ public:
 class difference : public image
 {
 public:
+    /// Subtract all samples of image *R* from image *L*. The width, height, and
+    /// depth of the result are the larger of the widths, heights, and depths of
+    /// the inputs.
+
     difference(image *L, image *R) : image(L, R) { }
 
     virtual double get(int i, int j, int k) const

@@ -16,15 +16,15 @@
 //------------------------------------------------------------------------------
 
 /// Spherical flatten
-///
-/// Account for variation in the flatness of the ellipse used to project
-/// spherical data. This function takes integer pixel locations as both input
-/// and output and performs no interpolation. This is preferable (for now) as
-/// it preserves the identity of data dropouts.
 
 class flatten : public image
 {
 public:
+    /// Account for variation in the flatness of the ellipse used to project
+    /// spherical data. This filter user integer pixel locations for both
+    /// input and output and performs no interpolation. This is preferable (for
+    /// now) as it preserves the identity of data dropouts.
+
     flatten(double value, image *L) : image(L), value(value) { }
 
     virtual double get(int i, int j, int k) const

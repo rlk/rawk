@@ -20,6 +20,10 @@
 class convolve : public image
 {
 public:
+    /// Convolve image *L* using a kernel of the given *radius*. While storage
+    /// for the kernel is allocated here, the value of the kernel is expected to
+    /// be supplied by a subclass constructor.
+
     convolve(int radius, int mode, image *L)
         : image(L), radius(radius), mode(mode), total(0), kernel((2 * radius + 1)
                                                                * (2 * radius + 1)) { }
@@ -56,6 +60,10 @@ protected:
 class gaussian : public convolve
 {
 public:
+    /// Convolve image *L* using a Gaussian kernel with standard deviation
+    /// *sigma*. *Mode* gives the @ref wrap "wrapping mode". The true radius of
+    /// the kernel is 3 sigma, rounded up.
+
     gaussian(double sigma, int mode, image *L)
         : convolve(int(ceil(3 * sigma)), mode, L)
     {

@@ -20,6 +20,12 @@
 class blend : public image
 {
 public:
+    /// Blend image *L* with image *R* using the alpha channel of *L*. The alpha
+    /// channel is taken to be the last channel, regardless of actual channel
+    /// count. The width, height, and depth of the result are the larger of the
+    /// widths, heights, and depths of the inputs (with the last channel of *L*
+    /// discarded).
+
     blend(image *L, image *R) : image(L, R) { }
 
     virtual double get(int i, int j, int k) const

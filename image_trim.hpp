@@ -20,6 +20,13 @@
 class trim : public image
 {
 public:
+    /// Add or subtract equal amounts of the top and bottom or left and right
+    /// edges of *L* to give a result with size *height* and *width*. This is
+    /// akin to a ::crop filter that automatically calculates the row and column
+    /// to favor the center of an image. If *height* and *width* are larger than
+    /// the source, the result will depend upon how *L* is configured to handle
+    /// out-of-bounds sampling.
+
     trim(int height, int width, image *L)
         : image(L), height(height), width(width) { }
 
@@ -54,9 +61,6 @@ private:
     int height;
     int width;
 };
-
-//------------------------------------------------------------------------------
-
 
 //------------------------------------------------------------------------------
 

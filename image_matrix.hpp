@@ -20,6 +20,12 @@
 class matrix : public image
 {
 public:
+    /// Apply a color space transformation to image *L*. This transformation is
+    /// given in the form of a matrix of size *rows* by *columns*. The input
+    /// must have a depth equal to *columns* and the output will have a depth
+    /// equal to *rows*. The vector *values* gives the matrix in row-major
+    /// order.
+
     matrix(int rows, int columns, std::vector<double> values, image *L)
         : image(L), rows(rows), columns(columns), values(values)
     {
@@ -61,6 +67,8 @@ private:
 
 class rgb2yuv : public matrix
 {
+    /// Transform image *L* from the RGB to the YUV color space.
+
 public:
     rgb2yuv(image *L) : matrix(3, 3, std::vector<double>(v, v + 9), L) { }
 
@@ -81,6 +89,8 @@ const double rgb2yuv::v[9] = {
 class yuv2rgb : public matrix
 {
 public:
+    /// Transform image *L* from the YUV to the RGB color space.
+
     yuv2rgb(image *L) : matrix(3, 3, std::vector<double>(v, v + 9), L) { }
 
 private:

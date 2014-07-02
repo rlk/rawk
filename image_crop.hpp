@@ -20,6 +20,9 @@
 class crop : public image
 {
 public:
+    /// Crop image *L* to a size of *height* and *width*. *Row* and *column*
+    /// give the location of the upper-left corner of the crop area in *L*.
+
     crop(int row, int column, int height, int width, image *L)
         : image(L), row(row), column(column), height(height), width(width) { }
 

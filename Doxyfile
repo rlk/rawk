@@ -99,7 +99,7 @@ BRIEF_MEMBER_DESC      = YES
 # brief descriptions will be completely suppressed.
 # The default value is: YES.
 
-REPEAT_BRIEF           = YES
+REPEAT_BRIEF           = NO
 
 # This tag implements a quasi-intelligent brief description abbreviator that is
 # used to form the text in various listings. Each string in this list, if found
@@ -1788,18 +1788,6 @@ GENERATE_XML           = NO
 # This tag requires that the tag GENERATE_XML is set to YES.
 
 XML_OUTPUT             = xml
-
-# The XML_SCHEMA tag can be used to specify a XML schema, which can be used by a
-# validating XML parser to check the syntax of the XML files.
-# This tag requires that the tag GENERATE_XML is set to YES.
-
-XML_SCHEMA             =
-
-# The XML_DTD tag can be used to specify a XML DTD, which can be used by a
-# validating XML parser to check the syntax of the XML files.
-# This tag requires that the tag GENERATE_XML is set to YES.
-
-XML_DTD                =
 
 # If the XML_PROGRAMLISTING tag is set to YES doxygen will dump the program
 # listings (including syntax highlighting and cross-referencing information) to

@@ -20,6 +20,11 @@
 class dilate : public image
 {
 public:
+    /// Apply a morphological dilate with a circular kernel of the given
+    /// *radius* to image *L*, wrapped by the given @ref wrap "mode". The dilate
+    /// filter gives the maximum value found among all pixels within the kernel
+    /// footprint.
+
     dilate(int radius, int mode, image *L)
         : image(L), radius(radius), mode(mode) { }
 
@@ -34,7 +39,7 @@ public:
             for (int x = -radius; x <= +radius; x++)
 
                 if (x * x + y * y <= radius * radius)
-                    v = std::min(v, L->get(wrap(i + y, h, mode & 1),
+                    v = std::max(v, L->get(wrap(i + y, h, mode & 1),
                                            wrap(j + x, w, mode & 2), k));
         return v;
     }
@@ -56,6 +61,11 @@ protected:
 class erode : public image
 {
 public:
+    /// Apply a morphological erode with a circular kernel of the given *radius*
+    /// to image *L*, wrapped by the given @ref wrap "mode". The erode filter
+    /// gives the minimum value found among all pixels within the kernel
+    /// footprint.
+
     erode(int radius, int mode, image *L)
         : image(L), radius(radius), mode(mode) { }
 

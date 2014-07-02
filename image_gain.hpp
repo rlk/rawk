@@ -20,6 +20,8 @@
 class gain : public image
 {
 public:
+    /// Multiply *value* by all samples of *L*. This alters the contrast of *L*.
+
     gain(double value, image *L) : image(L), value(value) { }
 
     virtual double get(int i, int j, int k) const
