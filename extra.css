@@ -1,0 +1,113 @@
+
+/* Open up the margins. */
+
+div.contents {
+	margin-left:  32px;
+	margin-right: 32px;
+}
+
+/* Distinguish headers from body text in textblocks. */
+
+div.textblock {
+	margin-left:  30px;
+}
+
+div.textblock>h1 {
+	margin-left: -30px;
+}
+
+div.textblock>h2 {
+	margin-left: -20px;
+}
+
+div.textblock>h3 {
+	margin-left: -10px;
+}
+
+/* More consistent font usage. */
+
+#projectname
+{
+	font: inherit;
+	font-size: 300%;
+	font-weight: 500;
+	margin: 0.5em 8px 8px 8px;
+}
+
+#projectbrief
+{
+	font: inherit;
+	font-size: 120%;
+	margin: 8px;
+}
+
+#projectnumber
+{
+	font: inherit;
+	font-size: 50%;
+	margin: 8px;
+}
+
+/* Replace gradient images with flat colors. */
+
+.memproto, dl.reflist dt {
+	background-image: none;
+}
+
+.memdoc, dl.reflist dd {
+	background-image: none;
+}
+
+.tabsearch {
+	background-image: none;
+}
+
+.navpath ul {
+	background-image: none;
+}
+
+.tablist li {
+	background-image: none;
+}
+
+.tablist a {
+	background-image: none;
+}
+
+.tabs, .tabs2, .tabs3 {
+	background-image: none;
+	background-color: #FEF2CD;
+}
+
+.tablist a:hover {
+	background-image: none;
+	background-color: #FFE599;
+}
+
+.tablist li.current a {
+	background-image: none;
+	background-color: #FFC000;
+}
+
+/* The default directory border does not follow the Doxyfile hue. */
+
+div.directory
+{
+	border-top:    1px solid #FFE599;
+	border-bottom: 1px solid #FFE599;
+}
+
+/* Some of the other choices are just ugly or unhelpful. */
+
+pre.fragment
+{
+	background-color: #FFFCF5;
+	font-size: inherit;
+}
+
+table.doxtable th
+{
+	background-color: #FFE599;
+	color: inherit;
+	font-size: inherit;
+}
