@@ -2,11 +2,13 @@
 #include "GL/GLDemonstration.hpp"
 
 #include <stdexcept>
+#include <algorithm>
 #include <iostream>
 #include <iomanip>
 #include <sstream>
 #include <string>
 #include <vector>
+#include <limits>
 
 #include <sys/time.h>
 
@@ -553,12 +555,22 @@ void rawk::retitle()
     SDL_SetWindowTitle(window, stream.str().c_str());
 }
 
+static double difftimeval(const struct timeval *a, const struct timeval *b)
+{
+    return double(a->tv_sec  - b->tv_sec) +
+           double(a->tv_usec - b->tv_usec) / 1000000.0;
+}
+
+#include <omp.h>
+
 /// Update the contents of the image cache.
 
 void rawk::refresh()
 {
     if (curr_image)
     {
+        struct timeval ts;
+        struct timeval te;
         struct timeval t0;
         struct timeval t1;
 
@@ -570,10 +582,14 @@ void rawk::refresh()
         int c;
         int k;
 
+        cache_state = curr_state;
+
+        gettimeofday(&ts, 0);
         gettimeofday(&t0, 0);
 
-        #pragma omp parallel for private(c, k)
+        #pragma omp parallel for private(c, k) schedule(dynamic)
         for         (r = 0; r < height; ++r)
+        {
             for     (c = 0; c < width;  ++c)
                 for (k = 0; k < depth;  ++k)
                 {
@@ -582,16 +598,26 @@ void rawk::refresh()
                     pixel[(r * width + c) * 3 + k] = curr_image->get(i, j, k);
                 }
 
-        gettimeofday(&t1, 0);
+            if (omp_get_thread_num() == 0)
+            {
+                gettimeofday(&t1, 0);
+
+                if (difftimeval(&t1, &t0) > 0.1)
+                {
+                    t0 = t1;
+                    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height,
+                                    GL_RGB, GL_FLOAT, &pixel.front());
+                    draw();
+                    SDL_GL_SwapWindow(window);
+                }
+            }
+        }
 
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height,
                         GL_RGB, GL_FLOAT, &pixel.front());
 
-        cache_state = curr_state;
-#if 0
-        std::cout << double(t1.tv_sec  - t0.tv_sec) +
-                     double(t1.tv_usec - t0.tv_usec) / 1000000.0 << std::endl;
-#endif
+        gettimeofday(&te, 0);
+        std::cout << difftimeval(&te, &ts) << std::endl;
     }
 }
 
