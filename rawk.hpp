@@ -13,9 +13,7 @@
 #ifndef RAWK_HPP
 #define RAWK_HPP
 
-/** @mainpage RAWK : Gigapixel Raw Image Processing Toolkit
-
-@section manual Manual
+/** @mainpage Manual
 
 RAWK is a command-line tool capable of performing a variety of image processing
 operations on very large raw binary image files. It provides a pannable,
@@ -42,17 +40,17 @@ This tree of objects is specified on the command line. The various ::image
 objects and their parameters are itemized below. Real-world examples of their use are given
 toward the end of this page.
 
-@subsection image_objects Image Objects
+@section image_objects Image Objects
 
 There is a direct mapping between an image object's constructor and its command
 line arguments, so see the documentation of each individual object for usage.
 
-@subsubsection image_sources Image Sources
+@subsection image_sources Image Sources
 
 ::input ---
 ::solid
 
-@subsubsection image_filters Image Filters
+@subsection image_filters Image Filters
 
 ::bias ---
 ::crop ---
@@ -78,7 +76,7 @@ line arguments, so see the documentation of each individual object for usage.
 ::trim ---
 ::yuv2rgb
 
-@subsubsection image_operators Image Operators
+@subsection image_operators Image Operators
 
 ::append ---
 ::blend ---
@@ -86,7 +84,7 @@ line arguments, so see the documentation of each individual object for usage.
 ::paste ---
 ::sum
 
-@subsection interaction Interaction
+@section interaction Interaction
 
 On execution, RAWK displays an OpenGL window showing a *cache* of the
 result of the image process.
@@ -98,7 +96,7 @@ result of the image process.
 The window title updates to reflect the current position of the mouse pointer
 within the image, as well as the sample value beneath the pointer.
 
-@subsubsection exploring_the_tree Exploring the tree
+@subsection exploring_the_tree Exploring the tree
 
 By default, the view displays the root of the image process tree, but image
 objects deeper in the tree may also be explored.
@@ -110,7 +108,7 @@ objects deeper in the tree may also be explored.
 
 The window title bar changes to reflect the current image.
 
-@subsubsection modifying_parameters Modifying parameters
+@subsection modifying_parameters Modifying parameters
 
 The parameters of many image objects may be tuned interactively.
 
@@ -121,7 +119,7 @@ The parameters of many image objects may be tuned interactively.
 Hold the Shift key to magnify the increase or decrease by a factor of 10. The
 window title bar changes to reflect the current parameters.
 
-@subsubsection storing_views Storing Views
+@subsection storing_views Storing Views
 
 The Function keys allow up to 12 view configurations to be stored and recalled.
 This includes both the position and zoom of the view as well as the current image.
@@ -140,7 +138,7 @@ This capability allows the user to view the output of one image while
 manipulating the parameters of another. For example, tweak an ::offset to bring
 the results of two separate processes into alignment before summing thing.
 
-@subsubsection display_modes Display Modes
+@subsection display_modes Display Modes
 
 A variety of different data types are supported, but their interpretation must
 be selected manually.
@@ -150,9 +148,9 @@ be selected manually.
 - Press 3 to display three channels as an RGB image.
 - Press 4 to display one channel as a relief-shaded height map.
 
-@subsection data Data Issues
+@section data Data Issues
 
-@subsubsection type Sample Type
+@subsection type Sample Type
 
 A variety of sample formats are supported. The following single-character
 tags are used to indicate sample type in both the API and on the command line.
@@ -179,7 +177,7 @@ Char | Type
 `F`  | 32-bit floating point in non-native byte order
 `D`  | 64-bit floating point in non-native byte order
 
-@subsubsection wrap Out-of-bounds Sampling
+@subsection wrap Out-of-bounds Sampling
 
 As an image object samples and processes the pixels of its source image,
 accesses to neighboring pixels often occur. At the image edges, such neighbor
@@ -305,8 +303,7 @@ signed values, so `b` is a reasonable type tag.
                     paste     0 11520 input megt88n090hb.img 0 5632 11520 1 S \
                                       input megt88n000hb.img 0 5632 11520 1 S
 
-This might take a minute or two, depending on the number of processor cores
-available.
+This might take a minute or two, depending on the I/O throughput of the system.
 
 */
 #endif
