@@ -22,7 +22,7 @@ class convolve : public image
 public:
     /// Convolve image *L* using a kernel of the given *radius*. While storage
     /// for the kernel is allocated here, the value of the kernel is expected to
-    /// be supplied by a subclass constructor.
+    /// be supplied by a subclass.
 
     convolve(int radius, int mode, image *L)
         : image(L), radius(radius), mode(mode), total(0), kernel((2 * radius + 1)
@@ -64,15 +64,33 @@ public:
     /// *sigma*. *Mode* gives the @ref wrap "wrapping mode". The true radius of
     /// the kernel is 3 sigma, rounded up.
 
-    gaussian(double sigma, int mode, image *L)
-        : convolve(int(ceil(3 * sigma)), mode, L)
+    gaussian(double sigma, int mode, image *L) : convolve(0, mode, L), sigma(sigma)
     {
+        update();
+    }
+
+    virtual void tweak(int a, int v)
+    {
+        if (a == 0)
+        {
+            sigma += v;
+            update();
+        }
+    }
+
+    void update()
+    {
+        radius = int(ceil(3 * sigma));
+        total  = 0;
+
+        kernel.reserve((2 * radius + 1) * (2 * radius + 1));
+
         int z = 0;
 
         for     (int y = -radius; y <= +radius; y++)
             for (int x = -radius; x <= +radius; x++, z++)
             {
-                double t = exp(-0.5 * double(x * x + y * y) / double(sigma * sigma));
+                double t = exp(-(x * x + y * y) / (2.0 * sigma * sigma));
                 kernel[z] = t;
                 total    += t;
             }
@@ -80,8 +98,11 @@ public:
 
     virtual void doc(std::ostream& out) const
     {
-        out << "gaussian " << radius << " " << mode;
+        out << "gaussian " << sigma << " " << mode;
     }
+
+private:
+    double sigma;
 };
 
 //------------------------------------------------------------------------------
