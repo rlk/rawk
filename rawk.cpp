@@ -12,9 +12,17 @@
 
 #include <sys/time.h>
 
+#ifdef _OPENMP
+#include <omp.h>
+#else
+int omp_get_thread_num() { return 0; }
+#endif
+
 #include "raw.hpp"
 #include "rawk.hpp"
 #include "image.hpp"
+
+class rawk;
 
 #include "image_append.hpp"
 #include "image_arithmetic.hpp"
@@ -108,11 +116,15 @@ private:
 
     // Current and stored view configurations
 
+    image *parse(int&, char **);
+
     image *root_image;
     state  curr_state;
     image *curr_image;
     state  mark_state[12];
     image *mark_image[12];
+
+    output *out;
 
     state cache_state;
     state click_state;
@@ -127,15 +139,32 @@ private:
     void   doU();
     void   doD();
 
+    void process();
     void refresh();
     void retitle();
 
-    image *parse(int&, char **);
+    void cache_row(image *, state *, int, int);
+    void cache_all(image *, state *);
+
+    std::vector<GLfloat> cache;
+
+    void zerocache()
+    {
+        std::fill(cache.begin(), cache.end(), 0);
+    }
+    void showcache()
+    {
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height,
+                        GL_RGB, GL_FLOAT, &cache.front());
+        draw();
+        swap();
+    }
 };
 
 //------------------------------------------------------------------------------
 
-rawk::rawk(int argc, char **argv) : demonstration("RAWK", 1280, 720), program(0)
+rawk::rawk(int argc, char **argv)
+    : demonstration("RAWK", 1280, 720), program(0), cache(width * height * 3)
 {
     // Initialize the OpenGL state.
 
@@ -445,6 +474,10 @@ void rawk::key(int key, bool down, bool repeat)
             else
                 switch (key)
                 {
+                    case SDL_SCANCODE_TAB:
+                        if (out) process();
+                        break;
+
                     case SDL_SCANCODE_SPACE:
                         if (selector >= 0)
                         {
@@ -515,6 +548,16 @@ static inline int toint(double d)
     return (c - d < d - f) ? int(c) : int(f);
 }
 
+static double getsecsince(const struct timeval *tv)
+{
+    struct timeval tw;
+
+    gettimeofday(&tw, 0);
+
+    return double(tw.tv_sec  - tv->tv_sec) +
+           double(tw.tv_usec - tv->tv_usec) / 1000000.0;
+}
+
 /// Write the current view configuration to the window's title bar.
 
 void rawk::retitle()
@@ -555,13 +598,80 @@ void rawk::retitle()
     SDL_SetWindowTitle(window, stream.str().c_str());
 }
 
-static double difftimeval(const struct timeval *a, const struct timeval *b)
+void rawk::cache_row(image *p, state *s, int r, int d)
 {
-    return double(a->tv_sec  - b->tv_sec) +
-           double(a->tv_usec - b->tv_usec) / 1000000.0;
+    for     (int c = 0; c < width; ++c)
+        for (int k = 0; k < d; ++k)
+        {
+            int i = toint(s->y + (r - height / 2) * s->z);
+            int j = toint(s->x + (c - width / 2) * s->z);
+            cache[(r * width + c) * 3 + k] = p->get(i, j, k);
+        }
 }
 
-#include <omp.h>
+void rawk::cache_all(image *p, state *s)
+{
+    struct timeval tv;
+    gettimeofday(&tv, 0);
+
+    int r, d = std::min(p->get_depth(), 3);
+
+    zerocache();
+    showcache();
+
+    #pragma omp parallel for schedule(dynamic)
+    for (r = 0; r < height; ++r)
+    {
+        cache_row(p, s, r, d);
+
+        if (omp_get_thread_num() == 0)
+        {
+            if (getsecsince(&tv) > 0.1)
+            {
+                showcache();
+                gettimeofday(&tv, 0);
+            }
+        }
+    }
+    showcache();
+}
+
+void rawk::process()
+{
+    struct timeval tv;
+    gettimeofday(&tv, 0);
+
+    int d = std::min(out->get_depth (), 3);
+    int h =          out->get_height();
+    int i;
+
+    state all;
+    all.center(out, width, height);
+
+    out->set_cache(true);
+
+    zerocache();
+    showcache();
+
+    #pragma omp parallel for schedule(dynamic)
+    for (i = 0; i < h; ++i)
+    {
+        out->process(i);
+
+        if (omp_get_thread_num() == 0)
+        {
+            if (getsecsince(&tv) > 0.1)
+            {
+                for (int r = 0; r < height; r++)
+                    cache_row(out, &all, r, d);
+
+                showcache();
+                gettimeofday(&tv, 0);
+            }
+        }
+    }
+    out->set_cache(false);
+}
 
 /// Update the contents of the image cache.
 
@@ -569,55 +679,8 @@ void rawk::refresh()
 {
     if (curr_image)
     {
-        struct timeval ts;
-        struct timeval te;
-        struct timeval t0;
-        struct timeval t1;
-
-        std::vector<GLfloat> pixel(width * height * 3, 0);
-
-        const int depth = std::min(curr_image->get_depth(), 3);
-
-        int r;
-        int c;
-        int k;
-
         cache_state = curr_state;
-
-        gettimeofday(&ts, 0);
-        gettimeofday(&t0, 0);
-
-        #pragma omp parallel for private(c, k) schedule(dynamic)
-        for         (r = 0; r < height; ++r)
-        {
-            for     (c = 0; c < width;  ++c)
-                for (k = 0; k < depth;  ++k)
-                {
-                    int i = toint(curr_state.y + (r - height / 2) * curr_state.z);
-                    int j = toint(curr_state.x + (c - width  / 2) * curr_state.z);
-                    pixel[(r * width + c) * 3 + k] = curr_image->get(i, j, k);
-                }
-
-            if (omp_get_thread_num() == 0)
-            {
-                gettimeofday(&t1, 0);
-
-                if (difftimeval(&t1, &t0) > 0.1)
-                {
-                    t0 = t1;
-                    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height,
-                                    GL_RGB, GL_FLOAT, &pixel.front());
-                    draw();
-                    SDL_GL_SwapWindow(window);
-                }
-            }
-        }
-
-        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height,
-                        GL_RGB, GL_FLOAT, &pixel.front());
-
-        gettimeofday(&te, 0);
-        std::cout << difftimeval(&te, &ts) << std::endl;
+        cache_all(curr_image, &curr_state);
     }
 }
 
@@ -834,7 +897,7 @@ image *rawk::parse(int& i, char **v)
             char  *a = v[i++];
             char   t = v[i++][0];
             image *L = parse(i, v);
-            return new output(a, t, L);
+            return (out = new output(a, t, L));
         }
 
         if (op == "paste")
