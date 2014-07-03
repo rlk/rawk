@@ -35,7 +35,7 @@ public:
 
     swizzle(std::string element, image *L) : image(L), element(element)
     {
-        for (int i = 0; i < element.size(); i++)
+        for (int i = 0; i < int(element.size()); i++)
         {
             char c = element[i];
             int  k = 0;
