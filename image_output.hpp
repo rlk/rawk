@@ -26,7 +26,7 @@ public:
     /// the range [0,1] and signed samples to the range [-1,+1] before being
     /// cast to the destination data type.
 
-    output(std::string name, char type, image *L) : image(L), file(0)
+    output(std::string name, char type, image *L) : image(L), cache(false), file(0)
     {
         const int height = L->get_height();
         const int width  = L->get_width ();
@@ -58,7 +58,16 @@ public:
 
     virtual double get(int i, int j, int k) const
     {
-        return L->get(i, j, k);
+        if (0 <= i && i < file->get_height() &&
+            0 <= j && j < file->get_width () &&
+            0 <= k && k < file->get_depth ())
+        {
+            if (cache)
+                return file->get(i, j, k);
+            else
+                return    L->get(i, j, k);
+        }
+        return 0.0;
     }
 
     virtual void doc(std::ostream& out) const
@@ -69,20 +78,23 @@ public:
                   << " " << file->get_depth ();
     }
 
-    void go() const
+    void process(int i) const
     {
-     	int i, h = get_height();
      	int j, w = get_width();
      	int k, d = get_depth();
 
-    	#pragma omp parallel for private(j, k)
-        for         (i = 0; i < h; ++i)
-            for     (j = 0; j < w; ++j)
-                for (k = 0; k < d; ++k)
-                    file->put(i, j, k, L->get(i, j, k));
+        for     (j = 0; j < w; ++j)
+            for (k = 0; k < d; ++k)
+                file->put(i, j, k, L->get(i, j, k));
+    }
+
+    void set_cache(bool c)
+    {
+        cache = c;
     }
 
 private:
+    bool cache;
     raw *file;
 };
 
