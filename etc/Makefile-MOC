@@ -100,7 +100,7 @@ preview :
 	rawk \
 		append \
 			paste 512 0 \
-				scale 20.0 \
+				gain 20.0 \
 					gradient 2 \
 						cubic 45056 92160 2 \
 							paste 16896 34560 input MOLA/megt44s270hb.img 0 5632 11520 1 S \
