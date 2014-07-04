@@ -9,5 +9,4 @@ The repo has a submodule ([GLFundamentals](https://github.com/rlk/GLFundamentals
 	git submodule update --init
 
 Todo:
-- better error messages
 - BMP example
