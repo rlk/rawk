@@ -143,29 +143,50 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;{</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="keyword">public</span>:</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;</div>
-<div class="line"><a name="l00067"></a><span class="lineno"><a class="line" href="classgaussian.html#ab374eb5d99af0be82fa0127e1d0fcbe6">   67</a></span>&#160;    <a class="code" href="classgaussian.html#ab374eb5d99af0be82fa0127e1d0fcbe6">gaussian</a>(<span class="keywordtype">double</span> sigma, <span class="keywordtype">int</span> mode, <a class="code" href="classimage.html">image</a> *<a class="code" href="classimage.html#a96bc6a71fa16d5f0d4083ebe7a10a865">L</a>)</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        : <a class="code" href="classconvolve.html">convolve</a>(int(ceil(3 * sigma)), mode, L)</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    {</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        <span class="keywordtype">int</span> z = 0;</div>
+<div class="line"><a name="l00067"></a><span class="lineno"><a class="line" href="classgaussian.html#ab374eb5d99af0be82fa0127e1d0fcbe6">   67</a></span>&#160;    <a class="code" href="classgaussian.html#ab374eb5d99af0be82fa0127e1d0fcbe6">gaussian</a>(<span class="keywordtype">double</span> sigma, <span class="keywordtype">int</span> mode, <a class="code" href="classimage.html">image</a> *<a class="code" href="classimage.html#a96bc6a71fa16d5f0d4083ebe7a10a865">L</a>) : <a class="code" href="classconvolve.html">convolve</a>(0, mode, L), sigma(sigma)</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    {</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        update();</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    }</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;        <span class="keywordflow">for</span>     (<span class="keywordtype">int</span> y = -radius; y &lt;= +radius; y++)</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> x = -radius; x &lt;= +radius; x++, z++)</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;            {</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;                <span class="keywordtype">double</span> t = exp(-0.5 * <span class="keywordtype">double</span>(x * x + y * y) / <span class="keywordtype">double</span>(sigma * sigma));</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;                kernel[z] = t;</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;                total    += t;</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;            }</div>
+<div class="line"><a name="l00072"></a><span class="lineno"><a class="line" href="classgaussian.html#a88db5019c5ff1f9153ec152f74692819">   72</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classgaussian.html#a88db5019c5ff1f9153ec152f74692819">tweak</a>(<span class="keywordtype">int</span> a, <span class="keywordtype">int</span> v)</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    {</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        <span class="keywordflow">if</span> (a == 0)</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        {</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;            sigma += v;</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;            update();</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;        }</div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    }</div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;</div>
-<div class="line"><a name="l00081"></a><span class="lineno"><a class="line" href="classgaussian.html#a5ddacc6dab56b458c868f7d8f2959b8b">   81</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classgaussian.html#a5ddacc6dab56b458c868f7d8f2959b8b">doc</a>(std::ostream&amp; out)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="keyword">    </span>{</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        out &lt;&lt; <span class="stringliteral">&quot;gaussian &quot;</span> &lt;&lt; radius &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; mode;</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    }</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;};</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="comment">//------------------------------------------------------------------------------</span></div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    <span class="keywordtype">void</span> update()</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    {</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        radius = int(ceil(3 * sigma));</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        total  = 0;</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        kernel.reserve((2 * radius + 1) * (2 * radius + 1));</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;        <span class="keywordtype">int</span> z = 0;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        <span class="keywordflow">for</span>     (<span class="keywordtype">int</span> y = -radius; y &lt;= +radius; y++)</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">int</span> x = -radius; x &lt;= +radius; x++, z++)</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;            {</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;                <span class="keywordtype">double</span> t = exp(-(x * x + y * y) / (2.0 * sigma * sigma));</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;                kernel[z] = t;</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;                total    += t;</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;            }</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    }</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;</div>
+<div class="line"><a name="l00099"></a><span class="lineno"><a class="line" href="classgaussian.html#a5ddacc6dab56b458c868f7d8f2959b8b">   99</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classgaussian.html#a5ddacc6dab56b458c868f7d8f2959b8b">doc</a>(std::ostream&amp; out)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;<span class="keyword">    </span>{</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        out &lt;&lt; <span class="stringliteral">&quot;gaussian &quot;</span> &lt;&lt; sigma &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; mode;</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    }</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <span class="keywordtype">double</span> sigma;</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;};</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;<span class="comment">//------------------------------------------------------------------------------</span></div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="classimage_html_ac3ed8eccf2eda22c789b88e106e9fed9"><div class="ttname"><a href="classimage.html#ac3ed8eccf2eda22c789b88e106e9fed9">image::get</a></div><div class="ttdeci">virtual double get(int i, int j, int k) const =0</div><div class="ttdoc">Return the value of the sample at row i, column j, channel k. </div></div>
 <div class="ttc" id="classimage_html_a96bc6a71fa16d5f0d4083ebe7a10a865"><div class="ttname"><a href="classimage.html#a96bc6a71fa16d5f0d4083ebe7a10a865">image::L</a></div><div class="ttdeci">image * L</div><div class="ttdoc">Left child. </div><div class="ttdef"><b>Definition:</b> image.hpp:109</div></div>
 <div class="ttc" id="classimage_html"><div class="ttname"><a href="classimage.html">image</a></div><div class="ttdoc">Base class for all image sources, filters, and operators. </div><div class="ttdef"><b>Definition:</b> image.hpp:20</div></div>
@@ -174,7 +195,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="classgaussian_html_ab374eb5d99af0be82fa0127e1d0fcbe6"><div class="ttname"><a href="classgaussian.html#ab374eb5d99af0be82fa0127e1d0fcbe6">gaussian::gaussian</a></div><div class="ttdeci">gaussian(double sigma, int mode, image *L)</div><div class="ttdoc">Convolve image L using a Gaussian kernel with standard deviation sigma. Mode gives the wrapping mode...</div><div class="ttdef"><b>Definition:</b> image_convolve.hpp:67</div></div>
 <div class="ttc" id="classimage_html_ac28b939a0e0694e2ddd3df0106f93158"><div class="ttname"><a href="classimage.html#ac28b939a0e0694e2ddd3df0106f93158">image::get_height</a></div><div class="ttdeci">virtual int get_height() const </div><div class="ttdoc">Return the height of this image. </div><div class="ttdef"><b>Definition:</b> image.hpp:46</div></div>
 <div class="ttc" id="classimage_html_a3989b3409ee7f5f58aedc378c0f2da5e"><div class="ttname"><a href="classimage.html#a3989b3409ee7f5f58aedc378c0f2da5e">image::get_width</a></div><div class="ttdeci">virtual int get_width() const </div><div class="ttdoc">Return the height of this image. </div><div class="ttdef"><b>Definition:</b> image.hpp:56</div></div>
-<div class="ttc" id="classgaussian_html_a5ddacc6dab56b458c868f7d8f2959b8b"><div class="ttname"><a href="classgaussian.html#a5ddacc6dab56b458c868f7d8f2959b8b">gaussian::doc</a></div><div class="ttdeci">virtual void doc(std::ostream &amp;out) const </div><div class="ttdoc">Produce a string documenting the function of this object. </div><div class="ttdef"><b>Definition:</b> image_convolve.hpp:81</div></div>
+<div class="ttc" id="classgaussian_html_a5ddacc6dab56b458c868f7d8f2959b8b"><div class="ttname"><a href="classgaussian.html#a5ddacc6dab56b458c868f7d8f2959b8b">gaussian::doc</a></div><div class="ttdeci">virtual void doc(std::ostream &amp;out) const </div><div class="ttdoc">Produce a string documenting the function of this object. </div><div class="ttdef"><b>Definition:</b> image_convolve.hpp:99</div></div>
+<div class="ttc" id="classgaussian_html_a88db5019c5ff1f9153ec152f74692819"><div class="ttname"><a href="classgaussian.html#a88db5019c5ff1f9153ec152f74692819">gaussian::tweak</a></div><div class="ttdeci">virtual void tweak(int a, int v)</div><div class="ttdoc">Tweak image parameter a, changing the value by a factor of v. </div><div class="ttdef"><b>Definition:</b> image_convolve.hpp:72</div></div>
 <div class="ttc" id="classconvolve_html"><div class="ttname"><a href="classconvolve.html">convolve</a></div><div class="ttdoc">Convolution filter. </div><div class="ttdef"><b>Definition:</b> image_convolve.hpp:20</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->

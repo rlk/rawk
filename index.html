@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>RAWK: RAWK : Gigapixel Raw Image Processing Toolkit</title>
+<title>RAWK: Manual</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -77,30 +77,31 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div class="header">
   <div class="headertitle">
-<div class="title">RAWK : Gigapixel Raw Image Processing Toolkit </div>  </div>
+<div class="title">Manual </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h1><a class="anchor" id="manual"></a>
-Manual</h1>
-<p>RAWK is a command-line tool capable of performing a variety of image processing operations on very large raw binary image files. It provides a pannable, zoomable preview of the result of the process and enables image process parameters to be tuned interactively regardless of the scale of the input and output.</p>
+<div class="textblock"><p>RAWK is a command-line tool capable of performing a variety of image processing operations on very large raw binary image files. It provides a pannable, zoomable preview of the result of the process and enables image process parameters to be tuned interactively regardless of the scale of the input and output.</p>
+<ul>
+<li><a href="https://github.com/rlk/rawk">GitHub source repository</a></li>
+</ul>
 <p>The speed and capability of RAWK lies in its reliance upon the raw binary image format, as such images may be read and written without the overhead of coding and compression, and may be many times larger than available RAM without added algorithmic complexity.</p>
 <p>The simplicity of raw binary makes it the recommended format for the NASA Planetary Data System, the primary motivator of RAWK. Both Photoshop and Imagemagick are capable of transforming image into and out of raw format (for limited file sizes) enabling interoperability with off-the-shelf tools.</p>
 <p>The RAWK tool emphasizes the application of several image processes in a single command. An image process is represented by a <em>tree</em> of <a class="el" href="classimage.html" title="Base class for all image sources, filters, and operators. ">image</a> objects. Each object acts as a source of pixels with a specific height, width, and depth. Each samples its own input data from zero, one, or two source image objects.</p>
 <p>This tree of objects is specified on the command line. The various <a class="el" href="classimage.html" title="Base class for all image sources, filters, and operators. ">image</a> objects and their parameters are itemized below. Real-world examples of their use are given toward the end of this page.</p>
-<h2><a class="anchor" id="image_objects"></a>
-Image Objects</h2>
+<h1><a class="anchor" id="image_objects"></a>
+Image Objects</h1>
 <p>There is a direct mapping between an image object's constructor and its command line arguments, so see the documentation of each individual object for usage.</p>
-<h3><a class="anchor" id="image_sources"></a>
-Image Sources</h3>
+<h2><a class="anchor" id="image_sources"></a>
+Image Sources</h2>
 <p><a class="el" href="classinput.html" title="Image file reader. ">input</a> &mdash; <a class="el" href="classsolid.html" title="Solid value generator. ">solid</a></p>
-<h3><a class="anchor" id="image_filters"></a>
-Image Filters</h3>
+<h2><a class="anchor" id="image_filters"></a>
+Image Filters</h2>
 <p><a class="el" href="classbias.html" title="Bias filter. ">bias</a> &mdash; <a class="el" href="classcrop.html" title="Crop filter. ">crop</a> &mdash; <a class="el" href="classcubic.html" title="Cubic-interpolated resampling filter. ">cubic</a> &mdash; <a class="el" href="classdilate.html" title="Dilation filter. ">dilate</a> &mdash; <a class="el" href="classerode.html" title="Erosion filter. ">erode</a> &mdash; <a class="el" href="classflatten.html" title="Spherical flatten. ">flatten</a> &mdash; <a class="el" href="classgain.html" title="Gain filter. ">gain</a> &mdash; <a class="el" href="classgaussian.html" title="Gaussian convolution filter. ">gaussian</a> &mdash; <a class="el" href="classgradient.html" title="Gradient filter. ">gradient</a> &mdash; <a class="el" href="classlinear.html" title="Linearly-interpolated resampling filter. ">linear</a> &mdash; <a class="el" href="classmedian.html" title="Median filter. ">median</a> &mdash; <a class="el" href="classmedianh.html" title="Median filter with a horizontal kernel. ">medianh</a> &mdash; <a class="el" href="classmedianv.html" title="Median filter with a vertical kernel. ">medianv</a> &mdash; <a class="el" href="classnearest.html" title="Nearest value resampling filter. ">nearest</a> &mdash; <a class="el" href="classnormalize.html" title="Vector renormalization filter. ">normalize</a> &mdash; <a class="el" href="classoffset.html" title="Offset filter. ">offset</a> &mdash; <a class="el" href="classoutput.html" title="Image file writer. ">output</a> &mdash; <a class="el" href="classreduce.html" title="50% down-sample filter ">reduce</a> &mdash; <a class="el" href="classrgb2yuv.html" title="RGB to YUV color space transformation. ">rgb2yuv</a> &mdash; <a class="el" href="classswizzle.html" title="Swizzle filter. ">swizzle</a> &mdash; <a class="el" href="classthreshold.html" title="Threshold filter. ">threshold</a> &mdash; <a class="el" href="classtrim.html" title="Trim filter. ">trim</a> &mdash; <a class="el" href="classyuv2rgb.html" title="YUV to RGB color space transformation. ">yuv2rgb</a></p>
-<h3><a class="anchor" id="image_operators"></a>
-Image Operators</h3>
+<h2><a class="anchor" id="image_operators"></a>
+Image Operators</h2>
 <p><a class="el" href="classappend.html" title="Channel append. ">append</a> &mdash; <a class="el" href="classblend.html" title="Blend operator. ">blend</a> &mdash; <a class="el" href="classdifference.html" title="Difference operator. ">difference</a> &mdash; <a class="el" href="classpaste.html" title="Overlay operator. ">paste</a> &mdash; <a class="el" href="classsum.html" title="Sum operator. ">sum</a></p>
-<h2><a class="anchor" id="interaction"></a>
-Interaction</h2>
+<h1><a class="anchor" id="interaction"></a>
+Interaction</h1>
 <p>On execution, RAWK displays an OpenGL window showing a <em>cache</em> of the result of the image process.</p>
 <ul>
 <li>Click and drag with the left mouse button to pan the cache.</li>
@@ -108,8 +109,8 @@ Interaction</h2>
 <li><b>Press Space</b> to update the cache with the modified view configuration.</li>
 </ul>
 <p>The window title updates to reflect the current position of the mouse pointer within the image, as well as the sample value beneath the pointer.</p>
-<h3><a class="anchor" id="exploring_the_tree"></a>
-Exploring the tree</h3>
+<h2><a class="anchor" id="exploring_the_tree"></a>
+Exploring the tree</h2>
 <p>By default, the view displays the root of the image process tree, but image objects deeper in the tree may also be explored.</p>
 <ul>
 <li>Press Alt-Left to jump to the first child of the current image.</li>
@@ -118,8 +119,8 @@ Exploring the tree</h3>
 <li><b>Press Space</b> to update the cache to display result of the current image object.</li>
 </ul>
 <p>The window title bar changes to reflect the current image.</p>
-<h3><a class="anchor" id="modifying_parameters"></a>
-Modifying parameters</h3>
+<h2><a class="anchor" id="modifying_parameters"></a>
+Modifying parameters</h2>
 <p>The parameters of many image objects may be tuned interactively.</p>
 <ul>
 <li>Press Left or Right to decrease or increase the first parameter of the current image.</li>
@@ -127,8 +128,8 @@ Modifying parameters</h3>
 <li>Again, <b>press Space</b> to update the cache to display the modified process.</li>
 </ul>
 <p>Hold the Shift key to magnify the increase or decrease by a factor of 10. The window title bar changes to reflect the current parameters.</p>
-<h3><a class="anchor" id="storing_views"></a>
-Storing Views</h3>
+<h2><a class="anchor" id="storing_views"></a>
+Storing Views</h2>
 <p>The Function keys allow up to 12 view configurations to be stored and recalled. This includes both the position and zoom of the view as well as the current image.</p>
 <ul>
 <li>Hold Function-n and press Enter to store the current view in slot <em>n</em>.</li>
@@ -140,8 +141,8 @@ Storing Views</h3>
 <li>Hold Function-n and press Down or Up to decrease and increase the first parameter of the image stored in slot <em>n</em>.</li>
 </ul>
 <p>This capability allows the user to view the output of one image while manipulating the parameters of another. For example, tweak an <a class="el" href="classoffset.html" title="Offset filter. ">offset</a> to bring the results of two separate processes into alignment before summing thing.</p>
-<h3><a class="anchor" id="display_modes"></a>
-Display Modes</h3>
+<h2><a class="anchor" id="display_modes"></a>
+Display Modes</h2>
 <p>A variety of different data types are supported, but their interpretation must be selected manually.</p>
 <ul>
 <li>Press 1 to display one channel as a grayscale image.</li>
@@ -149,10 +150,10 @@ Display Modes</h3>
 <li>Press 3 to display three channels as an RGB image.</li>
 <li>Press 4 to display one channel as a relief-shaded height map.</li>
 </ul>
-<h2><a class="anchor" id="data"></a>
-Data Issues</h2>
-<h3><a class="anchor" id="type"></a>
-Sample Type</h3>
+<h1><a class="anchor" id="data"></a>
+Data Issues</h1>
+<h2><a class="anchor" id="type"></a>
+Sample Type</h2>
 <p>A variety of sample formats are supported. The following single-character tags are used to indicate sample type in both the API and on the command line.</p>
 <table class="doxtable">
 <tr>
@@ -191,9 +192,9 @@ Sample Type</h3>
 <tr>
 <td><code>D</code> </td><td>64-bit floating point in non-native byte order </td></tr>
 </table>
-<h3><a class="anchor" id="wrap"></a>
-Out-of-bounds Sampling</h3>
-<p>As an image object samples and processes the pixels of its source image, accesses to neighboring pixels often occur. At the image edges, such neighbor samples may fall outside the source image. Generally, an out-of-bounds sample results in a zero value. However, it is often preferable to treat the source as a repeating pattern and <em>wrap</em> out-of-bounds references to the opposite edge. In other cases, it is sometimes necessary to clamp sample positions to ensure they fall within the source. In circumstances where this distinction is important, a mode* parameter is defined like so:</p>
+<h2><a class="anchor" id="wrap"></a>
+Out-of-bounds Sampling</h2>
+<p>As an image object samples and processes the pixels of its source image, accesses to neighboring pixels often occur. At the image edges, such neighbor samples may fall outside the source image. Generally, an out-of-bounds sample results in a zero value. However, it is often preferable to treat the source as a repeating pattern and <em>wrap</em> out-of-bounds references to the opposite edge. In other cases, it is sometimes necessary to clamp sample positions to ensure they fall within the source. In circumstances where this distinction is important, a <em>mode</em> parameter is defined like so:</p>
 <table class="doxtable">
 <tr>
 <th>Mode </th><th>Behavior  </th></tr>
@@ -278,7 +279,7 @@ Planetary Data System</h2>
                 paste     0 23040 input megt88n180hb.img 0 5632 11520 1 S \
                 paste     0 11520 input megt88n090hb.img 0 5632 11520 1 S \
                                   input megt88n000hb.img 0 5632 11520 1 S
-</pre><p>This might take a minute or two, depending on the number of processor cores available. </p>
+</pre><p>This might take a minute or two, depending on the I/O throughput of the system. </p>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

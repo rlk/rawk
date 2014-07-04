@@ -109,7 +109,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;</div>
 <div class="line"><a name="l00036"></a><span class="lineno"><a class="line" href="classswizzle.html#a7712f432a92235dc3258f18f27b2c36c">   36</a></span>&#160;    <a class="code" href="classswizzle.html#a7712f432a92235dc3258f18f27b2c36c">swizzle</a>(std::string element, <a class="code" href="classimage.html">image</a> *<a class="code" href="classimage.html#a96bc6a71fa16d5f0d4083ebe7a10a865">L</a>) : <a class="code" href="classimage.html">image</a>(L), element(element)</div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    {</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; element.size(); i++)</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; int(element.size()); i++)</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;        {</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;            <span class="keywordtype">char</span> c = element[i];</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;            <span class="keywordtype">int</span>  k = 0;</div>

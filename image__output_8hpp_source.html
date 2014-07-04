@@ -107,7 +107,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;{</div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="keyword">public</span>:</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;</div>
-<div class="line"><a name="l00029"></a><span class="lineno"><a class="line" href="classoutput.html#af55bc6cb2507c27d388cfb7412e624d8">   29</a></span>&#160;    <a class="code" href="classoutput.html#af55bc6cb2507c27d388cfb7412e624d8">output</a>(std::string name, <span class="keywordtype">char</span> type, <a class="code" href="classimage.html">image</a> *<a class="code" href="classimage.html#a96bc6a71fa16d5f0d4083ebe7a10a865">L</a>) : <a class="code" href="classimage.html">image</a>(L), file(0)</div>
+<div class="line"><a name="l00029"></a><span class="lineno"><a class="line" href="classoutput.html#af55bc6cb2507c27d388cfb7412e624d8">   29</a></span>&#160;    <a class="code" href="classoutput.html#af55bc6cb2507c27d388cfb7412e624d8">output</a>(std::string name, <span class="keywordtype">char</span> type, <a class="code" href="classimage.html">image</a> *<a class="code" href="classimage.html#a96bc6a71fa16d5f0d4083ebe7a10a865">L</a>) : <a class="code" href="classimage.html">image</a>(L), cache(false), file(0)</div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    {</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">int</span> height = L-&gt;<a class="code" href="classimage.html#ac28b939a0e0694e2ddd3df0106f93158">get_height</a>();</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">int</span> width  = L-&gt;<a class="code" href="classimage.html#a3989b3409ee7f5f58aedc378c0f2da5e">get_width</a> ();</div>
@@ -139,42 +139,54 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;</div>
 <div class="line"><a name="l00059"></a><span class="lineno"><a class="line" href="classoutput.html#ad3d00993140087a27d89ad2f9f7b6acd">   59</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">double</span> <span class="keyword">get</span>(<span class="keywordtype">int</span> i, <span class="keywordtype">int</span> j, <span class="keywordtype">int</span> k) <span class="keyword">const</span></div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    {</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="classimage.html#a96bc6a71fa16d5f0d4083ebe7a10a865">L</a>-&gt;<a class="code" href="classimage.html#ac3ed8eccf2eda22c789b88e106e9fed9">get</a>(i, j, k);</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    }</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;</div>
-<div class="line"><a name="l00064"></a><span class="lineno"><a class="line" href="classoutput.html#af0578f2b0983fa48fb255f9453481bbb">   64</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classoutput.html#af0578f2b0983fa48fb255f9453481bbb">doc</a>(std::ostream&amp; out)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="keyword">    </span>{</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        out &lt;&lt; <span class="stringliteral">&quot;output &quot;</span> &lt;&lt; file-&gt;get_name  ()</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;                  &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; file-&gt;get_height()</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;                  &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; file-&gt;get_width ()</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;                  &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; file-&gt;get_depth ();</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    }</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    <span class="keywordtype">void</span> go()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="keyword">    </span>{</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        <span class="keywordtype">int</span> i, h = <a class="code" href="classimage.html#ac28b939a0e0694e2ddd3df0106f93158">get_height</a>();</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        <span class="keywordtype">int</span> j, w = <a class="code" href="classimage.html#a3989b3409ee7f5f58aedc378c0f2da5e">get_width</a>();</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;        <span class="keywordtype">int</span> k, d = <a class="code" href="classimage.html#a1eea2521cb7e4e7d9dc81929b6cd6aa8">get_depth</a>();</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="preprocessor">        #pragma omp parallel for private(j, k)</span></div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="preprocessor"></span>        <span class="keywordflow">for</span>         (i = 0; i &lt; h; ++i)</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;            <span class="keywordflow">for</span>     (j = 0; j &lt; w; ++j)</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;                <span class="keywordflow">for</span> (k = 0; k &lt; d; ++k)</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;                    file-&gt;put(i, j, k, <a class="code" href="classimage.html#a96bc6a71fa16d5f0d4083ebe7a10a865">L</a>-&gt;<a class="code" href="classimage.html#ac3ed8eccf2eda22c789b88e106e9fed9">get</a>(i, j, k));</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    }</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    <a class="code" href="classraw.html">raw</a> *file;</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;};</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="comment">//------------------------------------------------------------------------------</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        <span class="keywordflow">if</span> (0 &lt;= i &amp;&amp; i &lt; file-&gt;<a class="code" href="classimage.html#ac28b939a0e0694e2ddd3df0106f93158">get_height</a>() &amp;&amp;</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;            0 &lt;= j &amp;&amp; j &lt; file-&gt;get_width () &amp;&amp;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;            0 &lt;= k &amp;&amp; k &lt; file-&gt;get_depth ())</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        {</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;            <span class="keywordflow">if</span> (cache)</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;                <span class="keywordflow">return</span> file-&gt;get(i, j, k);</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;            <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;                <span class="keywordflow">return</span>    <a class="code" href="classimage.html#a96bc6a71fa16d5f0d4083ebe7a10a865">L</a>-&gt;<a class="code" href="classimage.html#ac3ed8eccf2eda22c789b88e106e9fed9">get</a>(i, j, k);</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        }</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        <span class="keywordflow">return</span> 0.0;</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    }</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;</div>
+<div class="line"><a name="l00073"></a><span class="lineno"><a class="line" href="classoutput.html#af0578f2b0983fa48fb255f9453481bbb">   73</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classoutput.html#af0578f2b0983fa48fb255f9453481bbb">doc</a>(std::ostream&amp; out)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="keyword">    </span>{</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        out &lt;&lt; <span class="stringliteral">&quot;output &quot;</span> &lt;&lt; file-&gt;get_name  ()</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;                  &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; file-&gt;get_height()</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;                  &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; file-&gt;get_width ()</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;                  &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; file-&gt;get_depth ();</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    }</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    <span class="keywordtype">void</span> process(<span class="keywordtype">int</span> i)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="keyword">    </span>{</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        <span class="keywordtype">int</span> j, w = <a class="code" href="classimage.html#a3989b3409ee7f5f58aedc378c0f2da5e">get_width</a>();</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        <span class="keywordtype">int</span> k, d = <a class="code" href="classimage.html#a1eea2521cb7e4e7d9dc81929b6cd6aa8">get_depth</a>();</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        <span class="keywordflow">for</span>     (j = 0; j &lt; w; ++j)</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;            <span class="keywordflow">for</span> (k = 0; k &lt; d; ++k)</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;                file-&gt;put(i, j, k, <a class="code" href="classimage.html#a96bc6a71fa16d5f0d4083ebe7a10a865">L</a>-&gt;<a class="code" href="classimage.html#ac3ed8eccf2eda22c789b88e106e9fed9">get</a>(i, j, k));</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    }</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <span class="keywordtype">void</span> set_cache(<span class="keywordtype">bool</span> c)</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    {</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        cache = c;</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    }</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    <span class="keywordtype">bool</span> cache;</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <a class="code" href="classraw.html">raw</a> *file;</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;};</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;<span class="comment">//------------------------------------------------------------------------------</span></div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="classimage_html_ac3ed8eccf2eda22c789b88e106e9fed9"><div class="ttname"><a href="classimage.html#ac3ed8eccf2eda22c789b88e106e9fed9">image::get</a></div><div class="ttdeci">virtual double get(int i, int j, int k) const =0</div><div class="ttdoc">Return the value of the sample at row i, column j, channel k. </div></div>
 <div class="ttc" id="classoutput_html_af55bc6cb2507c27d388cfb7412e624d8"><div class="ttname"><a href="classoutput.html#af55bc6cb2507c27d388cfb7412e624d8">output::output</a></div><div class="ttdeci">output(std::string name, char type, image *L)</div><div class="ttdoc">Write a raw-formatted data file named name. Type is a character giving the output sample type...</div><div class="ttdef"><b>Definition:</b> image_output.hpp:29</div></div>
 <div class="ttc" id="classimage_html_a96bc6a71fa16d5f0d4083ebe7a10a865"><div class="ttname"><a href="classimage.html#a96bc6a71fa16d5f0d4083ebe7a10a865">image::L</a></div><div class="ttdeci">image * L</div><div class="ttdoc">Left child. </div><div class="ttdef"><b>Definition:</b> image.hpp:109</div></div>
 <div class="ttc" id="classraw_html"><div class="ttname"><a href="classraw.html">raw</a></div><div class="ttdoc">RAW image file. </div><div class="ttdef"><b>Definition:</b> raw.hpp:68</div></div>
-<div class="ttc" id="classoutput_html_af0578f2b0983fa48fb255f9453481bbb"><div class="ttname"><a href="classoutput.html#af0578f2b0983fa48fb255f9453481bbb">output::doc</a></div><div class="ttdeci">virtual void doc(std::ostream &amp;out) const </div><div class="ttdoc">Produce a string documenting the function of this object. </div><div class="ttdef"><b>Definition:</b> image_output.hpp:64</div></div>
+<div class="ttc" id="classoutput_html_af0578f2b0983fa48fb255f9453481bbb"><div class="ttname"><a href="classoutput.html#af0578f2b0983fa48fb255f9453481bbb">output::doc</a></div><div class="ttdeci">virtual void doc(std::ostream &amp;out) const </div><div class="ttdoc">Produce a string documenting the function of this object. </div><div class="ttdef"><b>Definition:</b> image_output.hpp:73</div></div>
 <div class="ttc" id="classrawi_html"><div class="ttname"><a href="classrawi.html">rawi</a></div><div class="ttdoc">Signed 32-bit RAW adapter. </div><div class="ttdef"><b>Definition:</b> raw.hpp:331</div></div>
 <div class="ttc" id="classraw_d_html"><div class="ttname"><a href="classraw_d.html">rawD</a></div><div class="ttdoc">Byte-swapped single precision floating point RAW adapter. </div><div class="ttdef"><b>Definition:</b> raw.hpp:463</div></div>
 <div class="ttc" id="classrawd_html"><div class="ttname"><a href="classrawd.html">rawd</a></div><div class="ttdoc">Single precision floating point RAW adapter. </div><div class="ttdef"><b>Definition:</b> raw.hpp:445</div></div>
