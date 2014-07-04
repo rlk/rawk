@@ -2,6 +2,8 @@
 
 RAWK is a command-line tool capable of performing a variety of image processing operations on very large raw binary image files. It provides a pannable, zoomable preview of the result of the process and enables image process parameters to be tuned interactively regardless of the scale of the input and output.
 
+- [GitHub source repository](https://github.com/rlk/rawk)
+
 The speed and capability of RAWK lies in its reliance upon the raw binary image format, as such images may be read and written without the overhead of coding and compression, and may be many times larger than available RAM without added algorithmic complexity.
 
 The simplicity of raw binary makes it the recommended format for the NASA Planetary Data System, the primary motivator of RAWK. Both Photoshop and Imagemagick are capable of transforming image into and out of raw format (for limited file sizes) enabling interoperability with off-the-shelf tools.
