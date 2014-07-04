@@ -144,13 +144,12 @@ private:
     void retitle();
 
     void cache_row(image *, state *, int, int);
-    void cache_all(image *, state *);
 
     std::vector<GLfloat> cache;
 
     void zerocache()
     {
-        std::fill(cache.begin(), cache.end(), 0);
+        std::fill(cache.begin(), cache.end(), 0.5f);
     }
     void showcache()
     {
@@ -164,7 +163,7 @@ private:
 //------------------------------------------------------------------------------
 
 rawk::rawk(int argc, char **argv)
-    : demonstration("RAWK", 1280, 720), program(0), cache(width * height * 3)
+    : demonstration("RAWK", 1280, 720), program(0), out(0), cache(width * height * 3)
 {
     // Initialize the OpenGL state.
 
@@ -609,33 +608,6 @@ void rawk::cache_row(image *p, state *s, int r, int d)
         }
 }
 
-void rawk::cache_all(image *p, state *s)
-{
-    struct timeval tv;
-    gettimeofday(&tv, 0);
-
-    int r, d = std::min(p->get_depth(), 3);
-
-    zerocache();
-    showcache();
-
-    #pragma omp parallel for schedule(dynamic)
-    for (r = 0; r < height; ++r)
-    {
-        cache_row(p, s, r, d);
-
-        if (omp_get_thread_num() == 0)
-        {
-            if (getsecsince(&tv) > 0.1)
-            {
-                showcache();
-                gettimeofday(&tv, 0);
-            }
-        }
-    }
-    showcache();
-}
-
 void rawk::process()
 {
     struct timeval tv;
@@ -680,7 +652,30 @@ void rawk::refresh()
     if (curr_image)
     {
         cache_state = curr_state;
-        cache_all(curr_image, &curr_state);
+
+        struct timeval tv;
+        gettimeofday(&tv, 0);
+
+        int r, d = std::min(curr_image->get_depth(), 3);
+
+        zerocache();
+        showcache();
+
+        #pragma omp parallel for schedule(dynamic)
+        for (r = 0; r < height; ++r)
+        {
+            cache_row(curr_image, &curr_state, r, d);
+
+            if (omp_get_thread_num() == 0)
+            {
+                if (getsecsince(&tv) > 0.1)
+                {
+                    showcache();
+                    gettimeofday(&tv, 0);
+                }
+            }
+        }
+        showcache();
     }
 }
 
