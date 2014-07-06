@@ -21,6 +21,7 @@ rawk : image_append.hpp
 rawk : image_arithmetic.hpp
 rawk : image_bias.hpp
 rawk : image_blend.hpp
+rawk : image_choose.hpp
 rawk : image_convolve.hpp
 rawk : image_crop.hpp
 rawk : image_flatten.hpp

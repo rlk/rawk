@@ -27,6 +27,7 @@ class rawk;
 #include "image_arithmetic.hpp"
 #include "image_bias.hpp"
 #include "image_blend.hpp"
+#include "image_choose.hpp"
 #include "image_convolve.hpp"
 #include "image_crop.hpp"
 #include "image_flatten.hpp"
@@ -818,6 +819,14 @@ image *rawk::parse_image(int& i, char **v)
             image *L = parse_image(i, v);
             image *R = parse_image(i, v);
             return new blend(L, R);
+        }
+
+        if (op == "choose")
+        {
+            int    n = parse_int(i, v);
+            image *L = parse_image(i, v);
+            image *R = parse_image(i, v);
+            return new choose(n, L, R);
         }
 
         if (op == "crop")
