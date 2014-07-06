@@ -118,16 +118,17 @@ private:
 
     image *parse_image(int&, char **);
 
-    image *root_image;
-    state  curr_state;
-    image *curr_image;
-    state  mark_state[12];
-    image *mark_image[12];
+    image               *root_image;
+    state                temp_state;
+    state                down_state;
+    state                curr_state;
+    image               *curr_image;
+    std::vector<GLfloat> curr_cache;
+    state                mark_state[12];
+    image               *mark_image[12];
+    std::vector<GLfloat> mark_cache[12];
 
     output *out;
-
-    state cache_state;
-    state click_state;
 
     image *doL(image *);
     image *doR(image *);
@@ -145,25 +146,14 @@ private:
 
     void cache_row(image *, state *, int, int);
 
-    std::vector<GLfloat> cache;
-
-    void zerocache()
-    {
-        std::fill(cache.begin(), cache.end(), 0.5f);
-    }
-    void showcache()
-    {
-        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height,
-                        GL_RGB, GL_FLOAT, &cache.front());
-        draw();
-        swap();
-    }
+    void zerocache(int selector=-1);
+    void showcache(int selector=-1);
 };
 
 //------------------------------------------------------------------------------
 
 rawk::rawk(int argc, char **argv)
-    : demonstration("RAWK", 1280, 720), program(0), out(0), cache(width * height * 3)
+    : demonstration("RAWK", 1280, 720), program(0), curr_cache(width * height * 3), out(0)
 {
     // Initialize the OpenGL state.
 
@@ -188,26 +178,18 @@ rawk::rawk(int argc, char **argv)
 
     if ((root_image = parse_image(argi, argv)))
     {
-        // Initialize the stored view and image states.
+        curr_state.center(root_image, width, height);
+        curr_image = root_image;
+
+        refresh();
 
         for (int i = 0; i < 12; i++)
-            if (mark_image[i])
-                mark_state[i].center(mark_image[i], width, height);
-            else
-            {
-                mark_state[i].center(root_image,    width, height);
-                mark_image[i] = root_image;
-            }
-
-        // Initialize the current view and image state.
-
-        curr_state = mark_state[0];
-        curr_image = mark_image[0];
+        {
+            mark_state[i] = curr_state;
+            mark_image[i] = curr_image;
+            mark_cache[i] = curr_cache;
+        }
     }
-
-    // Initialize the cache.
-
-    refresh();
 }
 
 rawk::~rawk()
@@ -404,8 +386,8 @@ void rawk::motion(int x, int y)
 
     if (dragging)
     {
-        curr_state.x = click_state.x + (click_x - x) * curr_state.z;
-        curr_state.y = click_state.y + (click_y - y) * curr_state.z;
+        curr_state.x = down_state.x + (click_x - x) * curr_state.z;
+        curr_state.y = down_state.y + (click_y - y) * curr_state.z;
     }
 }
 
@@ -416,7 +398,7 @@ void rawk::button(int button, bool down)
     if (button == SDL_BUTTON_LEFT)
     {
         dragging    = down;
-        click_state = curr_state;
+        down_state = curr_state;
         click_x     = point_x;
         click_y     = point_y;
     }
@@ -482,8 +464,11 @@ void rawk::key(int key, bool down, bool repeat)
                         {
                             curr_state = mark_state[selector];
                             curr_image = mark_image[selector];
+                            curr_cache = mark_cache[selector];
+                            temp_state = curr_state;
+                            showcache();
                         }
-                        refresh();
+                        else refresh();
                         break;
 
                     case SDL_SCANCODE_RETURN:
@@ -491,6 +476,7 @@ void rawk::key(int key, bool down, bool repeat)
                         {
                             mark_state[selector] = curr_state;
                             mark_image[selector] = curr_image;
+                            mark_cache[selector] = curr_cache;
                         }
                         break;
 
@@ -511,18 +497,18 @@ void rawk::key(int key, bool down, bool repeat)
 
         switch (key)
         {
-            case SDL_SCANCODE_F1:  selector = (down ?  0 : -1); break;
-            case SDL_SCANCODE_F2:  selector = (down ?  1 : -1); break;
-            case SDL_SCANCODE_F3:  selector = (down ?  2 : -1); break;
-            case SDL_SCANCODE_F4:  selector = (down ?  3 : -1); break;
-            case SDL_SCANCODE_F5:  selector = (down ?  4 : -1); break;
-            case SDL_SCANCODE_F6:  selector = (down ?  5 : -1); break;
-            case SDL_SCANCODE_F7:  selector = (down ?  6 : -1); break;
-            case SDL_SCANCODE_F8:  selector = (down ?  7 : -1); break;
-            case SDL_SCANCODE_F9:  selector = (down ?  8 : -1); break;
-            case SDL_SCANCODE_F10: selector = (down ?  9 : -1); break;
-            case SDL_SCANCODE_F11: selector = (down ? 10 : -1); break;
-            case SDL_SCANCODE_F12: selector = (down ? 11 : -1); break;
+            case SDL_SCANCODE_F1:  showcache(selector = (down ?  0 : -1)); break;
+            case SDL_SCANCODE_F2:  showcache(selector = (down ?  1 : -1)); break;
+            case SDL_SCANCODE_F3:  showcache(selector = (down ?  2 : -1)); break;
+            case SDL_SCANCODE_F4:  showcache(selector = (down ?  3 : -1)); break;
+            case SDL_SCANCODE_F5:  showcache(selector = (down ?  4 : -1)); break;
+            case SDL_SCANCODE_F6:  showcache(selector = (down ?  5 : -1)); break;
+            case SDL_SCANCODE_F7:  showcache(selector = (down ?  6 : -1)); break;
+            case SDL_SCANCODE_F8:  showcache(selector = (down ?  7 : -1)); break;
+            case SDL_SCANCODE_F9:  showcache(selector = (down ?  8 : -1)); break;
+            case SDL_SCANCODE_F10: showcache(selector = (down ?  9 : -1)); break;
+            case SDL_SCANCODE_F11: showcache(selector = (down ? 10 : -1)); break;
+            case SDL_SCANCODE_F12: showcache(selector = (down ? 11 : -1)); break;
         }
     }
 
@@ -604,7 +590,7 @@ void rawk::cache_row(image *p, state *s, int r, int d)
         {
             int i = toint(s->y + (r - height / 2) * s->z);
             int j = toint(s->x + (c - width / 2) * s->z);
-            cache[(r * width + c) * 3 + k] = p->get(i, j, k);
+            curr_cache[(r * width + c) * 3 + k] = p->get(i, j, k);
         }
 }
 
@@ -651,7 +637,7 @@ void rawk::refresh()
 {
     if (curr_image)
     {
-        cache_state = curr_state;
+        temp_state = curr_state;
 
         struct timeval tv;
         gettimeofday(&tv, 0);
@@ -685,17 +671,39 @@ void rawk::draw()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    double x = 2.0 * (cache_state.x - curr_state.x) / cache_state.z / width;
-    double y = 2.0 * (cache_state.y - curr_state.y) / cache_state.z / height;
-    double z =        cache_state.z / curr_state.z;
+    double x = 2.0 * (temp_state.x - curr_state.x) / temp_state.z / width;
+    double y = 2.0 * (temp_state.y - curr_state.y) / temp_state.z / height;
+    double z =        temp_state.z / curr_state.z;
 
-    glUniform1f(u_zoom, cache_state.z);
+    glUniform1f(u_zoom, temp_state.z);
     glUniform1f(u_scale,  z);
     glUniform2f(u_offset, x, y);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     retitle();
+}
+
+void rawk::zerocache(int selector)
+{
+    if (selector < 0)
+        std::fill(curr_cache.begin(),
+                  curr_cache.end(), 0.5f);
+    else
+        std::fill(mark_cache[selector].begin(),
+                  mark_cache[selector].end(), 0.5f);
+}
+
+void rawk::showcache(int selector)
+{
+    if (selector < 0)
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height,
+                        GL_RGB, GL_FLOAT, &curr_cache.front());
+    else
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height,
+                        GL_RGB, GL_FLOAT, &mark_cache[selector].front());
+    draw();
+    swap();
 }
 
 //------------------------------------------------------------------------------
