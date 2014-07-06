@@ -38,12 +38,12 @@ public:
         int z = 0;
 
         for     (int y = -radius; y <= radius; y++)
-            for (int x = -radius; x <= radius; x++, z++)
+            for (int x = -radius; x <= radius; x++)
+                if (x * x + y * y <= radius * radius)
+                    v[z++] = L->get(wrap(i + y, h, mode & 1),
+                                    wrap(j + x, w, mode & 2), k);
 
-                v[z] = L->get(wrap(i + y, h, mode & 1),
-                              wrap(j + x, w, mode & 2), k);
-
-        std::nth_element(v.begin(), v.begin() + z / 2, v.end());
+        std::nth_element(v.begin(), v.begin() + z / 2, v.begin() + z);
         return v[z / 2];
     }
 
@@ -88,7 +88,7 @@ public:
         for (int y = -radius; y <= radius; y++, z++)
             v[z] = L->get(wrap(i + y, h, mode & 1), j, k);
 
-        std::nth_element(v.begin(), v.begin() + z / 2, v.end());
+        std::nth_element(v.begin(), v.begin() + z / 2, v.begin() + z);
         return v[z / 2];
     }
 
@@ -122,7 +122,7 @@ public:
         for (int x = -radius; x <= radius; x++, z++)
             v[z] = L->get(i, wrap(j + x, w, mode & 2), k);
 
-        std::nth_element(v.begin(), v.begin() + z / 2, v.end());
+        std::nth_element(v.begin(), v.begin() + z / 2, v.begin() + z);
         return v[z / 2];
     }
 
