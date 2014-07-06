@@ -26,7 +26,7 @@ There is a direct mapping between an image object's constructor and its command 
 
 @subsection image_operators Image Operators
 
-::append --- ::blend --- ::difference --- ::paste --- ::sum
+::append --- ::blend --- ::choose --- ::difference --- ::paste --- ::sum
 
 @section interaction Interaction
 

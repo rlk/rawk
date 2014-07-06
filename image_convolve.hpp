@@ -36,8 +36,8 @@ public:
         double t = 0;
         int    z = 0;
 
-        for     (int y = -radius; y <= +radius; y++)
-            for (int x = -radius; x <= +radius; x++, z++)
+        for     (int y = -radius; y <= radius; y++)
+            for (int x = -radius; x <= radius; x++, z++)
 
             t += kernel[z] * L->get(wrap(i + y, h, mode & 1),
                                     wrap(j + x, w, mode & 2), k);
@@ -87,8 +87,8 @@ public:
 
         int z = 0;
 
-        for     (int y = -radius; y <= +radius; y++)
-            for (int x = -radius; x <= +radius; x++, z++)
+        for     (int y = -radius; y <= radius; y++)
+            for (int x = -radius; x <= radius; x++, z++)
             {
                 double t = exp(-(x * x + y * y) / (2.0 * sigma * sigma));
                 kernel[z] = t;

@@ -31,23 +31,28 @@ public:
     virtual double get(int i, int j, int k) const
     {
         const int h = L->get_height();
-        const int w = L->get_height();
+        const int w = L->get_width ();
 
         std::vector<double> v((2 * radius + 1) * (2 * radius + 1));
 
-        for     (int ii = i - radius; ii <= i + radius; ii++)
-            for (int jj = j - radius; jj <= j + radius; jj++)
+        int z = 0;
 
-                v.push_back(L->get(int(wrap(ii, h, mode & 1)),
-                                   int(wrap(jj, w, mode & 2)), k));
+        for     (int y = -radius; y <= radius; y++)
+            for (int x = -radius; x <= radius; x++, z++)
 
-        std::nth_element(v.begin(), v.begin() + v.size() / 2, v.end());
-        return v[v.size() / 2];
+                v[z] = L->get(wrap(i + y, h, mode & 1),
+                              wrap(j + x, w, mode & 2), k);
+
+        std::nth_element(v.begin(), v.begin() + z / 2, v.end());
+        return v[z / 2];
     }
 
     virtual void tweak(int a, int v)
     {
-        if (a == 0) radius += v;
+        if (a == 0)
+        {
+            radius += v;
+        }
     }
 
     virtual void doc(std::ostream& out) const
@@ -78,11 +83,13 @@ public:
 
         std::vector<double> v(2 * radius + 1);
 
-        for (int ii = i - radius; ii <= i + radius; ii++)
-            v.push_back(L->get(int(wrap(ii, h, mode & 1)), j, k));
+        int z = 0;
 
-        std::nth_element(v.begin(), v.begin() + v.size() / 2, v.end());
-        return v[v.size() / 2];
+        for (int y = -radius; y <= radius; y++, z++)
+            v[z] = L->get(wrap(i + y, h, mode & 1), j, k);
+
+        std::nth_element(v.begin(), v.begin() + z / 2, v.end());
+        return v[z / 2];
     }
 
     virtual void doc(std::ostream& out) const
@@ -110,11 +117,13 @@ public:
 
         std::vector<double> v(2 * radius + 1);
 
-        for (int jj = j - radius; jj <= j + radius; jj++)
-            v.push_back(L->get(i, int(wrap(jj, w, mode & 1)), k));
+        int z = 0;
 
-        std::nth_element(v.begin(), v.begin() + v.size() / 2, v.end());
-        return v[v.size() / 2];
+        for (int x = -radius; x <= radius; x++, z++)
+            v[z] = L->get(i, wrap(j + x, w, mode & 2), k);
+
+        std::nth_element(v.begin(), v.begin() + z / 2, v.end());
+        return v[z / 2];
     }
 
     virtual void doc(std::ostream& out) const
