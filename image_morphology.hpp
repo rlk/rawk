@@ -33,7 +33,7 @@ public:
         const int h = L->get_height();
         const int w = L->get_width ();
 
-        double v = std::numeric_limits<double>::max();
+        double v = std::numeric_limits<double>::min();
 
         for     (int y = -radius; y <= +radius; y++)
             for (int x = -radius; x <= +radius; x++)
