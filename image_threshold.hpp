@@ -37,7 +37,7 @@ public:
 
     virtual void tweak(int a, int v)
     {
-        if (a == 0) value += 0.1 * v;
+        if (a == 0) value += 0.001 * v;
     }
 
     virtual void doc(std::ostream& out) const
