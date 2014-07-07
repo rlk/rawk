@@ -32,7 +32,6 @@ class rawk;
 #include "image_crop.hpp"
 #include "image_flatten.hpp"
 #include "image_gain.hpp"
-#include "image_gradient.hpp"
 #include "image_input.hpp"
 #include "image_matrix.hpp"
 #include "image_median.hpp"
@@ -43,6 +42,7 @@ class rawk;
 #include "image_paste.hpp"
 #include "image_reduce.hpp"
 #include "image_resample.hpp"
+#include "image_sobel.hpp"
 #include "image_solid.hpp"
 #include "image_swizzle.hpp"
 #include "image_threshold.hpp"
@@ -1002,6 +1002,20 @@ image *rawk::parse_image(int& i, char **v)
         {
             image *L = parse_image(i, v);
             return new rgb2yuv(L);
+        }
+
+        if (op == "sobelx")
+        {
+            int    m = parse_wrap(i, v);
+            image *L = parse_image(i, v);
+            return new sobelx(m, L);
+        }
+
+        if (op == "sobely")
+        {
+            int    m = parse_wrap(i, v);
+            image *L = parse_image(i, v);
+            return new sobely(m, L);
         }
 
         if (op == "solid")
