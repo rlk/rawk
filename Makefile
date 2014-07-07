@@ -25,6 +25,7 @@ rawk : image_choose.hpp
 rawk : image_convolve.hpp
 rawk : image_crop.hpp
 rawk : image_flatten.hpp
+rawk : image_function.hpp
 rawk : image_gain.hpp
 rawk : image_input.hpp
 rawk : image_matrix.hpp

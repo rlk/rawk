@@ -22,7 +22,7 @@ There is a direct mapping between an image object's constructor and its command 
 
 @subsection image_filters Image Filters
 
-::bias --- ::crop --- ::cubic --- ::dilate --- ::erode --- ::flatten --- ::gain --- ::gaussian --- ::gaussianh --- ::gaussianv --- ::gradient --- ::linear --- ::median --- ::medianh --- ::medianv --- ::nearest --- ::normalize --- ::offset --- ::output --- ::reduce --- ::rgb2yuv --- ::sobelx --- ::sobely --- ::swizzle --- ::threshold --- ::trim --- ::yuv2rgb
+::absolute --- ::bias --- ::crop --- ::cubic --- ::dilate --- ::erode --- ::flatten --- ::gain --- ::gaussian --- ::gaussianh --- ::gaussianv --- ::gradient --- ::linear --- ::median --- ::medianh --- ::medianv --- ::nearest --- ::normalize --- ::offset --- ::output --- ::reduce --- ::rgb2yuv --- ::sobelx --- ::sobely --- ::swizzle --- ::threshold --- ::trim --- ::yuv2rgb
 
 @subsection image_operators Image Operators
 
