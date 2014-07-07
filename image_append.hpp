@@ -43,9 +43,9 @@ public:
         return L->get_depth() + R->get_depth();
     }
 
-    virtual std::string describe() const
+    virtual void doc(std::ostream& out) const
     {
-        return "append";
+        out << "append";
     }
 };
 
