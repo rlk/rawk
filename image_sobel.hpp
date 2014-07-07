@@ -77,7 +77,7 @@ public:
         double d8 = L->get(is, j,  k);
         double d9 = L->get(is, je, k);
 
-        return d1 - d7 + 2.0 * (d2 - d8) + d3 - d9;
+        return d7 - d1 + 2.0 * (d8 - d2) + d9 - d3;
     }
 
     virtual void doc(std::ostream& out) const
@@ -119,7 +119,7 @@ public:
         double d9 = L->get(is, je, k);
 
         double Lx = d3 - d1 + 2.0 * (d6 - d4) + d9 - d7;
-        double Ly = d1 - d7 + 2.0 * (d2 - d8) + d3 - d9;
+        double Ly = d7 - d1 + 2.0 * (d8 - d2) + d9 - d3;
 
         return sqrt(Lx * Lx + Ly * Ly);
     }
