@@ -70,16 +70,19 @@ public:
 class multiply : public image
 {
 public:
-    /// Multiply all samples of image *R* and image *L*. The width, height, and
-    /// depth of the result are the larger of the widths, heights, and depths of
-    /// the inputs.
+    /// Multiply all samples of image *L* and image *R*. This operator is short-
+    /// circuited and will only evaluate *R* if *L* is non-zero. The width,
+    /// height, and depth of the result are the larger of the widths, heights,
+    /// and depths of the inputs.
 
     multiply(image *L, image *R) : image(L, R) { }
 
     virtual double get(int i, int j, int k) const
     {
-        return L->get(i, j, k)
-             * R->get(i, j, k);
+        if (double v = L->get(i, j, k))
+            return v * R->get(i, j, k);
+        else
+            return 0.0;
     }
 
     virtual void doc(std::ostream& out) const
