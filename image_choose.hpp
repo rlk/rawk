@@ -20,7 +20,7 @@
 class choose : public image
 {
 public:
-    /// Choose image *L* if *which* is 0 or image *R* if *which* is 1. his is
+    /// Choose image *L* if *which* is 0 or image *R* if *which* is 1. This is
     /// akin to turning a layer on and off. It allows alternatives to be viewed
     /// without the overhead of evaluating both.
 
