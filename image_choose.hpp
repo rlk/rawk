@@ -31,6 +31,11 @@ public:
         return which ? R->get(i, j, k) : L->get(i, j, k);
     }
 
+    virtual void tweak(int a, int v)
+    {
+        if (a == 0) which += v;
+    }
+
     virtual void doc(std::ostream& out) const
     {
         out << "choose " << which;
