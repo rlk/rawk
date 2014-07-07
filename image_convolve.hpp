@@ -20,37 +20,39 @@
 class convolve : public image
 {
 public:
-    /// Convolve image *L* using a kernel of the given *radius*. While storage
-    /// for the kernel is allocated here, the value of the kernel is expected to
-    /// be supplied by a subclass.
+    /// Convolve image *L* using a kernel of the given *xradius* and *yradius*.
+    /// The kernel is expected to be supplied by a subclass.
 
-    convolve(int radius, int mode, image *L)
-        : image(L), radius(radius), mode(mode), total(0), kernel((2 * radius + 1)
-                                                               * (2 * radius + 1)) { }
+    convolve(int xradius, int yradius, int mode, image *L)
+        : image(L), xradius(xradius), yradius(yradius), mode(mode) { }
 
     virtual double get(int i, int j, int k) const
     {
         const int h = L->get_height();
         const int w = L->get_width ();
 
+        double s = 0;
         double t = 0;
-        int    z = 0;
+        double T = 0;
 
-        for     (int y = -radius; y <= radius; y++)
-            for (int x = -radius; x <= radius; x++, z++)
-
-            t += kernel[z] * L->get(wrap(i + y, h, mode & 1),
+        for     (int y = -xradius; y <= xradius; y++)
+            for (int x = -yradius; x <= yradius;  x++)
+                if ((s = kernel(y, x)))
+                {
+                    T += s;
+                    t += s * L->get(wrap(i + y, h, mode & 1),
                                     wrap(j + x, w, mode & 2), k);
+                }
 
-
-        return t / total;
+        return t / T;
     }
 
 protected:
-    int    radius;
+    virtual double kernel(int, int) const = 0;
+
+    int    xradius;
+    int    yradius;
     int    mode;
-    double total;
-    std::vector<double> kernel;
 };
 
 //------------------------------------------------------------------------------
@@ -64,36 +66,23 @@ public:
     /// *sigma*. *Mode* gives the @ref wrap "wrapping mode". The true radius of
     /// the kernel is 3 sigma, rounded up.
 
-    gaussian(double sigma, int mode, image *L) : convolve(0, mode, L), sigma(sigma)
-    {
-        update();
-    }
+    gaussian(double sigma, int mode, image *L)
+        : convolve(int(ceil(sigma * 3)),
+                   int(ceil(sigma * 3)), mode, L), sigma(sigma) { }
 
     virtual void tweak(int a, int v)
     {
         if (a == 0)
         {
-            sigma += v;
-            update();
+            sigma  += v;
+            xradius = int(ceil(sigma * 3));
+            yradius = int(ceil(sigma * 3));
         }
     }
 
-    void update()
+    virtual double kernel(int x, int y) const
     {
-        radius = int(ceil(3 * sigma));
-        total  = 0;
-
-        kernel.reserve((2 * radius + 1) * (2 * radius + 1));
-
-        int z = 0;
-
-        for     (int y = -radius; y <= radius; y++)
-            for (int x = -radius; x <= radius; x++, z++)
-            {
-                double t = exp(-(x * x + y * y) / (2.0 * sigma * sigma));
-                kernel[z] = t;
-                total    += t;
-            }
+        return sigma ? exp(-(x * x + y * y) / (2.0 * sigma * sigma)) : 1.0;
     }
 
     virtual void doc(std::ostream& out) const
@@ -104,6 +93,7 @@ public:
 private:
     double sigma;
 };
+
 
 //------------------------------------------------------------------------------
 
