@@ -31,6 +31,7 @@ class rawk;
 #include "image_convolve.hpp"
 #include "image_crop.hpp"
 #include "image_flatten.hpp"
+#include "image_function.hpp"
 #include "image_gain.hpp"
 #include "image_input.hpp"
 #include "image_matrix.hpp"
@@ -589,7 +590,7 @@ void rawk::cache_row(image *p, state *s, int r, int d)
         for (int k = 0; k < d; ++k)
         {
             int i = toint(s->y + (r - height / 2) * s->z);
-            int j = toint(s->x + (c - width / 2) * s->z);
+            int j = toint(s->x + (c - width  / 2) * s->z);
             curr_cache[(r * width + c) * 3 + k] = p->get(i, j, k);
         }
 }
@@ -688,10 +689,10 @@ void rawk::zerocache(int selector)
 {
     if (selector < 0)
         std::fill(curr_cache.begin(),
-                  curr_cache.end(), 0.5f);
+                  curr_cache.end(), 0.0f);
     else
         std::fill(mark_cache[selector].begin(),
-                  mark_cache[selector].end(), 0.5f);
+                  mark_cache[selector].end(), 0.0f);
 }
 
 void rawk::showcache(int selector)
@@ -807,6 +808,12 @@ image *rawk::parse_image(int& i, char **v)
     if (v[i])
     {
         std::string op(v[i++]);
+
+        if (op == "absolute")
+        {
+            image *L = parse_image(i, v);
+            return new absolute(L);
+        }
 
         if (op == "append")
         {
