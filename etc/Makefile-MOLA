@@ -1,3 +1,6 @@
+# Assemble the 16 tiles of the Mission Experiment Gridded Topography to a
+# single 22528 x 46080 image.
+
 MEGT= \
 	paste 16896 34560 input megt44s270hb.img 0 5632 11520 1 S \
 	paste 16896 23040 input megt44s180hb.img 0 5632 11520 1 S \
@@ -16,5 +19,67 @@ MEGT= \
 	paste     0 11520 input megt88n090hb.img 0 5632 11520 1 S \
 	                  input megt88n000hb.img 0 5632 11520 1 S
 
+# The subtleties of a 16-bit height map are difficult to detect by eye.
+# Detect the edges of the height map to produce a useful reference.
+
+OUTLINE= gain 10.0 absolute gradient 2 $(MEGT)
+
+# MOLA interpolation was clearly performed on 2048-pixel chunks. This resulted
+# in a discontinuity in the derivative with respect to latitude in the in-fill
+# areas every 2048 lines. This becomes very apparent in shaded relief.
+#
+# Mark the affected scan lines above and below each discontinuity. This is the
+# first step in isolating the artifact and filtering it out.
+
+BADLINES= \
+	paste  1023 0 solid     2 46080 1 \
+	paste  3071 0 solid     2 46080 1 \
+	paste  5119 0 solid     2 46080 1 \
+	paste  7167 0 solid     2 46080 1 \
+	paste  9215 0 solid     2 46080 1 \
+	paste 11263 0 solid     2 46080 1 \
+	paste 13311 0 solid     2 46080 1 \
+	paste 15359 0 solid     2 46080 1 \
+	paste 17407 0 solid     2 46080 1 \
+	paste 19455 0 solid     2 46080 1 \
+	paste 21503 0 solid     2 46080 1 \
+				  solid 22528 46080 0
+
+# As these discontinuities are found in the derivative with respect to latitude,
+# they can be detected by a vertical Sobel filter, thresholded to trigger only
+# on significant change. Of course a vertical Sobel filter will highlight every
+# north-south change in elevation, but since we know the discontinuities lie
+# along specific sets of scan lines, the product of the filter with the scan
+# line mask highlights precisely what we want.
+#
+# Multiply the scan line on the left as it's mostly zeros and will short-circuit
+# the more expensive evaluation of the Sobel filter.
+
+BADPIXELS= multiply \
+				$(BADLINES) \
+				threshold 0.015 absolute sobely 2 $(MEGT)
+
+# If the bad pixels were simply replaced with repared pixels then new
+# discontinuities would emerge. We must instead blend toward the repair.
+#
+# Generate a blend mask by "feathering" the bad pixels. Gauss blur with a
+# standard deviation of 1.0. We'll need to dilate by three times that radius
+# to ensure that the lit pixels of the input remain 100% lit after the blur.
+
+BADMASK= gaussian 1 2 dilate 3 2 $(BADPIXELS)
+
+# Despite the discontinuity in the input, none of the pixels are bad, as such.
+# They're simply not connect relative to one another. The only way to fix them
+# then is to move them closer to one another using a wide blur.
+
+BLURRED= gaussianv 4 2 $(MEGT)
+
+# Blend the original input with its blurred self using our carefully-crafted
+# mask.
+
+REPAIRED= blend append $(BLURRED) $(BADMASK) $(MEGT)
+
 preview :
-	rawk $(MEGT)
+	rawk gain 10.0 absolute gradient 2 $(REPAIRED)
+
+
