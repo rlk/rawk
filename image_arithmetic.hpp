@@ -65,4 +65,29 @@ public:
 
 //------------------------------------------------------------------------------
 
+/// Multiplication operator
+
+class multiply : public image
+{
+public:
+    /// Multiply all samples of image *R* and image *L*. The width, height, and
+    /// depth of the result are the larger of the widths, heights, and depths of
+    /// the inputs.
+
+    multiply(image *L, image *R) : image(L, R) { }
+
+    virtual double get(int i, int j, int k) const
+    {
+        return L->get(i, j, k)
+             * R->get(i, j, k);
+    }
+
+    virtual void doc(std::ostream& out) const
+    {
+        out << "multiply";
+    }
+};
+
+//------------------------------------------------------------------------------
+
 #endif

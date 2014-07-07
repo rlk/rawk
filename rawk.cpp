@@ -968,6 +968,13 @@ image *rawk::parse_image(int& i, char **v)
             return new medianv(r, m, L);
         }
 
+        if (op == "multiply")
+        {
+            image *L = parse_image(i, v);
+            image *R = parse_image(i, v);
+            return new multiply(L, R);
+        }
+
         if (op == "nearest")
         {
             int    h = parse_int(i, v);
