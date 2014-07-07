@@ -10,8 +10,84 @@
 // FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
 // more details.
 
-#ifndef IMAGE_GRADIENT_HPP
-#define IMAGE_GRADIENT_HPP
+#ifndef IMAGE_SOBEL_HPP
+#define IMAGE_SOBEL_HPP
+
+//------------------------------------------------------------------------------
+
+/// Horizontal Sobel filter
+
+class sobelx : public image
+{
+public:
+    /// Apply the horizontal 3x3 Sobel filter to image *L*. This will detect
+    /// vertical lines in the input. *Mode* gives the @ref wrap "wrap mode".
+
+    sobelx(int mode, image *L) : image(L), mode(mode) { }
+
+    virtual double get(int i, int j, int k) const
+    {
+        const int in = wrap(i - 1, L->get_height(), mode & 1);
+        const int is = wrap(i + 1, L->get_height(), mode & 1);
+        const int jw = wrap(j - 1, L->get_width (), mode & 2);
+        const int je = wrap(j + 1, L->get_width (), mode & 2);
+
+        double d1 = L->get(in, jw, k);
+        double d3 = L->get(in, je, k);
+        double d4 = L->get(i,  jw, k);
+        double d6 = L->get(i,  je, k);
+        double d7 = L->get(is, jw, k);
+        double d9 = L->get(is, je, k);
+
+        return d3 - d1 + 2.0 * (d6 - d4) + d9 - d7;
+    }
+
+    virtual void doc(std::ostream& out) const
+    {
+        out << "sobelx " << mode;
+    }
+
+private:
+    int mode;
+};
+
+//------------------------------------------------------------------------------
+
+/// Vertical Sobol filter
+
+class sobely : public image
+{
+public:
+    /// Apply the vertical 3x3 Sobel filter to image *L*. This will detect
+    /// horizontal lines in the input. *Mode* gives the @ref wrap "wrap mode".
+
+    sobely(int mode, image *L) : image(L), mode(mode) { }
+
+    virtual double get(int i, int j, int k) const
+    {
+        const int in = wrap(i - 1, L->get_height(), mode & 1);
+        const int is = wrap(i + 1, L->get_height(), mode & 1);
+        const int jw = wrap(j - 1, L->get_width (), mode & 2);
+        const int je = wrap(j + 1, L->get_width (), mode & 2);
+
+        double d1 = L->get(in, jw, k);
+        double d2 = L->get(in, j,  k);
+        double d3 = L->get(in, je, k);
+        double d7 = L->get(is, jw, k);
+        double d8 = L->get(is, j,  k);
+        double d9 = L->get(is, je, k);
+
+        return d1 - d7 + 2.0 * (d2 - d8) + d3 - d9;
+    }
+
+    virtual void doc(std::ostream& out) const
+    {
+        out << "sobely " << mode;
+    }
+
+private:
+    int mode;
+};
 
 //------------------------------------------------------------------------------
 
@@ -21,8 +97,8 @@ class gradient : public image
 {
 public:
     /// Compute the magnitude of the gradient of image *L*. This is the value of
-    /// the greatest rate of change in that image. This behaves as an edge
-    /// detect. *Mode* gives the @ref wrap "wrapping mode".
+    /// the greatest rate of change in that image. This behaves as an omni-
+    /// directional edge detect. *Mode* gives the @ref wrap "wrap mode".
 
     gradient(int mode, image *L) : image(L), mode(mode) { }
 
@@ -37,7 +113,6 @@ public:
         double d2 = L->get(in, j,  k);
         double d3 = L->get(in, je, k);
         double d4 = L->get(i,  jw, k);
-
         double d6 = L->get(i,  je, k);
         double d7 = L->get(is, jw, k);
         double d8 = L->get(is, j,  k);

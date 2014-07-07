@@ -1004,6 +1004,20 @@ image *rawk::parse_image(int& i, char **v)
             return new rgb2yuv(L);
         }
 
+        if (op == "sobelx")
+        {
+            int    m = parse_wrap(i, v);
+            image *L = parse_image(i, v);
+            return new sobelx(m, L);
+        }
+
+        if (op == "sobely")
+        {
+            int    m = parse_wrap(i, v);
+            image *L = parse_image(i, v);
+            return new sobely(m, L);
+        }
+
         if (op == "solid")
         {
             int    h = parse_int(i, v);
