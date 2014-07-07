@@ -20,11 +20,11 @@
 class convolve : public image
 {
 public:
-    /// Convolve image *L* using a kernel of the given *xradius* and *yradius*.
+    /// Convolve image *L* using a kernel of the given *yradius* and *xradius*.
     /// The kernel is expected to be supplied by a subclass.
 
-    convolve(int xradius, int yradius, int mode, image *L)
-        : image(L), xradius(xradius), yradius(yradius), mode(mode) { }
+    convolve(int yradius, int xradius, int mode, image *L)
+        : image(L), yradius(yradius), xradius(xradius), mode(mode) { }
 
     virtual double get(int i, int j, int k) const
     {
@@ -35,8 +35,8 @@ public:
         double t = 0;
         double T = 0;
 
-        for     (int y = -xradius; y <= xradius; y++)
-            for (int x = -yradius; x <= yradius;  x++)
+        for     (int y = -yradius; y <= yradius; y++)
+            for (int x = -xradius; x <= xradius; x++)
                 if ((s = kernel(y, x)))
                 {
                     T += s;
@@ -50,9 +50,9 @@ public:
 protected:
     virtual double kernel(int, int) const = 0;
 
-    int    xradius;
-    int    yradius;
-    int    mode;
+    int yradius;
+    int xradius;
+    int mode;
 };
 
 //------------------------------------------------------------------------------
@@ -80,9 +80,9 @@ public:
         }
     }
 
-    virtual double kernel(int x, int y) const
+    virtual double kernel(int y, int x) const
     {
-        return sigma ? exp(-(x * x + y * y) / (2.0 * sigma * sigma)) : 1.0;
+        return sigma ? exp(-0.5 * (x * x + y * y) / (sigma * sigma)) : 1.0;
     }
 
     virtual void doc(std::ostream& out) const
@@ -94,6 +94,79 @@ private:
     double sigma;
 };
 
+//------------------------------------------------------------------------------
+
+/// Vertical Gaussian convolution filter
+
+class gaussianv : public convolve
+{
+public:
+    /// Convolve image *L* using a vertical 1D Gaussian kernel with standard
+    /// deviation *sigma*. *Mode* gives the @ref wrap "wrapping mode". The true
+    /// radius of the kernel is 3 sigma, rounded up.
+
+    gaussianv(double sigma, int mode, image *L)
+        : convolve(int(ceil(sigma * 3)), 0, mode, L), sigma(sigma) { }
+
+    virtual void tweak(int a, int v)
+    {
+        if (a == 0)
+        {
+            sigma  += v;
+            yradius = int(ceil(sigma * 3));
+        }
+    }
+
+    virtual double kernel(int y, int x) const
+    {
+        return sigma ? exp(-0.5 * (y * y) / (sigma * sigma)) : 1.0;
+    }
+
+    virtual void doc(std::ostream& out) const
+    {
+        out << "gaussianv " << sigma << " " << mode;
+    }
+
+private:
+    double sigma;
+};
+
+//------------------------------------------------------------------------------
+
+/// Horizontal Gaussian convolution filter
+
+class gaussianh : public convolve
+{
+public:
+    /// Convolve image *L* using a horizontal 1D Gaussian kernel with standard
+    /// deviation *sigma*. *Mode* gives the @ref wrap "wrapping mode". The true
+    /// radius of the kernel is 3 sigma, rounded up.
+
+    gaussianh(double sigma, int mode, image *L)
+        : convolve(0, int(ceil(sigma * 3)), mode, L), sigma(sigma) { }
+
+    virtual void tweak(int a, int v)
+    {
+        if (a == 0)
+        {
+            sigma  += v;
+            xradius = int(ceil(sigma * 3));
+        }
+    }
+
+    virtual double kernel(int y, int x) const
+    {
+        return sigma ? exp(-0.5 * (x * x) / (sigma * sigma)) : 1.0;
+    }
+
+    virtual void doc(std::ostream& out) const
+    {
+        out << "gaussianh " << sigma << " " << mode;
+    }
+
+private:
+    double sigma;
+};
 
 //------------------------------------------------------------------------------
 

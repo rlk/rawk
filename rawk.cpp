@@ -901,6 +901,22 @@ image *rawk::parse_image(int& i, char **v)
             return new gaussian(d, m, L);
         }
 
+        if (op == "gaussianh")
+        {
+            double d = parse_double(i, v);
+            int    m = parse_wrap(i, v);
+            image *L = parse_image(i, v);
+            return new gaussianh(d, m, L);
+        }
+
+        if (op == "gaussianv")
+        {
+            double d = parse_double(i, v);
+            int    m = parse_wrap(i, v);
+            image *L = parse_image(i, v);
+            return new gaussianv(d, m, L);
+        }
+
         if (op == "gradient")
         {
             int    m = parse_wrap(i, v);

@@ -1,13 +1,13 @@
 FLAGS  = -Wall
 
-CXX = c++
-FLAGS += -O2
+#CXX = c++
+#FLAGS += -O2
 
 #CXX = c++
 #FLAGS += -g
 
-#CXX = /usr/local/bin/g++
-#FLAGS += -O2 -fopenmp
+CXX = /usr/local/bin/g++
+FLAGS += -O2 -fopenmp
 
 
 FLAGS +=$(shell /usr/local/bin/sdl2-config --cflags --libs)
