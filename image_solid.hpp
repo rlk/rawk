@@ -33,6 +33,7 @@ public:
 
     virtual int get_height() const { return height; }
     virtual int get_width () const { return width;  }
+    virtual int get_depth () const { return 1;      }
 
     virtual void doc(std::ostream& out) const
     {
