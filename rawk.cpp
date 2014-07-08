@@ -468,7 +468,7 @@ struct state
 class rawk : public gl::demonstration
 {
 public:
-    rawk(image *, double, double, double);
+    rawk(image *, int, int, double, double, double);
    ~rawk();
 
     void   draw();
@@ -537,8 +537,8 @@ private:
 
 //------------------------------------------------------------------------------
 
-rawk::rawk(image *p, double x, double y, double z)
-    : demonstration("RAWK", 1280, 720), program(0), curr_cache(width * height * 3)
+rawk::rawk(image *p, int h, int w, double x, double y, double z)
+    : demonstration("RAWK", w, h), program(0), curr_cache(width * height * 3)
 {
     // Initialize the OpenGL state.
 
@@ -1055,19 +1055,23 @@ int main(int argc, char **argv)
     try
     {
         bool   n = false;
+        int    h = 512;
+        int    w = 1024;
         double x = 0;
         double y = 0;
         double z = 0;
 
         int c;
 
-        while ((c = getopt(argc, argv, "nx:y:z:")) != -1)
+        while ((c = getopt(argc, argv, "h:nw:x:y:z:")) != -1)
             switch (c)
             {
-                case 'n': n = true;              break;
-                case 'x': x = strtod(optarg, 0); break;
-                case 'y': y = strtod(optarg, 0); break;
-                case 'z': z = strtod(optarg, 0); break;
+                case 'n': n = true;                 break;
+                case 'h': h = strtol(optarg, 0, 0); break;
+                case 'w': w = strtol(optarg, 0, 0); break;
+                case 'x': x = strtod(optarg, 0);    break;
+                case 'y': y = strtod(optarg, 0);    break;
+                case 'z': z = strtod(optarg, 0);    break;
             }
 
         if (image *p = parse_image(optind, argv))
@@ -1076,7 +1080,7 @@ int main(int argc, char **argv)
                 p->process();
             else
             {
-                rawk app(p, x, y, z);
+                rawk app(p, h, w, x, y, z);
                 app.run(true);
             }
         }
