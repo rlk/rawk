@@ -13,8 +13,13 @@ FLAGS += -O2 -fopenmp
 FLAGS +=$(shell /usr/local/bin/sdl2-config --cflags --libs)
 FLAGS +=-framework OpenGL
 
+all : rawk rawtif
+
 rawk : rawk.cpp
-	$(CXX) $(FLAGS) -o rawk rawk.cpp
+	$(CXX) $(FLAGS) -o $@ rawk.cpp
+
+rawtif : rawtif.cpp
+	$(CXX) $(FLAGS) -o $@ rawtif.cpp -ltiff
 
 rawk : image.hpp
 rawk : image_append.hpp
