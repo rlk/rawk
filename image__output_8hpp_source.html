@@ -159,32 +159,36 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;                  &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; file-&gt;get_depth ();</div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    }</div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    <span class="keywordtype">void</span> process(<span class="keywordtype">int</span> i)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="keyword">    </span>{</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        <span class="keywordtype">int</span> j, w = <a class="code" href="classimage.html#a3989b3409ee7f5f58aedc378c0f2da5e">get_width</a>();</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        <span class="keywordtype">int</span> k, d = <a class="code" href="classimage.html#a1eea2521cb7e4e7d9dc81929b6cd6aa8">get_depth</a>();</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        <span class="keywordflow">for</span>     (j = 0; j &lt; w; ++j)</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;            <span class="keywordflow">for</span> (k = 0; k &lt; d; ++k)</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;                file-&gt;put(i, j, k, <a class="code" href="classimage.html#a96bc6a71fa16d5f0d4083ebe7a10a865">L</a>-&gt;<a class="code" href="classimage.html#ac3ed8eccf2eda22c789b88e106e9fed9">get</a>(i, j, k));</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    }</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <span class="keywordtype">void</span> set_cache(<span class="keywordtype">bool</span> c)</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    {</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        cache = c;</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    }</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    <span class="keywordtype">bool</span> cache;</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <a class="code" href="classraw.html">raw</a> *file;</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;};</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;</div>
+<div class="line"><a name="l00087"></a><span class="lineno"><a class="line" href="classoutput.html#a3b4a57012736fad73ccd308f1aa295a6">   87</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classoutput.html#a3b4a57012736fad73ccd308f1aa295a6">process</a>()</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    {</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        <span class="keywordtype">int</span> i, h = <a class="code" href="classimage.html#ac28b939a0e0694e2ddd3df0106f93158">get_height</a>();</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        <span class="keywordtype">int</span> j, w = <a class="code" href="classimage.html#a3989b3409ee7f5f58aedc378c0f2da5e">get_width</a> ();</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;        <span class="keywordtype">int</span> k, d = <a class="code" href="classimage.html#a1eea2521cb7e4e7d9dc81929b6cd6aa8">get_depth</a> ();</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        <a class="code" href="classimage.html#a4293a094b7a79a62758469c95f254e2b">image::process</a>();</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="preprocessor">        #pragma omp parallel for private(j, k)</span></div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="preprocessor"></span>        <span class="keywordflow">for</span>         (i = 0; i &lt; h; ++i)</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;            <span class="keywordflow">for</span>     (j = 0; j &lt; w; ++j)</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;                <span class="keywordflow">for</span> (k = 0; k &lt; d; ++k)</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;                    file-&gt;put(i, j, k, <a class="code" href="classimage.html#a96bc6a71fa16d5f0d4083ebe7a10a865">L</a>-&gt;<a class="code" href="classimage.html#ac3ed8eccf2eda22c789b88e106e9fed9">get</a>(i, j, k));</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;<span class="comment">//------------------------------------------------------------------------------</span></div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        cache = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    }</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <span class="keywordtype">bool</span> cache;</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    <a class="code" href="classraw.html">raw</a> *file;</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;};</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;<span class="comment">//------------------------------------------------------------------------------</span></div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="classimage_html_ac3ed8eccf2eda22c789b88e106e9fed9"><div class="ttname"><a href="classimage.html#ac3ed8eccf2eda22c789b88e106e9fed9">image::get</a></div><div class="ttdeci">virtual double get(int i, int j, int k) const =0</div><div class="ttdoc">Return the value of the sample at row i, column j, channel k. </div></div>
+<div class="ttc" id="classoutput_html_a3b4a57012736fad73ccd308f1aa295a6"><div class="ttname"><a href="classoutput.html#a3b4a57012736fad73ccd308f1aa295a6">output::process</a></div><div class="ttdeci">virtual void process()</div><div class="ttdoc">Process all samples of this image, storing them in the file. Then, switch into cached mode...</div><div class="ttdef"><b>Definition:</b> image_output.hpp:87</div></div>
 <div class="ttc" id="classoutput_html_af55bc6cb2507c27d388cfb7412e624d8"><div class="ttname"><a href="classoutput.html#af55bc6cb2507c27d388cfb7412e624d8">output::output</a></div><div class="ttdeci">output(std::string name, char type, image *L)</div><div class="ttdoc">Write a raw-formatted data file named name. Type is a character giving the output sample type...</div><div class="ttdef"><b>Definition:</b> image_output.hpp:29</div></div>
-<div class="ttc" id="classimage_html_a96bc6a71fa16d5f0d4083ebe7a10a865"><div class="ttname"><a href="classimage.html#a96bc6a71fa16d5f0d4083ebe7a10a865">image::L</a></div><div class="ttdeci">image * L</div><div class="ttdoc">Left child. </div><div class="ttdef"><b>Definition:</b> image.hpp:109</div></div>
+<div class="ttc" id="classimage_html_a96bc6a71fa16d5f0d4083ebe7a10a865"><div class="ttname"><a href="classimage.html#a96bc6a71fa16d5f0d4083ebe7a10a865">image::L</a></div><div class="ttdeci">image * L</div><div class="ttdoc">Left child. </div><div class="ttdef"><b>Definition:</b> image.hpp:117</div></div>
 <div class="ttc" id="classraw_html"><div class="ttname"><a href="classraw.html">raw</a></div><div class="ttdoc">RAW image file. </div><div class="ttdef"><b>Definition:</b> raw.hpp:68</div></div>
 <div class="ttc" id="classoutput_html_af0578f2b0983fa48fb255f9453481bbb"><div class="ttname"><a href="classoutput.html#af0578f2b0983fa48fb255f9453481bbb">output::doc</a></div><div class="ttdeci">virtual void doc(std::ostream &amp;out) const </div><div class="ttdoc">Produce a string documenting the function of this object. </div><div class="ttdef"><b>Definition:</b> image_output.hpp:73</div></div>
 <div class="ttc" id="classrawi_html"><div class="ttname"><a href="classrawi.html">rawi</a></div><div class="ttdoc">Signed 32-bit RAW adapter. </div><div class="ttdef"><b>Definition:</b> raw.hpp:331</div></div>
@@ -206,6 +210,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="classraw_i_html"><div class="ttname"><a href="classraw_i.html">rawI</a></div><div class="ttdoc">Byte-swapped signed 32-bit RAW adapter. </div><div class="ttdef"><b>Definition:</b> raw.hpp:349</div></div>
 <div class="ttc" id="classoutput_html"><div class="ttname"><a href="classoutput.html">output</a></div><div class="ttdoc">Image file writer. </div><div class="ttdef"><b>Definition:</b> image_output.hpp:20</div></div>
 <div class="ttc" id="classraw_l_html"><div class="ttname"><a href="classraw_l.html">rawL</a></div><div class="ttdoc">Byte-swapped unsigned 32-bit RAW adapter. </div><div class="ttdef"><b>Definition:</b> raw.hpp:387</div></div>
+<div class="ttc" id="classimage_html_a4293a094b7a79a62758469c95f254e2b"><div class="ttname"><a href="classimage.html#a4293a094b7a79a62758469c95f254e2b">image::process</a></div><div class="ttdeci">virtual void process()</div><div class="ttdoc">Process all samples of both children. </div><div class="ttdef"><b>Definition:</b> image.hpp:103</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

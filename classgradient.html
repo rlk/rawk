@@ -95,7 +95,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <p>Gradient filter.  
 </p>
 
-<p><code>#include &lt;<a class="el" href="image__gradient_8hpp_source.html">image_gradient.hpp</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="image__sobel_8hpp_source.html">image_sobel.hpp</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for gradient:</div>
 <div class="dyncontent">
@@ -110,7 +110,7 @@ Inheritance diagram for gradient:</div>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a75c916244b43b852ab3d2dbb4a29d439"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a75c916244b43b852ab3d2dbb4a29d439"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgradient.html#a75c916244b43b852ab3d2dbb4a29d439">gradient</a> (int mode, <a class="el" href="classimage.html">image</a> *<a class="el" href="classimage.html#a96bc6a71fa16d5f0d4083ebe7a10a865">L</a>)</td></tr>
-<tr class="memdesc:a75c916244b43b852ab3d2dbb4a29d439"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the magnitude of the gradient of image <em>L</em>. This is the value of the greatest rate of change in that image. This behaves as an edge detect. <em>Mode</em> gives the <a class="el" href="index.html#wrap">wrapping mode</a>. <br/></td></tr>
+<tr class="memdesc:a75c916244b43b852ab3d2dbb4a29d439"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the magnitude of the gradient of image <em>L</em>. This is the value of the greatest rate of change in that image. This behaves as an omni- directional edge detect. <em>Mode</em> gives the <a class="el" href="index.html#wrap">wrap mode</a>. <br/></td></tr>
 <tr class="separator:a75c916244b43b852ab3d2dbb4a29d439"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a31d8aeb15c4c3a26d9c20d24329093e3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a31d8aeb15c4c3a26d9c20d24329093e3"></a>
 virtual double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgradient.html#a31d8aeb15c4c3a26d9c20d24329093e3">get</a> (int i, int j, int k) const </td></tr>
@@ -157,6 +157,10 @@ virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classimage.html#a3e8a795b76ae5d738c2f989814e87e4c">tweak</a> (int a, int v)</td></tr>
 <tr class="memdesc:a3e8a795b76ae5d738c2f989814e87e4c inherit pub_methods_classimage"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tweak image parameter <em>a</em>, changing the value by a factor of <em>v</em>. <br/></td></tr>
 <tr class="separator:a3e8a795b76ae5d738c2f989814e87e4c inherit pub_methods_classimage"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4293a094b7a79a62758469c95f254e2b inherit pub_methods_classimage"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4293a094b7a79a62758469c95f254e2b"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classimage.html#a4293a094b7a79a62758469c95f254e2b">process</a> ()</td></tr>
+<tr class="memdesc:a4293a094b7a79a62758469c95f254e2b inherit pub_methods_classimage"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process all samples of both children. <br/></td></tr>
+<tr class="separator:a4293a094b7a79a62758469c95f254e2b inherit pub_methods_classimage"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
@@ -175,7 +179,7 @@ Additional Inherited Members</h2></td></tr>
 <tr class="separator:a254442815c2727dadd27ec86fa325155 inherit pro_attribs_classimage"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li><a class="el" href="image__gradient_8hpp_source.html">image_gradient.hpp</a></li>
+<li><a class="el" href="image__sobel_8hpp_source.html">image_sobel.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

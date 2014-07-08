@@ -86,10 +86,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="classconvolve-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">convolve Class Reference</div>  </div>
+<div class="title">convolve Class Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -103,17 +104,19 @@ Inheritance diagram for convolve:</div>
  <div class="center">
   <img src="classconvolve.png" usemap="#convolve_map" alt=""/>
   <map id="convolve_map" name="convolve_map">
-<area href="classimage.html" title="Base class for all image sources, filters, and operators. " alt="image" shape="rect" coords="0,0,64,24"/>
-<area href="classgaussian.html" title="Gaussian convolution filter. " alt="gaussian" shape="rect" coords="0,112,64,136"/>
+<area href="classimage.html" title="Base class for all image sources, filters, and operators. " alt="image" shape="rect" coords="79,0,148,24"/>
+<area href="classgaussian.html" title="Gaussian convolution filter. " alt="gaussian" shape="rect" coords="0,112,69,136"/>
+<area href="classgaussianh.html" title="Horizontal Gaussian convolution filter. " alt="gaussianh" shape="rect" coords="79,112,148,136"/>
+<area href="classgaussianv.html" title="Vertical Gaussian convolution filter. " alt="gaussianv" shape="rect" coords="158,112,227,136"/>
 </map>
  </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:afc73740a0b542605b94c342bb98dc389"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afc73740a0b542605b94c342bb98dc389"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classconvolve.html#afc73740a0b542605b94c342bb98dc389">convolve</a> (int radius, int mode, <a class="el" href="classimage.html">image</a> *<a class="el" href="classimage.html#a96bc6a71fa16d5f0d4083ebe7a10a865">L</a>)</td></tr>
-<tr class="memdesc:afc73740a0b542605b94c342bb98dc389"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convolve image <em>L</em> using a kernel of the given <em>radius</em>. While storage for the kernel is allocated here, the value of the kernel is expected to be supplied by a subclass. <br/></td></tr>
-<tr class="separator:afc73740a0b542605b94c342bb98dc389"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aabf40d6ea59129dd66b857faaad6c8a1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aabf40d6ea59129dd66b857faaad6c8a1"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classconvolve.html#aabf40d6ea59129dd66b857faaad6c8a1">convolve</a> (int yradius, int xradius, int mode, <a class="el" href="classimage.html">image</a> *<a class="el" href="classimage.html#a96bc6a71fa16d5f0d4083ebe7a10a865">L</a>)</td></tr>
+<tr class="memdesc:aabf40d6ea59129dd66b857faaad6c8a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convolve image <em>L</em> using a kernel of the given <em>yradius</em> and <em>xradius</em>. The kernel is expected to be supplied by a subclass. <br/></td></tr>
+<tr class="separator:aabf40d6ea59129dd66b857faaad6c8a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7e24dffe727b571af34c5ac8bf3577e2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7e24dffe727b571af34c5ac8bf3577e2"></a>
 virtual double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classconvolve.html#a7e24dffe727b571af34c5ac8bf3577e2">get</a> (int i, int j, int k) const </td></tr>
 <tr class="memdesc:a7e24dffe727b571af34c5ac8bf3577e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the value of the sample at row <em>i</em>, column <em>j</em>, channel <em>k</em>. <br/></td></tr>
@@ -155,25 +158,32 @@ virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classimage.html#a3e8a795b76ae5d738c2f989814e87e4c">tweak</a> (int a, int v)</td></tr>
 <tr class="memdesc:a3e8a795b76ae5d738c2f989814e87e4c inherit pub_methods_classimage"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tweak image parameter <em>a</em>, changing the value by a factor of <em>v</em>. <br/></td></tr>
 <tr class="separator:a3e8a795b76ae5d738c2f989814e87e4c inherit pub_methods_classimage"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4293a094b7a79a62758469c95f254e2b inherit pub_methods_classimage"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4293a094b7a79a62758469c95f254e2b"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classimage.html#a4293a094b7a79a62758469c95f254e2b">process</a> ()</td></tr>
+<tr class="memdesc:a4293a094b7a79a62758469c95f254e2b inherit pub_methods_classimage"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process all samples of both children. <br/></td></tr>
+<tr class="separator:a4293a094b7a79a62758469c95f254e2b inherit pub_methods_classimage"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afd36bd4d825f1fde59a1e3b598499191 inherit pub_methods_classimage"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afd36bd4d825f1fde59a1e3b598499191"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classimage.html#afd36bd4d825f1fde59a1e3b598499191">doc</a> (std::ostream &amp;out) const </td></tr>
 <tr class="memdesc:afd36bd4d825f1fde59a1e3b598499191 inherit pub_methods_classimage"><td class="mdescLeft">&#160;</td><td class="mdescRight">Produce a string documenting the function of this object. <br/></td></tr>
 <tr class="separator:afd36bd4d825f1fde59a1e3b598499191 inherit pub_methods_classimage"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
+Protected Member Functions</h2></td></tr>
+<tr class="memitem:a1d76fabc1c9ac0f920c45df1cf54d379"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1d76fabc1c9ac0f920c45df1cf54d379"></a>
+virtual double&#160;</td><td class="memItemRight" valign="bottom"><b>kernel</b> (int, int) const =0</td></tr>
+<tr class="separator:a1d76fabc1c9ac0f920c45df1cf54d379"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
-<tr class="memitem:ab435b47838c0d6746f7901d2d0cbc640"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab435b47838c0d6746f7901d2d0cbc640"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>radius</b></td></tr>
-<tr class="separator:ab435b47838c0d6746f7901d2d0cbc640"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a92fd0f725dcdadd74dc210e065f001ce"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a92fd0f725dcdadd74dc210e065f001ce"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>yradius</b></td></tr>
+<tr class="separator:a92fd0f725dcdadd74dc210e065f001ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1349adf348f244d9959adefcfb15142e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1349adf348f244d9959adefcfb15142e"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>xradius</b></td></tr>
+<tr class="separator:a1349adf348f244d9959adefcfb15142e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2ca5776d825446c0d88059dc9b1b3f76"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2ca5776d825446c0d88059dc9b1b3f76"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>mode</b></td></tr>
 <tr class="separator:a2ca5776d825446c0d88059dc9b1b3f76"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a347ae2c2944219ea27dd5278f6e89c01"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a347ae2c2944219ea27dd5278f6e89c01"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>total</b></td></tr>
-<tr class="separator:a347ae2c2944219ea27dd5278f6e89c01"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae2f8df67fe3b29d89a9c95c2697f9d46"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae2f8df67fe3b29d89a9c95c2697f9d46"></a>
-std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>kernel</b></td></tr>
-<tr class="separator:ae2f8df67fe3b29d89a9c95c2697f9d46"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_attribs_classimage"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classimage')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classimage.html">image</a></td></tr>
 <tr class="memitem:a96bc6a71fa16d5f0d4083ebe7a10a865 inherit pro_attribs_classimage"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a96bc6a71fa16d5f0d4083ebe7a10a865"></a>
 <a class="el" href="classimage.html">image</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classimage.html#a96bc6a71fa16d5f0d4083ebe7a10a865">L</a></td></tr>

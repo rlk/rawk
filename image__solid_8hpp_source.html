@@ -117,25 +117,27 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;</div>
 <div class="line"><a name="l00034"></a><span class="lineno"><a class="line" href="classsolid.html#a9c9d236c8b447ba433ec45e7dfd030fb">   34</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code" href="classsolid.html#a9c9d236c8b447ba433ec45e7dfd030fb">get_height</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> height; }</div>
 <div class="line"><a name="l00035"></a><span class="lineno"><a class="line" href="classsolid.html#a3122ab9d194b51c61c4f02b549295a2b">   35</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code" href="classsolid.html#a3122ab9d194b51c61c4f02b549295a2b">get_width</a> ()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> width;  }</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;</div>
-<div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="classsolid.html#a06d8dfa6825799918908285228e9038c">   37</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classsolid.html#a06d8dfa6825799918908285228e9038c">doc</a>(std::ostream&amp; out)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="keyword">    </span>{</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;        out &lt;&lt; <span class="stringliteral">&quot;solid &quot;</span> &lt;&lt; height &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; width &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; value;</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    }</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keywordtype">int</span>    height;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keywordtype">int</span>    width;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keywordtype">double</span> value;</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;};</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="comment">//------------------------------------------------------------------------------</span></div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00036"></a><span class="lineno"><a class="line" href="classsolid.html#af2234321d19a8af67ac0ea81a6017258">   36</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code" href="classsolid.html#af2234321d19a8af67ac0ea81a6017258">get_depth</a> ()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> 1;      }</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;</div>
+<div class="line"><a name="l00038"></a><span class="lineno"><a class="line" href="classsolid.html#a06d8dfa6825799918908285228e9038c">   38</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classsolid.html#a06d8dfa6825799918908285228e9038c">doc</a>(std::ostream&amp; out)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="keyword">    </span>{</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;        out &lt;&lt; <span class="stringliteral">&quot;solid &quot;</span> &lt;&lt; height &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; width &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; value;</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    }</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keywordtype">int</span>    height;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keywordtype">int</span>    width;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keywordtype">double</span> value;</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;};</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="comment">//------------------------------------------------------------------------------</span></div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="ttc" id="classsolid_html_af2234321d19a8af67ac0ea81a6017258"><div class="ttname"><a href="classsolid.html#af2234321d19a8af67ac0ea81a6017258">solid::get_depth</a></div><div class="ttdeci">virtual int get_depth() const </div><div class="ttdoc">Return the depth of this image. </div><div class="ttdef"><b>Definition:</b> image_solid.hpp:36</div></div>
 <div class="ttc" id="classsolid_html_a674f8830b48a0c6318bf6197a34236bd"><div class="ttname"><a href="classsolid.html#a674f8830b48a0c6318bf6197a34236bd">solid::solid</a></div><div class="ttdeci">solid(int height, int width, double value)</div><div class="ttdoc">Generate a block of pixels with the given width and height, a depth of one, and a constant value...</div><div class="ttdef"><b>Definition:</b> image_solid.hpp:26</div></div>
 <div class="ttc" id="classsolid_html_a3122ab9d194b51c61c4f02b549295a2b"><div class="ttname"><a href="classsolid.html#a3122ab9d194b51c61c4f02b549295a2b">solid::get_width</a></div><div class="ttdeci">virtual int get_width() const </div><div class="ttdoc">Return the height of this image. </div><div class="ttdef"><b>Definition:</b> image_solid.hpp:35</div></div>
 <div class="ttc" id="classimage_html"><div class="ttname"><a href="classimage.html">image</a></div><div class="ttdoc">Base class for all image sources, filters, and operators. </div><div class="ttdef"><b>Definition:</b> image.hpp:20</div></div>
-<div class="ttc" id="classsolid_html_a06d8dfa6825799918908285228e9038c"><div class="ttname"><a href="classsolid.html#a06d8dfa6825799918908285228e9038c">solid::doc</a></div><div class="ttdeci">virtual void doc(std::ostream &amp;out) const </div><div class="ttdoc">Produce a string documenting the function of this object. </div><div class="ttdef"><b>Definition:</b> image_solid.hpp:37</div></div>
+<div class="ttc" id="classsolid_html_a06d8dfa6825799918908285228e9038c"><div class="ttname"><a href="classsolid.html#a06d8dfa6825799918908285228e9038c">solid::doc</a></div><div class="ttdeci">virtual void doc(std::ostream &amp;out) const </div><div class="ttdoc">Produce a string documenting the function of this object. </div><div class="ttdef"><b>Definition:</b> image_solid.hpp:38</div></div>
 <div class="ttc" id="classsolid_html"><div class="ttname"><a href="classsolid.html">solid</a></div><div class="ttdoc">Solid value generator. </div><div class="ttdef"><b>Definition:</b> image_solid.hpp:20</div></div>
 <div class="ttc" id="classsolid_html_a9c9d236c8b447ba433ec45e7dfd030fb"><div class="ttname"><a href="classsolid.html#a9c9d236c8b447ba433ec45e7dfd030fb">solid::get_height</a></div><div class="ttdeci">virtual int get_height() const </div><div class="ttdoc">Return the height of this image. </div><div class="ttdef"><b>Definition:</b> image_solid.hpp:34</div></div>
 </div><!-- fragment --></div><!-- contents -->
