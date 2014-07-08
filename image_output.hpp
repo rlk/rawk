@@ -26,7 +26,8 @@ public:
     /// the range [0,1] and signed samples to the range [-1,+1] before being
     /// cast to the destination data type.
 
-    output(std::string name, char type, image *L) : image(L), cache(false), file(0)
+    output(std::string name, char type, image *L)
+        : image(L), cache(false), file(0), chars(0)
     {
         const int height = L->get_height();
         const int width  = L->get_width ();
@@ -94,16 +95,39 @@ public:
 
         #pragma omp parallel for private(j, k)
         for         (i = 0; i < h; ++i)
+        {
             for     (j = 0; j < w; ++j)
                 for (k = 0; k < d; ++k)
                     file->put(i, j, k, L->get(i, j, k));
 
+            if (omp_get_thread_num() == 0)
+                report(i, h);
+        }
+
+        report(h, h);
         cache = true;
     }
 
 private:
     bool cache;
     raw *file;
+    int  chars;
+
+    void report(int i, int n)
+    {
+        std::ostringstream stream;
+
+        stream << "Wrote " << i
+               <<   " of " << n
+               <<   " to " << file->get_name();
+
+        if (i < n)
+            std::cout << std::string(chars, '\b') << stream.str() << std::flush;
+        else
+            std::cout << std::string(chars, '\b') << stream.str() << std::endl;
+
+        chars = stream.str().size();
+    }
 };
 
 //------------------------------------------------------------------------------
