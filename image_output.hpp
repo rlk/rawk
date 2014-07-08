@@ -87,22 +87,37 @@ public:
 
     virtual void process()
     {
+        int f, g = 8, c = 0;
         int i, h = get_height();
         int j, w = get_width ();
         int k, d = get_depth ();
 
         image::process();
 
-        #pragma omp parallel for private(j, k)
-        for         (i = 0; i < h; ++i)
+        // Divide the set of all scanlines into groups of size g.
+
+        #pragma omp parallel for private(i, j, k) schedule(dynamic)
+        for (f = 0; f < h; f += g)
         {
-            for     (j = 0; j < w; ++j)
-                for (k = 0; k < d; ++k)
-                    file->put(i, j, k, L->get(i, j, k));
+            // Process each group in parallel.
+
+            int l = std::min(f + g, h);
+
+            for         (i = f; i < l; ++i)
+                for     (j = 0; j < w; ++j)
+                    for (k = 0; k < d; ++k)
+                        file->put(i, j, k, L->get(i, j, k));
+
+            // Report a running total of completed scan lines.
+
+            #pragma omp critical
+            c += g;
 
             if (omp_get_thread_num() == 0)
-                report(i, h);
+                report(c, h);
         }
+
+        // Finish the report and enable the cache.
 
         report(h, h);
         cache = true;
