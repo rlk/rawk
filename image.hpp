@@ -98,6 +98,14 @@ public:
     {
     }
 
+    /// Process all samples of both children.
+
+    virtual void process()
+    {
+        if (L) L->process();
+        if (R) R->process();
+    }
+
     /// Produce a string documenting the function of this object.
 
     virtual void doc(std::ostream& out) const

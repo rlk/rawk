@@ -78,19 +78,27 @@ public:
                   << " " << file->get_depth ();
     }
 
-    void process(int i) const
-    {
-     	int j, w = get_width();
-     	int k, d = get_depth();
+    /// Process all samples of this image, storing them in the file. Then,
+    /// switch into cached mode, sourcing all subsequent sampling from the file
+    /// instead of invoking the process. This is useful as an optimization,
+    /// especially for processes that feed large-kernel convolutions, as it
+    /// eliminates the need to repeatedly compute expensive samples.
 
-        for     (j = 0; j < w; ++j)
-            for (k = 0; k < d; ++k)
-                file->put(i, j, k, L->get(i, j, k));
-    }
-
-    void set_cache(bool c)
+    virtual void process()
     {
-        cache = c;
+        int i, h = get_height();
+        int j, w = get_width ();
+        int k, d = get_depth ();
+
+        image::process();
+
+        #pragma omp parallel for private(j, k)
+        for         (i = 0; i < h; ++i)
+            for     (j = 0; j < w; ++j)
+                for (k = 0; k < d; ++k)
+                    file->put(i, j, k, L->get(i, j, k));
+
+        cache = true;
     }
 
 private:

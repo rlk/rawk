@@ -51,6 +51,395 @@ class rawk;
 
 //------------------------------------------------------------------------------
 
+/// Command line parsing error
+
+class parse_error : public std::runtime_error
+{
+public :
+    parse_error(const char *a, const char *b)
+        : std::runtime_error(message(a, b)) { }
+
+    std::string message(const char *a, const char *b)
+    {
+        if (a)
+            return "Expected " + std::string(b) + " but got '" + std::string(a) + "'";
+        else
+            return "Expected " + std::string(b) + " but got nothing";
+    }
+};
+
+char *parse_string(int &i, char **v)
+{
+    if (v[i])
+        return v[i++];
+    throw parse_error(v[i], "a string");
+}
+
+double parse_double(int& i, char **v)
+{
+    if (v[i])
+    {
+        char *e;
+        double d = strtod(v[i], &e);
+        if (e[0] == 0)
+        {
+            i++;
+            return d;
+        }
+    }
+    throw parse_error(v[i], "a floating point value");
+}
+
+int parse_int(int& i, char **v)
+{
+    if (v[i])
+    {
+        char *e;
+        long l = strtol(v[i], &e, 0);
+        if (e[0] == 0)
+        {
+            i++;
+            return l;
+        }
+    }
+    throw parse_error(v[i], "an integer value");
+}
+
+int parse_wrap(int& i, char **v)
+{
+    if (v[i])
+    {
+        if (v[i][0] && !v[i][1])
+        {
+            switch (v[i][0])
+            {
+                case '0':
+                case '1':
+                case '2':
+                case '3': return v[i++][0] - '0';
+            }
+        }
+    }
+    throw parse_error(v[i], "a wrap mode (0123)");
+}
+
+char parse_type(int& i, char **v)
+{
+    if (v[i])
+    {
+        if (v[i][0] && !v[i][1])
+        {
+            switch (v[i][0])
+            {
+                case 'b':
+                case 'c':
+                case 'u': case 'U':
+                case 's': case 'S':
+                case 'l': case 'L':
+                case 'i': case 'I':
+                case 'f': case 'F':
+                case 'd': case 'D': return v[i++][0];
+            }
+        }
+    }
+    throw parse_error(v[i], "a data type token (ucuslifdUSLIFD)");
+}
+
+image *parse_image(int& i, char **v)
+{
+    if (v[i])
+    {
+        std::string op(v[i++]);
+
+        if (op == "absolute")
+        {
+            image *L = parse_image(i, v);
+            return new absolute(L);
+        }
+
+        if (op == "append")
+        {
+            image *L = parse_image(i, v);
+            image *R = parse_image(i, v);
+            return new append(L, R);
+        }
+
+        if (op == "bias")
+        {
+            double d = parse_double(i, v);
+            image *L = parse_image(i, v);
+            return new bias(d, L);
+        }
+
+        if (op == "blend")
+        {
+            image *L = parse_image(i, v);
+            image *R = parse_image(i, v);
+            return new blend(L, R);
+        }
+
+        if (op == "choose")
+        {
+            int    n = parse_int(i, v);
+            image *L = parse_image(i, v);
+            image *R = parse_image(i, v);
+            return new choose(n, L, R);
+        }
+
+        if (op == "crop")
+        {
+            int    r = parse_int(i, v);
+            int    c = parse_int(i, v);
+            int    h = parse_int(i, v);
+            int    w = parse_int(i, v);
+            image *L = parse_image(i, v);
+            return new crop(r, c, h, w, L);
+        }
+
+        if (op == "cubic")
+        {
+            int    h = parse_int(i, v);
+            int    w = parse_int(i, v);
+            int    m = parse_wrap(i, v);
+            image *L = parse_image(i, v);
+            return new cubic(h, w, m, L);
+        }
+
+        if (op == "difference")
+        {
+            image *L = parse_image(i, v);
+            image *R = parse_image(i, v);
+            return new difference(L, R);
+        }
+
+        if (op == "dilate")
+        {
+            int    r = parse_int(i, v);
+            int    m = parse_wrap(i, v);
+            image *L = parse_image(i, v);
+            return new dilate(r, m, L);
+        }
+
+        if (op == "erode")
+        {
+            int    r = parse_int(i, v);
+            int    m = parse_wrap(i, v);
+            image *L = parse_image(i, v);
+            return new erode(r, m, L);
+        }
+
+        if (op == "flatten")
+        {
+            double d = parse_double(i, v);
+            image *L = parse_image(i, v);
+            return new flatten(d, L);
+        }
+
+        if (op == "gain")
+        {
+            double d = parse_double(i, v);
+            image *L = parse_image(i, v);
+            return new gain(d, L);
+        }
+
+        if (op == "gaussian")
+        {
+            double d = parse_double(i, v);
+            int    m = parse_wrap(i, v);
+            image *L = parse_image(i, v);
+            return new gaussian(d, m, L);
+        }
+
+        if (op == "gaussianh")
+        {
+            double d = parse_double(i, v);
+            int    m = parse_wrap(i, v);
+            image *L = parse_image(i, v);
+            return new gaussianh(d, m, L);
+        }
+
+        if (op == "gaussianv")
+        {
+            double d = parse_double(i, v);
+            int    m = parse_wrap(i, v);
+            image *L = parse_image(i, v);
+            return new gaussianv(d, m, L);
+        }
+
+        if (op == "gradient")
+        {
+            int    m = parse_wrap(i, v);
+            image *L = parse_image(i, v);
+            return new gradient(m, L);
+        }
+
+        if (op == "input")
+        {
+            char  *a = parse_string(i, v);
+            int    o = parse_int(i, v);
+            int    h = parse_int(i, v);
+            int    w = parse_int(i, v);
+            int    d = parse_int(i, v);
+            char   t = parse_type(i, v);
+            return new input(a, o, h, w, d, t);
+        }
+
+        if (op == "linear")
+        {
+            int    h = parse_int(i, v);
+            int    w = parse_int(i, v);
+            int    m = parse_wrap(i, v);
+            image *L = parse_image(i, v);
+            return new linear(h, w, m, L);
+        }
+
+        if (op == "median")
+        {
+            int    r = parse_int(i, v);
+            int    m = parse_wrap(i, v);
+            image *L = parse_image(i, v);
+            return new median(r, m, L);
+        }
+
+        if (op == "medianh")
+        {
+            int    r = parse_int(i, v);
+            int    m = parse_wrap(i, v);
+            image *L = parse_image(i, v);
+            return new medianh(r, m, L);
+        }
+
+        if (op == "medianv")
+        {
+            int    r = parse_int(i, v);
+            int    m = parse_wrap(i, v);
+            image *L = parse_image(i, v);
+            return new medianv(r, m, L);
+        }
+
+        if (op == "multiply")
+        {
+            image *L = parse_image(i, v);
+            image *R = parse_image(i, v);
+            return new multiply(L, R);
+        }
+
+        if (op == "nearest")
+        {
+            int    h = parse_int(i, v);
+            int    w = parse_int(i, v);
+            image *L = parse_image(i, v);
+            return new nearest(h, w, L);
+        }
+
+        if (op == "normalize")
+        {
+            image *L = parse_image(i, v);
+            return new normalize(L);
+        }
+
+        if (op == "offset")
+        {
+            int    r = parse_int(i, v);
+            int    c = parse_int(i, v);
+            int    w = parse_int(i, v);
+            image *L = parse_image(i, v);
+            return new offset(r, c, w, L);
+        }
+
+        if (op == "output")
+        {
+            char  *a = parse_string(i, v);
+            char   t = parse_type (i, v);
+            image *L = parse_image(i, v);
+            return new output(a, t, L);
+        }
+
+        if (op == "paste")
+        {
+            int    r = parse_int(i, v);
+            int    c = parse_int(i, v);
+            image *L = parse_image(i, v);
+            image *R = parse_image(i, v);
+            return new paste(r, c, L, R);
+        }
+
+        if (op == "reduce")
+        {
+            image *L = parse_image(i, v);
+            return new reduce(L);
+        }
+
+        if (op == "rgb2yuv")
+        {
+            image *L = parse_image(i, v);
+            return new rgb2yuv(L);
+        }
+
+        if (op == "sobelx")
+        {
+            int    m = parse_wrap(i, v);
+            image *L = parse_image(i, v);
+            return new sobelx(m, L);
+        }
+
+        if (op == "sobely")
+        {
+            int    m = parse_wrap(i, v);
+            image *L = parse_image(i, v);
+            return new sobely(m, L);
+        }
+
+        if (op == "solid")
+        {
+            int    h = parse_int(i, v);
+            int    w = parse_int(i, v);
+            double d = parse_double(i, v);
+            return new solid(h, w, d);
+        }
+
+        if (op == "sum")
+        {
+            image *L = parse_image(i, v);
+            image *R = parse_image(i, v);
+            return new sum(L, R);
+        }
+
+        if (op == "swizzle")
+        {
+            char  *m = v[i++];
+            image *L = parse_image(i, v);
+            return new swizzle(m, L);
+        }
+
+        if (op == "threshold")
+        {
+            double d = parse_double(i, v);
+            image *L = parse_image(i, v);
+            return new threshold(d, L);
+        }
+
+        if (op == "trim")
+        {
+            int    h = parse_int(i, v);
+            int    w = parse_int(i, v);
+            image *L = parse_image(i, v);
+            return new trim(h, w, L);
+        }
+
+        if (op == "yuv2rgb")
+        {
+            image *L = parse_image(i, v);
+            return new yuv2rgb(L);
+        }
+
+        i--;
+    }
+    throw parse_error(v[i], "an image process command");
+}
+
+//------------------------------------------------------------------------------
+
 /// View position and zoom
 
 struct state
@@ -79,7 +468,7 @@ struct state
 class rawk : public gl::demonstration
 {
 public:
-    rawk(int, char **);
+    rawk(image *, double, double, double);
    ~rawk();
 
     void   draw();
@@ -117,8 +506,6 @@ private:
 
     // Current and stored view configurations
 
-    image *parse_image(int&, char **);
-
     image               *root_image;
     state                temp_state;
     state                down_state;
@@ -128,8 +515,6 @@ private:
     state                mark_state[12];
     image               *mark_image[12];
     std::vector<GLfloat> mark_cache[12];
-
-    output *out;
 
     image *doL(image *);
     image *doR(image *);
@@ -141,7 +526,6 @@ private:
     void   doU();
     void   doD();
 
-    void process();
     void refresh();
     void retitle();
 
@@ -153,8 +537,8 @@ private:
 
 //------------------------------------------------------------------------------
 
-rawk::rawk(int argc, char **argv)
-    : demonstration("RAWK", 1280, 720), program(0), curr_cache(width * height * 3), out(0)
+rawk::rawk(image *p, double x, double y, double z)
+    : demonstration("RAWK", 1280, 720), program(0), curr_cache(width * height * 3)
 {
     // Initialize the OpenGL state.
 
@@ -171,25 +555,23 @@ rawk::rawk(int argc, char **argv)
     point_x  =  0;
     point_y  =  0;
 
-    // Parse the command line arguments.
+    // Initialize the cached and marked view states and images.
 
-    int argi = 1;
+    curr_image = p;
 
-    memset(mark_image, 0, sizeof (mark_image));
+    curr_state.center(curr_image, width, height);
 
-    if ((root_image = parse_image(argi, argv)))
+    if (x) curr_state.x = x;
+    if (y) curr_state.y = y;
+    if (z) curr_state.z = z;
+
+    refresh();
+
+    for (int i = 0; i < 12; i++)
     {
-        curr_state.center(root_image, width, height);
-        curr_image = root_image;
-
-        refresh();
-
-        for (int i = 0; i < 12; i++)
-        {
-            mark_state[i] = curr_state;
-            mark_image[i] = curr_image;
-            mark_cache[i] = curr_cache;
-        }
+        mark_state[i] = curr_state;
+        mark_image[i] = curr_image;
+        mark_cache[i] = curr_cache;
     }
 }
 
@@ -456,10 +838,6 @@ void rawk::key(int key, bool down, bool repeat)
             else
                 switch (key)
                 {
-                    case SDL_SCANCODE_TAB:
-                        if (out) process();
-                        break;
-
                     case SDL_SCANCODE_SPACE:
                         if (selector >= 0)
                         {
@@ -595,43 +973,6 @@ void rawk::cache_row(image *p, state *s, int r, int d)
         }
 }
 
-void rawk::process()
-{
-    struct timeval tv;
-    gettimeofday(&tv, 0);
-
-    int d = std::min(out->get_depth (), 3);
-    int h =          out->get_height();
-    int i;
-
-    state all;
-    all.center(out, width, height);
-
-    out->set_cache(true);
-
-    zerocache();
-    showcache();
-
-    #pragma omp parallel for schedule(dynamic)
-    for (i = 0; i < h; ++i)
-    {
-        out->process(i);
-
-        if (omp_get_thread_num() == 0)
-        {
-            if (getsecsince(&tv) > 0.1)
-            {
-                for (int r = 0; r < height; r++)
-                    cache_row(out, &all, r, d);
-
-                showcache();
-                gettimeofday(&tv, 0);
-            }
-        }
-    }
-    out->set_cache(false);
-}
-
 /// Update the contents of the image cache.
 
 void rawk::refresh()
@@ -709,399 +1050,36 @@ void rawk::showcache(int selector)
 
 //------------------------------------------------------------------------------
 
-/// Command line parsing error
-
-class parse_error : public std::runtime_error
-{
-public :
-    parse_error(const char *a, const char *b)
-        : std::runtime_error(message(a, b)) { }
-
-    std::string message(const char *a, const char *b)
-    {
-        if (a)
-            return "Expected " + std::string(b) + " but got '" + std::string(a) + "'";
-        else
-            return "Expected " + std::string(b) + " but got nothing";
-    }
-};
-
-char *parse_string(int &i, char **v)
-{
-    if (v[i])
-        return v[i++];
-    throw parse_error(v[i], "a string");
-}
-
-double parse_double(int& i, char **v)
-{
-    if (v[i])
-    {
-        char *e;
-        double d = strtod(v[i], &e);
-        if (e[0] == 0)
-        {
-            i++;
-            return d;
-        }
-    }
-    throw parse_error(v[i], "a floating point value");
-}
-
-int parse_int(int& i, char **v)
-{
-    if (v[i])
-    {
-        char *e;
-        long l = strtol(v[i], &e, 0);
-        if (e[0] == 0)
-        {
-            i++;
-            return l;
-        }
-    }
-    throw parse_error(v[i], "an integer value");
-}
-
-int parse_wrap(int& i, char **v)
-{
-    if (v[i])
-    {
-        if (v[i][0] && !v[i][1])
-        {
-            switch (v[i][0])
-            {
-                case '0':
-                case '1':
-                case '2':
-                case '3': return v[i++][0] - '0';
-            }
-        }
-    }
-    throw parse_error(v[i], "a wrap mode (0123)");
-}
-
-char parse_type(int& i, char **v)
-{
-    if (v[i])
-    {
-        if (v[i][0] && !v[i][1])
-        {
-            switch (v[i][0])
-            {
-                case 'b':
-                case 'c':
-                case 'u': case 'U':
-                case 's': case 'S':
-                case 'l': case 'L':
-                case 'i': case 'I':
-                case 'f': case 'F':
-                case 'd': case 'D': return v[i++][0];
-            }
-        }
-    }
-    throw parse_error(v[i], "a data type token (ucuslifdUSLIFD)");
-}
-
-image *rawk::parse_image(int& i, char **v)
-{
-    if (v[i])
-    {
-        std::string op(v[i++]);
-
-        if (op == "absolute")
-        {
-            image *L = parse_image(i, v);
-            return new absolute(L);
-        }
-
-        if (op == "append")
-        {
-            image *L = parse_image(i, v);
-            image *R = parse_image(i, v);
-            return new append(L, R);
-        }
-
-        if (op == "bias")
-        {
-            double d = parse_double(i, v);
-            image *L = parse_image(i, v);
-            return new bias(d, L);
-        }
-
-        if (op == "blend")
-        {
-            image *L = parse_image(i, v);
-            image *R = parse_image(i, v);
-            return new blend(L, R);
-        }
-
-        if (op == "choose")
-        {
-            int    n = parse_int(i, v);
-            image *L = parse_image(i, v);
-            image *R = parse_image(i, v);
-            return new choose(n, L, R);
-        }
-
-        if (op == "crop")
-        {
-            int    r = parse_int(i, v);
-            int    c = parse_int(i, v);
-            int    h = parse_int(i, v);
-            int    w = parse_int(i, v);
-            image *L = parse_image(i, v);
-            return new crop(r, c, h, w, L);
-        }
-
-        if (op == "cubic")
-        {
-            int    h = parse_int(i, v);
-            int    w = parse_int(i, v);
-            int    m = parse_wrap(i, v);
-            image *L = parse_image(i, v);
-            return new cubic(h, w, m, L);
-        }
-
-        if (op == "difference")
-        {
-            image *L = parse_image(i, v);
-            image *R = parse_image(i, v);
-            return new difference(L, R);
-        }
-
-        if (op == "dilate")
-        {
-            int    r = parse_int(i, v);
-            int    m = parse_wrap(i, v);
-            image *L = parse_image(i, v);
-            return new dilate(r, m, L);
-        }
-
-        if (op == "erode")
-        {
-            int    r = parse_int(i, v);
-            int    m = parse_wrap(i, v);
-            image *L = parse_image(i, v);
-            return new erode(r, m, L);
-        }
-
-        if (op == "flatten")
-        {
-            double d = parse_double(i, v);
-            image *L = parse_image(i, v);
-            return new flatten(d, L);
-        }
-
-        if (op == "gain")
-        {
-            double d = parse_double(i, v);
-            image *L = parse_image(i, v);
-            return new gain(d, L);
-        }
-
-        if (op == "gaussian")
-        {
-            double d = parse_double(i, v);
-            int    m = parse_wrap(i, v);
-            image *L = parse_image(i, v);
-            return new gaussian(d, m, L);
-        }
-
-        if (op == "gaussianh")
-        {
-            double d = parse_double(i, v);
-            int    m = parse_wrap(i, v);
-            image *L = parse_image(i, v);
-            return new gaussianh(d, m, L);
-        }
-
-        if (op == "gaussianv")
-        {
-            double d = parse_double(i, v);
-            int    m = parse_wrap(i, v);
-            image *L = parse_image(i, v);
-            return new gaussianv(d, m, L);
-        }
-
-        if (op == "gradient")
-        {
-            int    m = parse_wrap(i, v);
-            image *L = parse_image(i, v);
-            return new gradient(m, L);
-        }
-
-        if (op == "input")
-        {
-            char  *a = parse_string(i, v);
-            int    o = parse_int(i, v);
-            int    h = parse_int(i, v);
-            int    w = parse_int(i, v);
-            int    d = parse_int(i, v);
-            char   t = parse_type(i, v);
-            return new input(a, o, h, w, d, t);
-        }
-
-        if (op == "linear")
-        {
-            int    h = parse_int(i, v);
-            int    w = parse_int(i, v);
-            int    m = parse_wrap(i, v);
-            image *L = parse_image(i, v);
-            return new linear(h, w, m, L);
-        }
-
-        if (op == "median")
-        {
-            int    r = parse_int(i, v);
-            int    m = parse_wrap(i, v);
-            image *L = parse_image(i, v);
-            return new median(r, m, L);
-        }
-
-        if (op == "medianh")
-        {
-            int    r = parse_int(i, v);
-            int    m = parse_wrap(i, v);
-            image *L = parse_image(i, v);
-            return new medianh(r, m, L);
-        }
-
-        if (op == "medianv")
-        {
-            int    r = parse_int(i, v);
-            int    m = parse_wrap(i, v);
-            image *L = parse_image(i, v);
-            return new medianv(r, m, L);
-        }
-
-        if (op == "multiply")
-        {
-            image *L = parse_image(i, v);
-            image *R = parse_image(i, v);
-            return new multiply(L, R);
-        }
-
-        if (op == "nearest")
-        {
-            int    h = parse_int(i, v);
-            int    w = parse_int(i, v);
-            image *L = parse_image(i, v);
-            return new nearest(h, w, L);
-        }
-
-        if (op == "normalize")
-        {
-            image *L = parse_image(i, v);
-            return new normalize(L);
-        }
-
-        if (op == "offset")
-        {
-            int    r = parse_int(i, v);
-            int    c = parse_int(i, v);
-            int    w = parse_int(i, v);
-            image *L = parse_image(i, v);
-            return new offset(r, c, w, L);
-        }
-
-        if (op == "output")
-        {
-            char  *a = parse_string(i, v);
-            char   t = parse_type (i, v);
-            image *L = parse_image(i, v);
-            return (out = new output(a, t, L));
-        }
-
-        if (op == "paste")
-        {
-            int    r = parse_int(i, v);
-            int    c = parse_int(i, v);
-            image *L = parse_image(i, v);
-            image *R = parse_image(i, v);
-            return new paste(r, c, L, R);
-        }
-
-        if (op == "reduce")
-        {
-            image *L = parse_image(i, v);
-            return new reduce(L);
-        }
-
-        if (op == "rgb2yuv")
-        {
-            image *L = parse_image(i, v);
-            return new rgb2yuv(L);
-        }
-
-        if (op == "sobelx")
-        {
-            int    m = parse_wrap(i, v);
-            image *L = parse_image(i, v);
-            return new sobelx(m, L);
-        }
-
-        if (op == "sobely")
-        {
-            int    m = parse_wrap(i, v);
-            image *L = parse_image(i, v);
-            return new sobely(m, L);
-        }
-
-        if (op == "solid")
-        {
-            int    h = parse_int(i, v);
-            int    w = parse_int(i, v);
-            double d = parse_double(i, v);
-            return new solid(h, w, d);
-        }
-
-        if (op == "sum")
-        {
-            image *L = parse_image(i, v);
-            image *R = parse_image(i, v);
-            return new sum(L, R);
-        }
-
-        if (op == "swizzle")
-        {
-            char  *m = v[i++];
-            image *L = parse_image(i, v);
-            return new swizzle(m, L);
-        }
-
-        if (op == "threshold")
-        {
-            double d = parse_double(i, v);
-            image *L = parse_image(i, v);
-            return new threshold(d, L);
-        }
-
-        if (op == "trim")
-        {
-            int    h = parse_int(i, v);
-            int    w = parse_int(i, v);
-            image *L = parse_image(i, v);
-            return new trim(h, w, L);
-        }
-
-        if (op == "yuv2rgb")
-        {
-            image *L = parse_image(i, v);
-            return new yuv2rgb(L);
-        }
-
-        i--;
-    }
-    throw parse_error(v[i], "an image process command");
-}
-
 int main(int argc, char **argv)
 {
     try
     {
-        rawk app(argc, argv);
-        app.run(true);
+        bool   n = false;
+        double x = 0;
+        double y = 0;
+        double z = 0;
+
+        int c;
+
+        while ((c = getopt(argc, argv, "nx:y:z:")) != -1)
+            switch (c)
+            {
+                case 'n': n = true;              break;
+                case 'x': x = strtod(optarg, 0); break;
+                case 'y': y = strtod(optarg, 0); break;
+                case 'z': z = strtod(optarg, 0); break;
+            }
+
+        if (image *p = parse_image(optind, argv))
+        {
+            if (n)
+                p->process();
+            else
+            {
+                rawk app(p, x, y, z);
+                app.run(true);
+            }
+        }
         return 0;
     }
     catch (std::exception &e)
