@@ -37,7 +37,7 @@ class rawk;
 #include "image_matrix.hpp"
 #include "image_median.hpp"
 #include "image_morphology.hpp"
-#include "image_normalize.hpp"
+#include "image_normal.hpp"
 #include "image_offset.hpp"
 #include "image_output.hpp"
 #include "image_paste.hpp"
@@ -336,6 +336,13 @@ image *parse_image(int& i, char **v)
         {
             image *L = parse_image(i, v);
             return new normalize(L);
+        }
+
+        if (op == "normalmap")
+        {
+            double r = parse_double(i, v);
+            image *L = parse_image(i, v);
+            return new normalmap(r, L);
         }
 
         if (op == "offset")
@@ -973,13 +980,14 @@ void rawk::retitle()
 
 void rawk::cache_row(image *p, state *s, int r, int d)
 {
-    for     (int c = 0; c < width; ++c)
+    for (int c = 0; c < width; ++c)
+    {
+        int i = toint(s->y + (r - height / 2) * s->z);
+        int j = toint(s->x + (c - width  / 2) * s->z);
+
         for (int k = 0; k < d; ++k)
-        {
-            int i = toint(s->y + (r - height / 2) * s->z);
-            int j = toint(s->x + (c - width  / 2) * s->z);
             curr_cache[(r * width + c) * 3 + k] = p->get(i, j, k);
-        }
+    }
 }
 
 /// Update the contents of the image cache.

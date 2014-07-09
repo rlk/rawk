@@ -1,14 +1,13 @@
 FLAGS  = -Wall
 
-#CXX = c++
-#FLAGS += -O2
+CXX = c++
+FLAGS += -O2
 
 #CXX = c++
 #FLAGS += -g
 
-CXX = /usr/local/bin/g++
-FLAGS += -O2 -fopenmp
-
+#CXX = /usr/local/bin/g++
+#FLAGS += -O2 -fopenmp
 
 FLAGS +=$(shell /usr/local/bin/sdl2-config --cflags --libs)
 FLAGS +=-framework OpenGL
@@ -19,7 +18,7 @@ rawk : rawk.cpp
 	$(CXX) $(FLAGS) -o $@ rawk.cpp
 
 rawtif : rawtif.cpp
-	$(CXX) $(FLAGS) -o $@ rawtif.cpp -ltiff
+	$(CXX) $(FLAGS) -o $@ rawtif.cpp -I/usr/local/include -L/usr/local/lib -ltiff
 
 rawk : image.hpp
 rawk : image_append.hpp
@@ -36,7 +35,7 @@ rawk : image_input.hpp
 rawk : image_matrix.hpp
 rawk : image_median.hpp
 rawk : image_morphology.hpp
-rawk : image_normalize.hpp
+rawk : image_normal.hpp
 rawk : image_offset.hpp
 rawk : image_output.hpp
 rawk : image_paste.hpp
