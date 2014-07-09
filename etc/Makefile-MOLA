@@ -80,6 +80,12 @@ BLURRED= gaussianv 4 2 $(MEGT)
 
 REPAIRED= blend append $(BLURRED) $(BADMASK) $(MEGT)
 
+NORTH= offset 0 23040 2 gain 0.0000305185 input megt_n_128_1.raw 0 23040 46080 1 f
+SOUTH= offset 0 23040 2 gain 0.0000305185 input megt_s_128_1.raw 0 23040 46080 1 f
+
+NORTH_SCALE= crop  0 0 23040 46080 linear 23050 46080 2 $(NORTH)
+SOUTH_SCALE= crop 25 0 23040 46080 linear 23065 46080 2 $(SOUTH)
+
 test :
 	rawk sum $(OUTLINE) $(BADLINES)
 
@@ -91,14 +97,29 @@ merge :
 		append $(MEGT) \
 			offset 0 23040 2 input megt_s_128_1.raw 0 23040 46080 1 f
 
-test : megt44s000hb.raw megt_s_128_1.raw
+align :
 	rawk \
-		gain 0.0001 \
-		append \
-		    input megt44s000hb.raw 0 2048 4096 1 f \
-			input megt_s_128_1.raw 0 2048 4096 1 f
+		absolute \
+		gain 10.0 \
+		gradient 2 \
+		append $(NORTH_SCALE) append $(MEGT) $(SOUTH_SCALE)
 
-megt44s000hb.raw :
-megt_s_128_1.raw :
+diff :
+	rawk \
+		absolute \
+		gain 100.0 \
+		difference $(MEGT) sum $(NORTH_SCALE) $(SOUTH_SCALE)
 
+poles : megt_s_128_1.raw megt_n_128_1.raw
 
+megt_s_128_1.raw : megt_s_128_1.tif
+	rawtif $< $@
+
+megt_s_128_1.tif : megt_s_128_1.lbl
+	scmtiff -T -prectify -n23040 $<
+
+megt_n_128_1.raw : megt_n_128_1.tif
+	rawtif $< $@
+
+megt_n_128_1.tif : megt_n_128_1.lbl
+	scmtiff -T -prectify -n23040 $<
