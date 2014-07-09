@@ -370,6 +370,15 @@ image *parse_image(int& i, char **v)
             return new reduce(L);
         }
 
+        if (op == "relief")
+        {
+            double y = parse_double(i, v);
+            double x = parse_double(i, v);
+            int    m = parse_wrap(i, v);
+            image *L = parse_image(i, v);
+            return new relief(y, x, m, L);
+        }
+
         if (op == "rgb2yuv")
         {
             image *L = parse_image(i, v);
@@ -830,9 +839,6 @@ void rawk::key(int key, bool down, bool repeat)
                         break;
                     case SDL_SCANCODE_3:
                         init_program("rawk.vert", "rawk_rgb.frag");
-                        break;
-                    case SDL_SCANCODE_4:
-                        init_program("rawk.vert", "rawk_relief.frag");
                         break;
                 }
             else

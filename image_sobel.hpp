@@ -91,6 +91,55 @@ private:
 
 //------------------------------------------------------------------------------
 
+/// Relief shading filter
+
+class relief : public image
+{
+public:
+    relief(double dy, double dx, int mode, image *L)
+        : image(L), dy(dy), dx(dx), mode(mode) { }
+
+    virtual double get(int i, int j, int k) const
+    {
+        const int in = wrap(i - 1, L->get_height(), mode & 1);
+        const int is = wrap(i + 1, L->get_height(), mode & 1);
+        const int jw = wrap(j - 1, L->get_width (), mode & 2);
+        const int je = wrap(j + 1, L->get_width (), mode & 2);
+
+        double d1 = L->get(in, jw, k);
+        double d2 = L->get(in, j,  k);
+        double d3 = L->get(in, je, k);
+        double d4 = L->get(i,  jw, k);
+        double d6 = L->get(i,  je, k);
+        double d7 = L->get(is, jw, k);
+        double d8 = L->get(is, j,  k);
+        double d9 = L->get(is, je, k);
+
+        double Ly = d7 - d1 + 2.0 * (d8 - d2) + d9 - d3;
+        double Lx = d3 - d1 + 2.0 * (d6 - d4) + d9 - d7;
+
+        return 0.5 + Ly * dy + Lx * dx;
+    }
+
+    virtual void tweak(int a, int v)
+    {
+        if (a == 0) dx += v;
+        if (a == 1) dy += v;
+    }
+
+    virtual void doc(std::ostream& out) const
+    {
+        out << "relief " << dy << " " << dx << " " << mode;
+    }
+
+private:
+    double dy;
+    double dx;
+    int mode;
+};
+
+//------------------------------------------------------------------------------
+
 /// Gradient filter
 
 class gradient : public image
