@@ -21,7 +21,7 @@ class image
 {
 public:
     /// Create a new image object with left child *L* and right child *R*.
-    /// The parents *L* and *R* are set to *this*.
+    /// The parents of *L* and *R* are set to *this*.
 
     image(image *L=0, image *R=0) : L(L), R(R), P(0)
     {
