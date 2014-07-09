@@ -840,6 +840,9 @@ void rawk::key(int key, bool down, bool repeat)
                     case SDL_SCANCODE_3:
                         init_program("rawk.vert", "rawk_rgb.frag");
                         break;
+                    case SDL_SCANCODE_4:
+                        init_program("rawk.vert", "rawk_color.frag");
+                        break;
                 }
             else
                 switch (key)
