@@ -28,14 +28,12 @@ rawk : image_blend.hpp
 rawk : image_choose.hpp
 rawk : image_convolve.hpp
 rawk : image_crop.hpp
-rawk : image_flatten.hpp
 rawk : image_function.hpp
 rawk : image_gain.hpp
 rawk : image_input.hpp
 rawk : image_matrix.hpp
 rawk : image_median.hpp
 rawk : image_morphology.hpp
-rawk : image_normal.hpp
 rawk : image_offset.hpp
 rawk : image_output.hpp
 rawk : image_paste.hpp
@@ -45,5 +43,4 @@ rawk : image_sobel.hpp
 rawk : image_solid.hpp
 rawk : image_swizzle.hpp
 rawk : image_threshold.hpp
-rawk : image_trim.hpp
 rawk : raw.hpp
