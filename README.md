@@ -11,5 +11,4 @@ The repo has a submodule ([GLFundamentals](https://github.com/rlk/GLFundamentals
 Todo:
 - BMP example
 - TGA example
-- Normal map generator
 - Kuwahara filter
