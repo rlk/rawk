@@ -30,14 +30,12 @@ class rawk;
 #include "image_choose.hpp"
 #include "image_convolve.hpp"
 #include "image_crop.hpp"
-#include "image_flatten.hpp"
 #include "image_function.hpp"
 #include "image_gain.hpp"
 #include "image_input.hpp"
 #include "image_matrix.hpp"
 #include "image_median.hpp"
 #include "image_morphology.hpp"
-#include "image_normalize.hpp"
 #include "image_offset.hpp"
 #include "image_output.hpp"
 #include "image_paste.hpp"
@@ -47,7 +45,6 @@ class rawk;
 #include "image_solid.hpp"
 #include "image_swizzle.hpp"
 #include "image_threshold.hpp"
-#include "image_trim.hpp"
 
 //------------------------------------------------------------------------------
 
@@ -228,13 +225,6 @@ image *parse_image(int& i, char **v)
             return new erode(r, m, L);
         }
 
-        if (op == "flatten")
-        {
-            double d = parse_double(i, v);
-            image *L = parse_image(i, v);
-            return new flatten(d, L);
-        }
-
         if (op == "gain")
         {
             double d = parse_double(i, v);
@@ -332,12 +322,6 @@ image *parse_image(int& i, char **v)
             return new nearest(h, w, L);
         }
 
-        if (op == "normalize")
-        {
-            image *L = parse_image(i, v);
-            return new normalize(L);
-        }
-
         if (op == "offset")
         {
             int    r = parse_int(i, v);
@@ -426,14 +410,6 @@ image *parse_image(int& i, char **v)
             double d = parse_double(i, v);
             image *L = parse_image(i, v);
             return new threshold(d, L);
-        }
-
-        if (op == "trim")
-        {
-            int    h = parse_int(i, v);
-            int    w = parse_int(i, v);
-            image *L = parse_image(i, v);
-            return new trim(h, w, L);
         }
 
         if (op == "yuv2rgb")
