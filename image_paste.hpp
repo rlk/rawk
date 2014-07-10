@@ -29,14 +29,14 @@ public:
     paste(int row, int column, image *L, image *R)
         : image(L, R), row(row), column(column) { }
 
-    virtual double get(int i, int j, int k) const
+    virtual pixel get(int i, int j) const
     {
         if (row    <= i && i < row    + L->get_height() &&
             column <= j && j < column + L->get_width())
 
-            return L->get(i - row, j - column, k);
+            return L->get(i - row, j - column);
         else
-            return R->get(i, j, k);
+            return R->get(i, j);
     }
 
     virtual int get_height() const

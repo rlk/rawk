@@ -15,6 +15,17 @@
 
 //------------------------------------------------------------------------------
 
+struct pixel
+{
+    pixel(float r=0, float g=0, float b=0, float a=0) : r(r), g(g), b(b), a(a) { }
+    float r;
+    float g;
+    float b;
+    float a;
+};
+
+//------------------------------------------------------------------------------
+
 /// Base class for all image sources, filters, and operators
 
 class image
@@ -39,7 +50,7 @@ public:
 
     /// Return the value of the sample at row *i*, column *j*, channel *k*.
 
-    virtual double get(int i, int j, int k) const = 0;
+    virtual pixel get(int i, int j) const = 0;
 
     /// Return the height of this image.
 
@@ -58,16 +69,6 @@ public:
         if (L && R) return std::max(L->get_width(), R->get_width());
         else if (L) return L->get_width();
         else if (R) return L->get_width();
-        else        return 0;
-    }
-
-    /// Return the depth of this image.
-
-    virtual int get_depth() const
-    {
-        if (L && R) return std::max(L->get_depth(), R->get_depth());
-        else if (L) return L->get_depth();
-        else if (R) return L->get_depth();
         else        return 0;
     }
 

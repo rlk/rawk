@@ -26,10 +26,11 @@ public:
 
     sum(image *L, image *R) : image(L, R) { }
 
-    virtual double get(int i, int j, int k) const
+    virtual pixel get(int i, int j) const
     {
-        return L->get(i, j, k)
-             + R->get(i, j, k);
+        pixel l = L->get(i, j);
+        pixel r = R->get(i, j);
+        return pixel(l.r + r.r, l.g + r.g, l.b + r.b, l.a + r.a);
     }
 
     virtual void doc(std::ostream& out) const
@@ -51,10 +52,11 @@ public:
 
     difference(image *L, image *R) : image(L, R) { }
 
-    virtual double get(int i, int j, int k) const
+    virtual pixel get(int i, int j) const
     {
-        return L->get(i, j, k)
-             - R->get(i, j, k);
+        pixel l = L->get(i, j);
+        pixel r = R->get(i, j);
+        return pixel(l.r - r.r, l.g - r.g, l.b - r.b, l.a - r.a);
     }
 
     virtual void doc(std::ostream& out) const
@@ -77,12 +79,16 @@ public:
 
     multiply(image *L, image *R) : image(L, R) { }
 
-    virtual double get(int i, int j, int k) const
+    virtual pixel get(int i, int j) const
     {
-        if (double v = L->get(i, j, k))
-            return v * R->get(i, j, k);
-        else
-            return 0.0;
+        pixel l = L->get(i, j);
+
+        if (l.r || l.g || l.b || l.a)
+        {
+            pixel r = R->get(i, j);
+            return pixel(l.r * r.r, l.g * r.g, l.b * r.b, l.a * r.a);
+        }
+        else return pixel();
     }
 
     virtual void doc(std::ostream& out) const

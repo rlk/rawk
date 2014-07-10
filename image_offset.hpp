@@ -26,10 +26,10 @@ public:
     offset(int rows, int columns, int mode, image *L)
         : image(L), rows(rows), columns(columns), mode(mode) { }
 
-    virtual double get(int i, int j, int k) const
+    virtual pixel get(int i, int j) const
     {
         return L->get(wrap(i - rows,    L->get_height(), mode & 1),
-                      wrap(j - columns, L->get_width (), mode & 2), k);
+                      wrap(j - columns, L->get_width (), mode & 2));
     }
 
     virtual void tweak(int a, int v)

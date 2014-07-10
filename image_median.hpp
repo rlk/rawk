@@ -28,31 +28,42 @@ public:
     median(int radius, int mode, image *L)
         : image(L), radius(radius), mode(mode) { }
 
-    virtual double get(int i, int j, int k) const
+    virtual pixel get(int i, int j) const
     {
         const int h = L->get_height();
         const int w = L->get_width ();
 
-        std::vector<double> v((2 * radius + 1) * (2 * radius + 1));
+        std::vector<float> r((2 * radius + 1) * (2 * radius + 1));
+        std::vector<float> g((2 * radius + 1) * (2 * radius + 1));
+        std::vector<float> b((2 * radius + 1) * (2 * radius + 1));
+        std::vector<float> a((2 * radius + 1) * (2 * radius + 1));
 
         int z = 0;
 
         for     (int y = -radius; y <= radius; y++)
             for (int x = -radius; x <= radius; x++)
                 if (x * x + y * y <= radius * radius)
-                    v[z++] = L->get(wrap(i + y, h, mode & 1),
-                                    wrap(j + x, w, mode & 2), k);
+                {
+                    pixel p = L->get(wrap(i + y, h, mode & 1),
+                                     wrap(j + x, w, mode & 2));
+                    r[z] = p.r;
+                    g[z] = p.g;
+                    b[z] = p.b;
+                    a[z] = p.a;
+                    z++;
+                }
 
-        std::nth_element(v.begin(), v.begin() + z / 2, v.begin() + z);
-        return v[z / 2];
+        std::nth_element(r.begin(), r.begin() + z / 2, r.begin() + z);
+        std::nth_element(g.begin(), g.begin() + z / 2, g.begin() + z);
+        std::nth_element(b.begin(), b.begin() + z / 2, b.begin() + z);
+        std::nth_element(a.begin(), a.begin() + z / 2, a.begin() + z);
+
+        return pixel(r[z / 2], g[z / 2], b[z / 2], a[z / 2]);
     }
 
     virtual void tweak(int a, int v)
     {
-        if (a == 0)
-        {
-            radius += v;
-        }
+        if (a == 0) radius += v;
     }
 
     virtual void doc(std::ostream& out) const
@@ -66,7 +77,7 @@ protected:
 };
 
 //------------------------------------------------------------------------------
-
+#if 0
 /// Median filter with a vertical kernel
 
 class medianv : public median
@@ -77,7 +88,7 @@ public:
 
     medianv(int radius, int mode, image *L) : median(radius, mode, L) { }
 
-    virtual double get(int i, int j, int k) const
+    virtual pixel get(int i, int j) const
     {
         const int h = L->get_height();
 
@@ -97,11 +108,10 @@ public:
         out << "medianv " << radius;
     }
 };
-
+#endif
 //------------------------------------------------------------------------------
-
+#if 0
 /// Median filter with a horizontal kernel
-
 
 class medianh : public median
 {
@@ -111,7 +121,7 @@ public:
 
     medianh(int radius, int mode, image *L) : median(radius, mode, L) { }
 
-    virtual double get(int i, int j, int k) const
+    virtual pixel get(int i, int j) const
     {
         const int w = L->get_width();
 
@@ -131,7 +141,7 @@ public:
         out << "medianh " << radius;
     }
 };
-
+#endif
 //------------------------------------------------------------------------------
 
 #endif

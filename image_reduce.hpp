@@ -27,12 +27,17 @@ public:
 
     reduce(image *L) : image(L) { }
 
-    virtual double get(int i, int j, int k) const
+    virtual pixel get(int i, int j) const
     {
-        return (L->get(i * 2 + 0, j * 2 + 0, k) +
-                L->get(i * 2 + 0, j * 2 + 1, k) +
-                L->get(i * 2 + 1, j * 2 + 0, k) +
-                L->get(i * 2 + 1, j * 2 + 1, k)) / 4.0;
+        pixel a = L->get(i * 2 + 0, j * 2 + 0);
+        pixel b = L->get(i * 2 + 0, j * 2 + 1);
+        pixel c = L->get(i * 2 + 1, j * 2 + 0);
+        pixel d = L->get(i * 2 + 1, j * 2 + 1);
+
+        return pixel((a.r + b.r + c.r + d.r) / 4.0,
+                     (a.g + b.g + c.g + d.g) / 4.0,
+                     (a.b + b.b + c.b + d.b) / 4.0,
+                     (a.a + b.a + c.a + d.a) / 4.0);
     }
 
     virtual int get_height() const { return L->get_height() / 2; }

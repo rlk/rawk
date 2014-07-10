@@ -22,6 +22,14 @@ static inline double lerp(double a, double b, double t)
     return b * t + a * (1 - t);
 }
 
+static inline pixel lerpv(pixel a, pixel b, double t)
+{
+    return pixel(lerp(a.r, b.r, t),
+                 lerp(a.g, b.g, t),
+                 lerp(a.b, b.b, t),
+                 lerp(a.a, b.a, t));
+}
+
 /// Cubic interpolation
 
 static inline double cerp(double a, double b, double c, double d, double t)
@@ -29,6 +37,14 @@ static inline double cerp(double a, double b, double c, double d, double t)
     return b + (-a / 2                 + c / 2        ) * t
              + ( a     - 5 * b / 2 + 2 * c     - d / 2) * t * t
              + (-a / 2 + 3 * b / 2 - 3 * c / 2 + d / 2) * t * t * t;
+}
+
+static inline pixel cerpv(pixel a, pixel b, pixel c, pixel d, double t)
+{
+    return pixel(cerp(a.r, b.r, c.r, d.r, t),
+                 cerp(a.g, b.g, c.g, d.g, t),
+                 cerp(a.b, b.b, c.b, d.b, t),
+                 cerp(a.a, b.a, c.a, d.a, t));
 }
 
 //------------------------------------------------------------------------------
@@ -68,13 +84,13 @@ public:
 
     nearest(int height, int width, image *L) : resample(height, width, 0, L) { }
 
-    virtual double get(int i, int j, int k) const
+    virtual pixel get(int i, int j) const
     {
         const long long hh = (long long) L->get_height();
         const long long ww = (long long) L->get_width();
 
         return L->get(int((long long) i * hh / (long long) height),
-                      int((long long) j * ww / (long long) width), k);
+                      int((long long) j * ww / (long long) width));
     }
 
     virtual void doc(std::ostream& out) const
@@ -96,7 +112,7 @@ public:
     linear(int height, int width, int mode, image *L)
         : resample(height, width, mode, L) { }
 
-    virtual double get(int i, int j, int k) const
+    virtual pixel get(int i, int j) const
     {
         int hh = L->get_height();
         int ww = L->get_width();
@@ -112,13 +128,13 @@ public:
         int ja = wrap(int(floor(jj)), ww, mode & 2);
         int jb = wrap(int( ceil(jj)), ww, mode & 2);
 
-        double aa = L->get(ia, ja, k);
-        double ab = L->get(ia, jb, k);
-        double ba = L->get(ib, ja, k);
-        double bb = L->get(ib, jb, k);
+        pixel aa = L->get(ia, ja);
+        pixel ab = L->get(ia, jb);
+        pixel ba = L->get(ib, ja);
+        pixel bb = L->get(ib, jb);
 
-        return lerp(lerp(aa, ab, t),
-                    lerp(ba, bb, t), s);
+        return lerpv(lerpv(aa, ab, t),
+                     lerpv(ba, bb, t), s);
     }
 
     virtual void doc(std::ostream& out) const
@@ -140,7 +156,7 @@ public:
     cubic(int height, int width, int mode, image *L)
         : resample(height, width, mode, L) { }
 
-    virtual double get(int i, int j, int k) const
+    virtual pixel get(int i, int j) const
     {
         int hh = L->get_height();
         int ww = L->get_width();
@@ -161,27 +177,27 @@ public:
         int ja = wrap(jb - 1, ww, mode & 2);
         int jd = wrap(jc + 1, ww, mode & 2);
 
-        double aa = L->get(ia, ja, k);
-        double ab = L->get(ia, jb, k);
-        double ac = L->get(ia, jc, k);
-        double ad = L->get(ia, jd, k);
-        double ba = L->get(ib, ja, k);
-        double bb = L->get(ib, jb, k);
-        double bc = L->get(ib, jc, k);
-        double bd = L->get(ib, jd, k);
-        double ca = L->get(ic, ja, k);
-        double cb = L->get(ic, jb, k);
-        double cc = L->get(ic, jc, k);
-        double cd = L->get(ic, jd, k);
-        double da = L->get(id, ja, k);
-        double db = L->get(id, jb, k);
-        double dc = L->get(id, jc, k);
-        double dd = L->get(id, jd, k);
+        pixel aa = L->get(ia, ja);
+        pixel ab = L->get(ia, jb);
+        pixel ac = L->get(ia, jc);
+        pixel ad = L->get(ia, jd);
+        pixel ba = L->get(ib, ja);
+        pixel bb = L->get(ib, jb);
+        pixel bc = L->get(ib, jc);
+        pixel bd = L->get(ib, jd);
+        pixel ca = L->get(ic, ja);
+        pixel cb = L->get(ic, jb);
+        pixel cc = L->get(ic, jc);
+        pixel cd = L->get(ic, jd);
+        pixel da = L->get(id, ja);
+        pixel db = L->get(id, jb);
+        pixel dc = L->get(id, jc);
+        pixel dd = L->get(id, jd);
 
-        return cerp(cerp(aa, ab, ac, ad, t),
-                    cerp(ba, bb, bc, bd, t),
-                    cerp(ca, cb, cc, cd, t),
-                    cerp(da, db, dc, dd, t), s);
+        return cerpv(cerpv(aa, ab, ac, ad, t),
+                     cerpv(ba, bb, bc, bd, t),
+                     cerpv(ca, cb, cc, cd, t),
+                     cerpv(da, db, dc, dd, t), s);
     }
 
     virtual void doc(std::ostream& out) const

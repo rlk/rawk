@@ -26,14 +26,12 @@ public:
     crop(int row, int column, int height, int width, image *L)
         : image(L), row(row), column(column), height(height), width(width) { }
 
-    virtual double get(int i, int j, int k) const
+    virtual pixel get(int i, int j) const
     {
-        if (0 <= i && i < height &&
-            0 <= j && j < width)
-
-            return L->get(i + row, j + column, k);
+        if (0 <= i && i < height && 0 <= j && j < width)
+            return L->get(i + row, j + column);
         else
-            return 0.0;
+            return pixel();
     }
 
     virtual int get_height() const { return height; }

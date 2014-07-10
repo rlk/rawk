@@ -26,25 +26,28 @@ public:
     convolve(int yradius, int xradius, int mode, image *L)
         : image(L), yradius(yradius), xradius(xradius), mode(mode) { }
 
-    virtual double get(int i, int j, int k) const
+    virtual pixel get(int i, int j) const
     {
         const int h = L->get_height();
         const int w = L->get_width ();
 
-        double s = 0;
         double t = 0;
-        double T = 0;
+        pixel  p;
 
         for     (int y = -yradius; y <= yradius; y++)
             for (int x = -xradius; x <= xradius; x++)
-                if ((s = kernel(y, x)))
+                if (double s = kernel(y, x))
                 {
-                    T += s;
-                    t += s * L->get(wrap(i + y, h, mode & 1),
-                                    wrap(j + x, w, mode & 2), k);
+                    pixel q = L->get(wrap(i + y, h, mode & 1),
+                                     wrap(j + x, w, mode & 2));
+                    t   += s;
+                    p.r += s * q.r;
+                    p.g += s * q.g;
+                    p.b += s * q.b;
+                    p.a += s * q.a;
                 }
 
-        return t / T;
+        return pixel(p.r / t, p.g / t, p.b / t, p.a / t);
     }
 
 protected:

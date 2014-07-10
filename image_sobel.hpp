@@ -25,21 +25,24 @@ public:
 
     sobelx(int mode, image *L) : image(L), mode(mode) { }
 
-    virtual double get(int i, int j, int k) const
+    virtual pixel get(int i, int j) const
     {
         const int in = wrap(i - 1, L->get_height(), mode & 1);
         const int is = wrap(i + 1, L->get_height(), mode & 1);
         const int jw = wrap(j - 1, L->get_width (), mode & 2);
         const int je = wrap(j + 1, L->get_width (), mode & 2);
 
-        double d1 = L->get(in, jw, k);
-        double d3 = L->get(in, je, k);
-        double d4 = L->get(i,  jw, k);
-        double d6 = L->get(i,  je, k);
-        double d7 = L->get(is, jw, k);
-        double d9 = L->get(is, je, k);
+        pixel d1 = L->get(in, jw);
+        pixel d3 = L->get(in, je);
+        pixel d4 = L->get(i,  jw);
+        pixel d6 = L->get(i,  je);
+        pixel d7 = L->get(is, jw);
+        pixel d9 = L->get(is, je);
 
-        return d3 - d1 + 2.0 * (d6 - d4) + d9 - d7;
+        return pixel(d3.r - d1.r + 2.0 * (d6.r - d4.r) + d9.r - d7.r,
+                     d3.g - d1.g + 2.0 * (d6.g - d4.g) + d9.g - d7.g,
+                     d3.b - d1.b + 2.0 * (d6.b - d4.b) + d9.b - d7.b,
+                     d3.a - d1.a + 2.0 * (d6.a - d4.a) + d9.a - d7.a);
     }
 
     virtual void doc(std::ostream& out) const
@@ -63,21 +66,24 @@ public:
 
     sobely(int mode, image *L) : image(L), mode(mode) { }
 
-    virtual double get(int i, int j, int k) const
+    virtual pixel get(int i, int j) const
     {
         const int in = wrap(i - 1, L->get_height(), mode & 1);
         const int is = wrap(i + 1, L->get_height(), mode & 1);
         const int jw = wrap(j - 1, L->get_width (), mode & 2);
         const int je = wrap(j + 1, L->get_width (), mode & 2);
 
-        double d1 = L->get(in, jw, k);
-        double d2 = L->get(in, j,  k);
-        double d3 = L->get(in, je, k);
-        double d7 = L->get(is, jw, k);
-        double d8 = L->get(is, j,  k);
-        double d9 = L->get(is, je, k);
+        pixel d1 = L->get(in, jw);
+        pixel d2 = L->get(in, j );
+        pixel d3 = L->get(in, je);
+        pixel d7 = L->get(is, jw);
+        pixel d8 = L->get(is, j );
+        pixel d9 = L->get(is, je);
 
-        return d7 - d1 + 2.0 * (d8 - d2) + d9 - d3;
+        return pixel(d7.r - d1.r + 2.0 * (d8.r - d2.r) + d9.r - d3.r,
+                     d7.g - d1.g + 2.0 * (d8.g - d2.g) + d9.g - d3.g,
+                     d7.b - d1.b + 2.0 * (d8.b - d2.b) + d9.b - d3.b,
+                     d7.a - d1.a + 2.0 * (d8.a - d2.a) + d9.a - d3.a);
     }
 
     virtual void doc(std::ostream& out) const
@@ -103,26 +109,35 @@ public:
     relief(double dy, double dx, int mode, image *L)
         : image(L), dy(dy), dx(dx), mode(mode) { }
 
-    virtual double get(int i, int j, int k) const
+    virtual pixel get(int i, int j) const
     {
         const int in = wrap(i - 1, L->get_height(), mode & 1);
         const int is = wrap(i + 1, L->get_height(), mode & 1);
         const int jw = wrap(j - 1, L->get_width (), mode & 2);
         const int je = wrap(j + 1, L->get_width (), mode & 2);
 
-        double d1 = L->get(in, jw, k);
-        double d2 = L->get(in, j,  k);
-        double d3 = L->get(in, je, k);
-        double d4 = L->get(i,  jw, k);
-        double d6 = L->get(i,  je, k);
-        double d7 = L->get(is, jw, k);
-        double d8 = L->get(is, j,  k);
-        double d9 = L->get(is, je, k);
+        pixel d1 = L->get(in, jw);
+        pixel d2 = L->get(in, j );
+        pixel d3 = L->get(in, je);
+        pixel d4 = L->get(i,  jw);
+        pixel d6 = L->get(i,  je);
+        pixel d7 = L->get(is, jw);
+        pixel d8 = L->get(is, j );
+        pixel d9 = L->get(is, je);
 
-        double Ly = d7 - d1 + 2.0 * (d8 - d2) + d9 - d3;
-        double Lx = d3 - d1 + 2.0 * (d6 - d4) + d9 - d7;
+        pixel x(d3.r - d1.r + 2.0 * (d6.r - d4.r) + d9.r - d7.r,
+                d3.g - d1.g + 2.0 * (d6.g - d4.g) + d9.g - d7.g,
+                d3.b - d1.b + 2.0 * (d6.b - d4.b) + d9.b - d7.b,
+                d3.a - d1.a + 2.0 * (d6.a - d4.a) + d9.a - d7.a);
+        pixel y(d7.r - d1.r + 2.0 * (d8.r - d2.r) + d9.r - d3.r,
+                d7.g - d1.g + 2.0 * (d8.g - d2.g) + d9.g - d3.g,
+                d7.b - d1.b + 2.0 * (d8.b - d2.b) + d9.b - d3.b,
+                d7.a - d1.a + 2.0 * (d8.a - d2.a) + d9.a - d3.a);
 
-        return 0.5 + Ly * dy + Lx * dx;
+        return pixel(0.5 + x.r * dx + y.r * dy,
+                     0.5 + x.g * dx + y.g * dy,
+                     0.5 + x.b * dx + y.b * dy,
+                     0.5 + x.a * dx + y.a * dy);
     }
 
     virtual void tweak(int a, int v)
@@ -155,26 +170,35 @@ public:
 
     gradient(int mode, image *L) : image(L), mode(mode) { }
 
-    virtual double get(int i, int j, int k) const
+    virtual pixel get(int i, int j) const
     {
         const int in = wrap(i - 1, L->get_height(), mode & 1);
         const int is = wrap(i + 1, L->get_height(), mode & 1);
         const int jw = wrap(j - 1, L->get_width (), mode & 2);
         const int je = wrap(j + 1, L->get_width (), mode & 2);
 
-        double d1 = L->get(in, jw, k);
-        double d2 = L->get(in, j,  k);
-        double d3 = L->get(in, je, k);
-        double d4 = L->get(i,  jw, k);
-        double d6 = L->get(i,  je, k);
-        double d7 = L->get(is, jw, k);
-        double d8 = L->get(is, j,  k);
-        double d9 = L->get(is, je, k);
+        pixel d1 = L->get(in, jw);
+        pixel d2 = L->get(in, j );
+        pixel d3 = L->get(in, je);
+        pixel d4 = L->get(i,  jw);
+        pixel d6 = L->get(i,  je);
+        pixel d7 = L->get(is, jw);
+        pixel d8 = L->get(is, j );
+        pixel d9 = L->get(is, je);
 
-        double Lx = d3 - d1 + 2.0 * (d6 - d4) + d9 - d7;
-        double Ly = d7 - d1 + 2.0 * (d8 - d2) + d9 - d3;
+        pixel x(d3.r - d1.r + 2.0 * (d6.r - d4.r) + d9.r - d7.r,
+                d3.g - d1.g + 2.0 * (d6.g - d4.g) + d9.g - d7.g,
+                d3.b - d1.b + 2.0 * (d6.b - d4.b) + d9.b - d7.b,
+                d3.a - d1.a + 2.0 * (d6.a - d4.a) + d9.a - d7.a);
+        pixel y(d7.r - d1.r + 2.0 * (d8.r - d2.r) + d9.r - d3.r,
+                d7.g - d1.g + 2.0 * (d8.g - d2.g) + d9.g - d3.g,
+                d7.b - d1.b + 2.0 * (d8.b - d2.b) + d9.b - d3.b,
+                d7.a - d1.a + 2.0 * (d8.a - d2.a) + d9.a - d3.a);
 
-        return sqrt(Lx * Lx + Ly * Ly);
+        return pixel(sqrtf(x.r * x.r + y.r * y.r),
+                     sqrtf(x.g * x.g + y.g * y.g),
+                     sqrtf(x.b * x.b + y.b * y.b),
+                     sqrtf(x.a * x.a + y.a * y.a));
     }
 
     virtual void doc(std::ostream& out) const

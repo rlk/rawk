@@ -26,9 +26,9 @@ public:
 
     choose(int which, image *L, image *R) : image(L, R), which(which) { }
 
-    virtual double get(int i, int j, int k) const
+    virtual pixel get(int i, int j) const
     {
-        return which ? R->get(i, j, k) : L->get(i, j, k);
+        return which ? R->get(i, j) : L->get(i, j);
     }
 
     virtual void tweak(int a, int v)

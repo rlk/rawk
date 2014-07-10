@@ -28,20 +28,31 @@ public:
     dilate(int radius, int mode, image *L)
         : image(L), radius(radius), mode(mode) { }
 
-    virtual double get(int i, int j, int k) const
+    virtual pixel get(int i, int j) const
     {
         const int h = L->get_height();
         const int w = L->get_width ();
 
-        double v = std::numeric_limits<double>::min();
+        pixel p(std::numeric_limits<double>::min(),
+                std::numeric_limits<double>::min(),
+                std::numeric_limits<double>::min(),
+                std::numeric_limits<double>::min());
 
         for     (int y = -radius; y <= +radius; y++)
             for (int x = -radius; x <= +radius; x++)
 
                 if (x * x + y * y <= radius * radius)
-                    v = std::max(v, L->get(wrap(i + y, h, mode & 1),
-                                           wrap(j + x, w, mode & 2), k));
-        return v;
+                {
+                    pixel q = L->get(wrap(i + y, h, mode & 1),
+                                     wrap(j + x, w, mode & 2));
+
+                    p.r = std::max(p.r, q.r);
+                    p.g = std::max(p.g, q.g);
+                    p.b = std::max(p.b, q.b);
+                    p.a = std::max(p.a, q.a);
+                }
+
+        return p;
     }
 
     virtual void doc(std::ostream& out) const
@@ -69,20 +80,31 @@ public:
     erode(int radius, int mode, image *L)
         : image(L), radius(radius), mode(mode) { }
 
-    virtual double get(int i, int j, int k) const
+    virtual pixel get(int i, int j) const
     {
         const int h = L->get_height();
         const int w = L->get_width ();
 
-        double v = std::numeric_limits<double>::max();
+        pixel p(std::numeric_limits<double>::max(),
+                std::numeric_limits<double>::max(),
+                std::numeric_limits<double>::max(),
+                std::numeric_limits<double>::max());
 
         for     (int y = -radius; y <= +radius; y++)
             for (int x = -radius; x <= +radius; x++)
 
                 if (x * x + y * y <= radius * radius)
-                    v = std::min(v, L->get(wrap(i + y, h, mode & 1),
-                                           wrap(j + x, w, mode & 2), k));
-        return v;
+                {
+                    pixel q = L->get(wrap(i + y, h, mode & 1),
+                                     wrap(j + x, w, mode & 2));
+
+                    p.r = std::min(p.r, q.r);
+                    p.g = std::min(p.g, q.g);
+                    p.b = std::min(p.b, q.b);
+                    p.a = std::min(p.a, q.a);
+                }
+
+        return p;
     }
 
     virtual void doc(std::ostream& out) const

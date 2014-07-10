@@ -20,18 +20,18 @@
 class output : public image
 {
 public:
-    /// Write a raw-formatted data file named *name*. *Type* is a character
-    /// giving the output @ref type "sample type". The image height, width, and
-    /// depth are given by the *L* image object. Unsigned samples are clamped to
-    /// the range [0,1] and signed samples to the range [-1,+1] before being
-    /// cast to the destination data type.
+    /// Write a raw-formatted data file named *name*. *Depth* is the number of
+    /// channels to inclue and *type* is a character giving the output
+    /// @ref type "sample type". The image height and width are given by the
+    /// *L* image object. Unsigned samples are clamped to the range [0,1] and
+    /// signed samples to the range [-1,+1] before being cast to the destination
+    /// data type.
 
-    output(std::string name, char type, image *L)
+    output(std::string name, int depth, char type, image *L)
         : image(L), cache(false), file(0), chars(0)
     {
         const int height = L->get_height();
         const int width  = L->get_width ();
-        const int depth  = L->get_depth ();
 
         switch (type)
         {
@@ -57,16 +57,24 @@ public:
         delete file;
     }
 
-    virtual double get(int i, int j, int k) const
+    virtual pixel get(int i, int j) const
     {
         if (0 <= i && i < file->get_height() &&
-            0 <= j && j < file->get_width () &&
-            0 <= k && k < file->get_depth ())
+            0 <= j && j < file->get_width ())
         {
             if (cache)
-                return file->get(i, j, k);
+            {
+                int d = file->get_depth();
+
+                float r = d > 0 ? file->get(i, j, 0) : 0;
+                float g = d > 1 ? file->get(i, j, 1) : 0;
+                float b = d > 2 ? file->get(i, j, 2) : 0;
+                float a = d > 3 ? file->get(i, j, 3) : 0;
+
+                return pixel(r, g, b, a);
+            }
             else
-                return    L->get(i, j, k);
+                return L->get(i, j);
         }
         return 0.0;
     }
@@ -88,25 +96,32 @@ public:
     virtual void process()
     {
         int f, g = 8, c = 0;
-        int i, h = get_height();
-        int j, w = get_width ();
-        int k, d = get_depth ();
+        int i, h = file->get_height();
+        int j, w = file->get_width ();
+        int l, d = file->get_depth ();
+        pixel p;
 
         image::process();
 
         // Divide the set of all scanlines into groups of size g.
 
-        #pragma omp parallel for private(i, j, k) schedule(dynamic)
+        #pragma omp parallel for private(i, j, l, p) schedule(dynamic)
         for (f = 0; f < h; f += g)
         {
             // Process each group in parallel.
 
-            int l = std::min(f + g, h);
+            l = std::min(f + g, h);
 
-            for         (i = f; i < l; ++i)
-                for     (j = 0; j < w; ++j)
-                    for (k = 0; k < d; ++k)
-                        file->put(i, j, k, L->get(i, j, k));
+            for     (i = f; i < l; ++i)
+                for (j = 0; j < w; ++j)
+                {
+                    p = L->get(i, j);
+
+                    if (d > 0) file->put(i, j, 0, p.r);
+                    if (d > 1) file->put(i, j, 1, p.g);
+                    if (d > 2) file->put(i, j, 2, p.b);
+                    if (d > 3) file->put(i, j, 3, p.a);
+                }
 
             // Report a running total of completed scan lines.
 

@@ -24,9 +24,10 @@ public:
 
     gain(double value, image *L) : image(L), value(value) { }
 
-    virtual double get(int i, int j, int k) const
+    virtual pixel get(int i, int j) const
     {
-        return L->get(i, j, k) * value;
+        pixel p = L->get(i, j);
+        return pixel(p.r * value, p.g * value, p.b * value, p.a * value);
     }
 
     virtual void tweak(int a, int v)

@@ -21,14 +21,12 @@ rawtif : rawtif.cpp
 	$(CXX) $(FLAGS) -o $@ rawtif.cpp -I/usr/local/include -L/usr/local/lib -ltiff
 
 rawk : image.hpp
-rawk : image_append.hpp
 rawk : image_arithmetic.hpp
 rawk : image_bias.hpp
 rawk : image_blend.hpp
 rawk : image_choose.hpp
 rawk : image_convolve.hpp
 rawk : image_crop.hpp
-rawk : image_flatten.hpp
 rawk : image_function.hpp
 rawk : image_gain.hpp
 rawk : image_input.hpp
@@ -45,5 +43,4 @@ rawk : image_sobel.hpp
 rawk : image_solid.hpp
 rawk : image_swizzle.hpp
 rawk : image_threshold.hpp
-rawk : image_trim.hpp
 rawk : raw.hpp

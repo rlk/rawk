@@ -20,27 +20,19 @@
 class blend : public image
 {
 public:
-    /// Blend image *L* with image *R* using the alpha channel of *L*. The alpha
-    /// channel is taken to be the last channel, regardless of actual channel
-    /// count. The width, height, and depth of the result are the larger of the
-    /// widths, heights, and depths of the inputs (with the last channel of *L*
-    /// discarded).
+    /// Blend image *L* with image *R* using the alpha channel of *L*.
 
     blend(image *L, image *R) : image(L, R) { }
 
-    virtual double get(int i, int j, int k) const
+    virtual pixel get(int i, int j) const
     {
-        double a = L->get(i, j, L->get_depth() - 1);
+        pixel l = L->get(i, j);
+        pixel r = R->get(i, j);
 
-        if (a == 1.0) return L->get(i, j, k);
-        if (a == 0.0) return R->get(i, j, k);
-
-        return a * L->get(i, j, k) + (1.0 - a) * R->get(i, j, k);
-    }
-
-    virtual int get_depth() const
-    {
-        return std::max(L->get_depth() - 1, R->get_depth());
+        return pixel(l.a * l.r + (1.0 - l.a) * r.r,
+                     l.a * l.g + (1.0 - l.a) * r.g,
+                     l.a * l.b + (1.0 - l.a) * r.b,
+                     l.a * l.a + (1.0 - l.a) * r.a);
     }
 
     virtual void doc(std::ostream& out) const

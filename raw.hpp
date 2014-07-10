@@ -96,8 +96,8 @@ public:
         pixels = uint8_p(buffer) + start;
     }
 
-    virtual void   put(int, int, int, double) = 0;
-    virtual double get(int, int, int) const   = 0;
+    virtual void  put(int, int, int, float) = 0;
+    virtual float get(int, int, int) const  = 0;
 
     std::string get_name()   const { return name;   }
     int         get_height() const { return height; }
@@ -142,14 +142,14 @@ protected:
 
 // Clamps prevent under and overflow when casting to normalized sample types.
 
-static inline double uclamp(double d)
+static inline float uclamp(float d)
 {
     if      (d >  1.0) return  1;
     else if (d <  0.0) return  0;
     else               return  d;
 }
 
-static inline double clamp(double d)
+static inline float clamp(float d)
 {
     if      (d >  1.0) return  1;
     else if (d < -1.0) return -1;
@@ -220,13 +220,13 @@ public:
     rawc(std::string a, size_t o, size_t h, size_t w, size_t d, bool m)
         : raw(a, o, h, w, d, sizeof (int8_t), m) { }
 
-    void put(int i, int j, int k, double d)
+    void put(int i, int j, int k, float d)
     {
         *int8_p(data(i, j, k)) = int8_t(clamp(d) * INT8_MAX);
     }
-    double get(int i, int j, int k) const
+    float get(int i, int j, int k) const
     {
-        return double(*int8_p(data(i, j, k))) / INT8_MAX;
+        return float(*int8_p(data(i, j, k))) / INT8_MAX;
     }
 };
 
@@ -238,13 +238,13 @@ public:
     rawb(std::string a, size_t o, size_t h, size_t w, size_t d, bool m)
         : raw(a, o, h, w, d, sizeof (uint8_t), m) { }
 
-    void put(int i, int j, int k, double d)
+    void put(int i, int j, int k, float d)
     {
         *uint8_p(data(i, j, k)) = uint8_t(uclamp(d) * UINT8_MAX);
     }
-    double get(int i, int j, int k) const
+    float get(int i, int j, int k) const
     {
-        return double(*uint8_p(data(i, j, k))) / UINT8_MAX;
+        return float(*uint8_p(data(i, j, k))) / UINT8_MAX;
     }
 };
 
@@ -258,13 +258,13 @@ public:
     raws(std::string a, size_t o, size_t h, size_t w, size_t d, bool m)
         : raw(a, o, h, w, d, sizeof (int16_t), m) { }
 
-    void put(int i, int j, int k, double d)
+    void put(int i, int j, int k, float d)
     {
         *int16_p(data(i, j, k)) = int16_t(clamp(d) * INT16_MAX);
     }
-    double get(int i, int j, int k) const
+    float get(int i, int j, int k) const
     {
-        return double(*int16_p(data(i, j, k))) / INT16_MAX;
+        return float(*int16_p(data(i, j, k))) / INT16_MAX;
     }
 };
 
@@ -276,13 +276,13 @@ public:
     rawS(std::string a, size_t o, size_t h, size_t w, size_t d, bool m)
         : raw(a, o, h, w, d, sizeof (int16_t), m) { }
 
-    void put(int i, int j, int k, double d)
+    void put(int i, int j, int k, float d)
     {
         *int16_p(data(i, j, k)) = swap(int16_t(clamp(d) * INT16_MAX));
     }
-    double get(int i, int j, int k) const
+    float get(int i, int j, int k) const
     {
-        return double(swap(*int16_p(data(i, j, k)))) / INT16_MAX;
+        return float(swap(*int16_p(data(i, j, k)))) / INT16_MAX;
     }
 };
 
@@ -296,13 +296,13 @@ public:
     rawu(std::string a, size_t o, size_t h, size_t w, size_t d, bool m)
         : raw(a, o, h, w, d, sizeof (uint16_t), m) { }
 
-    void put(int i, int j, int k, double d)
+    void put(int i, int j, int k, float d)
     {
         *uint16_p(data(i, j, k)) = uint16_t(uclamp(d) * UINT16_MAX);
     }
-    double get(int i, int j, int k) const
+    float get(int i, int j, int k) const
     {
-        return double(*uint16_p(data(i, j, k))) / UINT16_MAX;
+        return float(*uint16_p(data(i, j, k))) / UINT16_MAX;
     }
 };
 
@@ -314,13 +314,13 @@ public:
     rawU(std::string a, size_t o, size_t h, size_t w, size_t d, bool m)
         : raw(a, o, h, w, d, sizeof (uint16_t), m) { }
 
-    void put(int i, int j, int k, double d)
+    void put(int i, int j, int k, float d)
     {
         *uint16_p(data(i, j, k)) = swap(uint16_t(uclamp(d) * UINT16_MAX));
     }
-    double get(int i, int j, int k) const
+    float get(int i, int j, int k) const
     {
-        return double(swap(*uint16_p(data(i, j, k)))) / UINT16_MAX;
+        return float(swap(*uint16_p(data(i, j, k)))) / UINT16_MAX;
     }
 };
 
@@ -334,13 +334,13 @@ public:
     rawi(std::string a, size_t o, size_t h, size_t w, size_t d, bool m)
         : raw(a, o, h, w, d, sizeof (int32_t), m) { }
 
-    void put(int i, int j, int k, double d)
+    void put(int i, int j, int k, float d)
     {
         *int32_p(data(i, j, k)) = int32_t(clamp(d) * INT32_MAX);
     }
-    double get(int i, int j, int k) const
+    float get(int i, int j, int k) const
     {
-        return double(*int32_p(data(i, j, k))) / INT32_MAX;
+        return float(*int32_p(data(i, j, k))) / INT32_MAX;
     }
 };
 
@@ -352,13 +352,13 @@ public:
     rawI(std::string a, size_t o, size_t h, size_t w, size_t d, bool m)
         : raw(a, o, h, w, d, sizeof (int32_t), m) { }
 
-    void put(int i, int j, int k, double d)
+    void put(int i, int j, int k, float d)
     {
         *int32_p(data(i, j, k)) = swap(int32_t(clamp(d) * INT32_MAX));
     }
-    double get(int i, int j, int k) const
+    float get(int i, int j, int k) const
     {
-        return double(swap(*int32_p(data(i, j, k)))) / INT32_MAX;
+        return float(swap(*int32_p(data(i, j, k)))) / INT32_MAX;
     }
 };
 
@@ -372,13 +372,13 @@ public:
     rawl(std::string a, size_t o, size_t h, size_t w, size_t d, bool m)
         : raw(a, o, h, w, d, sizeof (uint32_t), m) { }
 
-    void put(int i, int j, int k, double d)
+    void put(int i, int j, int k, float d)
     {
         *uint32_p(data(i, j, k)) = uint32_t(uclamp(d) * UINT32_MAX);
     }
-    double get(int i, int j, int k) const
+    float get(int i, int j, int k) const
     {
-        return double(*uint32_p(data(i, j, k))) / UINT32_MAX;
+        return float(*uint32_p(data(i, j, k))) / UINT32_MAX;
     }
 };
 
@@ -390,13 +390,13 @@ public:
     rawL(std::string a, size_t o, size_t h, size_t w, size_t d, bool m)
         : raw(a, o, h, w, d, sizeof (uint32_t), m) { }
 
-    void put(int i, int j, int k, double d)
+    void put(int i, int j, int k, float d)
     {
         *uint32_p(data(i, j, k)) = swap(uint32_t(uclamp(d) * UINT32_MAX));
     }
-    double get(int i, int j, int k) const
+    float get(int i, int j, int k) const
     {
-        return double(swap(*uint32_p(data(i, j, k)))) / UINT32_MAX;
+        return float(swap(*uint32_p(data(i, j, k)))) / UINT32_MAX;
     }
 };
 
@@ -410,13 +410,13 @@ public:
     rawf(std::string a, size_t o, size_t h, size_t w, size_t d, bool m)
         : raw(a, o, h, w, d, sizeof (float), m) { }
 
-    void put(int i, int j, int k, double d)
+    void put(int i, int j, int k, float d)
     {
         *float_p(data(i, j, k)) = float(d);
     }
-    double get(int i, int j, int k) const
+    float get(int i, int j, int k) const
     {
-        return double(*float_p(data(i, j, k)));
+        return float(*float_p(data(i, j, k)));
     }
 };
 
@@ -428,13 +428,13 @@ public:
     rawF(std::string a, size_t o, size_t h, size_t w, size_t d, bool m)
         : raw(a, o, h, w, d, sizeof (float), m) { }
 
-    void put(int i, int j, int k, double d)
+    void put(int i, int j, int k, float d)
     {
         *float_p(data(i, j, k)) = swap(float(d));
     }
-    double get(int i, int j, int k) const
+    float get(int i, int j, int k) const
     {
-        return double(swap(*float_p(data(i, j, k))));
+        return float(swap(*float_p(data(i, j, k))));
     }
 };
 
@@ -448,11 +448,11 @@ public:
     rawd(std::string a, size_t o, size_t h, size_t w, size_t d, bool m)
         : raw(a, o, h, w, d, sizeof (double), m) { }
 
-    void put(int i, int j, int k, double d)
+    void put(int i, int j, int k, float d)
     {
         *double_p(data(i, j, k)) = d;
     }
-    double get(int i, int j, int k) const
+    float get(int i, int j, int k) const
     {
         return *double_p(data(i, j, k));
     }
@@ -464,15 +464,15 @@ class rawD : public raw
 {
 public:
     rawD(std::string a, size_t o, size_t h, size_t w, size_t d, bool m)
-        : raw(a, o, h, w, d, sizeof (double), m) { }
+        : raw(a, o, h, w, d, sizeof (float), m) { }
 
-    void put(int i, int j, int k, double d)
+    void put(int i, int j, int k, float d)
     {
-        *double_p(data(i, j, k)) = swap(d);
+        *double_p(data(i, j, k)) = swap(double(d));
     }
-    double get(int i, int j, int k) const
+    float get(int i, int j, int k) const
     {
-        return swap(*double_p(data(i, j, k)));
+        return float(swap(*double_p(data(i, j, k))));
     }
 };
 

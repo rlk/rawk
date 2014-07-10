@@ -23,14 +23,12 @@ int omp_get_thread_num() { return 0; }
 
 class rawk;
 
-#include "image_append.hpp"
 #include "image_arithmetic.hpp"
 #include "image_bias.hpp"
 #include "image_blend.hpp"
 #include "image_choose.hpp"
 #include "image_convolve.hpp"
 #include "image_crop.hpp"
-#include "image_flatten.hpp"
 #include "image_function.hpp"
 #include "image_gain.hpp"
 #include "image_input.hpp"
@@ -47,7 +45,6 @@ class rawk;
 #include "image_solid.hpp"
 #include "image_swizzle.hpp"
 #include "image_threshold.hpp"
-#include "image_trim.hpp"
 
 //------------------------------------------------------------------------------
 
@@ -85,6 +82,21 @@ double parse_double(int& i, char **v)
         {
             i++;
             return d;
+        }
+    }
+    throw parse_error(v[i], "a floating point value");
+}
+
+float parse_float(int& i, char **v)
+{
+    if (v[i])
+    {
+        char *e;
+        float f = strtof(v[i], &e);
+        if (e[0] == 0)
+        {
+            i++;
+            return f;
         }
     }
     throw parse_error(v[i], "a floating point value");
@@ -157,13 +169,6 @@ image *parse_image(int& i, char **v)
             return new absolute(L);
         }
 
-        if (op == "append")
-        {
-            image *L = parse_image(i, v);
-            image *R = parse_image(i, v);
-            return new append(L, R);
-        }
-
         if (op == "bias")
         {
             double d = parse_double(i, v);
@@ -226,13 +231,6 @@ image *parse_image(int& i, char **v)
             int    m = parse_wrap(i, v);
             image *L = parse_image(i, v);
             return new erode(r, m, L);
-        }
-
-        if (op == "flatten")
-        {
-            double d = parse_double(i, v);
-            image *L = parse_image(i, v);
-            return new flatten(d, L);
         }
 
         if (op == "gain")
@@ -300,7 +298,7 @@ image *parse_image(int& i, char **v)
             image *L = parse_image(i, v);
             return new median(r, m, L);
         }
-
+#if 0
         if (op == "medianh")
         {
             int    r = parse_int(i, v);
@@ -316,7 +314,7 @@ image *parse_image(int& i, char **v)
             image *L = parse_image(i, v);
             return new medianv(r, m, L);
         }
-
+#endif
         if (op == "multiply")
         {
             image *L = parse_image(i, v);
@@ -357,9 +355,10 @@ image *parse_image(int& i, char **v)
         if (op == "output")
         {
             char  *a = parse_string(i, v);
-            char   t = parse_type (i, v);
+            int    d = parse_int(i, v);
+            char   t = parse_type(i, v);
             image *L = parse_image(i, v);
-            return new output(a, t, L);
+            return new output(a, d, t, L);
         }
 
         if (op == "paste")
@@ -410,8 +409,11 @@ image *parse_image(int& i, char **v)
         {
             int    h = parse_int(i, v);
             int    w = parse_int(i, v);
-            double d = parse_double(i, v);
-            return new solid(h, w, d);
+            float  r = parse_float(i, v);
+            float  g = parse_float(i, v);
+            float  b = parse_float(i, v);
+            float  a = parse_float(i, v);
+            return new solid(h, w, r, g, b, a);
         }
 
         if (op == "sum")
@@ -433,14 +435,6 @@ image *parse_image(int& i, char **v)
             double d = parse_double(i, v);
             image *L = parse_image(i, v);
             return new threshold(d, L);
-        }
-
-        if (op == "trim")
-        {
-            int    h = parse_int(i, v);
-            int    w = parse_int(i, v);
-            image *L = parse_image(i, v);
-            return new trim(h, w, L);
         }
 
         if (op == "yuv2rgb")
@@ -545,7 +539,7 @@ private:
     void refresh();
     void retitle();
 
-    void cache_row(image *, state *, int, int);
+    void cache_row(image *, state *, int);
 
     void zerocache(int selector=-1);
     void showcache(int selector=-1);
@@ -554,7 +548,7 @@ private:
 //------------------------------------------------------------------------------
 
 rawk::rawk(image *p, int h, int w, double x, double y, double z)
-    : demonstration("RAWK", w, h), program(0), curr_cache(width * height * 3)
+    : demonstration("RAWK", w, h), program(0), curr_cache(width * height * 4)
 {
     // Initialize the OpenGL state.
 
@@ -675,8 +669,8 @@ void rawk::init_texture()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, width, height, 0,
-                                   GL_RGB, GL_FLOAT, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0,
+                                   GL_RGBA, GL_FLOAT, 0);
 }
 
 //------------------------------------------------------------------------------
@@ -946,16 +940,16 @@ void rawk::retitle()
 
     // Determine the active image.
 
-    image *p = (selector < 0) ? curr_image : mark_image[selector];
+    image *P = (selector < 0) ? curr_image : mark_image[selector];
 
     // Document the current image. Parentheses indicate temporary selection.
 
     if (selector < 0)
-        p->doc(stream);
+        P->doc(stream);
     else
     {
         stream << "(";
-        p->doc(stream);
+        P->doc(stream);
         stream << ")";
     }
 
@@ -968,25 +962,27 @@ void rawk::retitle()
 
     // Include the pixel value at the current pointer position.
 
-    stream << std::setprecision(3);
+    pixel p = P->get(i, j);
 
-    for (int k = 0; k < p->get_depth(); k++)
-        stream << (k ? "/" : "") << p->get(i, j, k);
+    stream << std::setprecision(3)
+           << p.r << "/" << p.g << "/" << p.b << "/" << p.a;
 
     // Update the window title.
 
     SDL_SetWindowTitle(window, stream.str().c_str());
 }
 
-void rawk::cache_row(image *p, state *s, int r, int d)
+void rawk::cache_row(image *P, state *s, int r)
 {
     for (int c = 0; c < width; ++c)
     {
-        int i = toint(s->y + (r - height / 2) * s->z);
-        int j = toint(s->x + (c - width  / 2) * s->z);
+        pixel p = P->get(toint(s->y + (r - height / 2) * s->z),
+                         toint(s->x + (c - width  / 2) * s->z));
 
-        for (int k = 0; k < d; ++k)
-            curr_cache[(r * width + c) * 3 + k] = p->get(i, j, k);
+        curr_cache[(r * width + c) * 4 + 0] = p.r;
+        curr_cache[(r * width + c) * 4 + 1] = p.g;
+        curr_cache[(r * width + c) * 4 + 2] = p.b;
+        curr_cache[(r * width + c) * 4 + 3] = p.a;
     }
 }
 
@@ -1001,7 +997,7 @@ void rawk::refresh()
         struct timeval tv;
         gettimeofday(&tv, 0);
 
-        int r, d = std::min(curr_image->get_depth(), 3);
+        int r;
 
         zerocache();
         showcache();
@@ -1009,7 +1005,7 @@ void rawk::refresh()
         #pragma omp parallel for schedule(dynamic)
         for (r = 0; r < height; ++r)
         {
-            cache_row(curr_image, &curr_state, r, d);
+            cache_row(curr_image, &curr_state, r);
 
             if (omp_get_thread_num() == 0)
             {
@@ -1057,10 +1053,10 @@ void rawk::showcache(int selector)
 {
     if (selector < 0)
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height,
-                        GL_RGB, GL_FLOAT, &curr_cache.front());
+                        GL_RGBA, GL_FLOAT, &curr_cache.front());
     else
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height,
-                        GL_RGB, GL_FLOAT, &mark_cache[selector].front());
+                        GL_RGBA, GL_FLOAT, &mark_cache[selector].front());
     draw();
     swap();
 }

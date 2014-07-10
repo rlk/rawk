@@ -20,45 +20,26 @@
 class matrix : public image
 {
 public:
-    /// Apply a color space transformation to image *L*. This transformation is
-    /// given in the form of a matrix of size *rows* by *columns*. The input
-    /// must have a depth equal to *columns* and the output will have a depth
-    /// equal to *rows*. The vector *values* gives the matrix in row-major
-    /// order.
+    /// Apply a color space transformation to image *L*.
 
-    matrix(int rows, int columns, std::vector<double> values, image *L)
-        : image(L), rows(rows), columns(columns), values(values)
+    matrix(std::vector<double> M, image *L) : image(L), M(M) { }
+
+    virtual pixel get(int i, int j) const
     {
-        if (columns != L->get_depth())
-            throw std::runtime_error("Mismatched color matrix size");
-    }
-
-    virtual double get(int i, int j, int k) const
-    {
-        const int d = L->get_depth();
-        double    v = 0;
-
-        if (0 <= k && k < rows)
-            for (int l = 0; l < d; l++)
-                if (double w = values[k * columns + l])
-                    v += w * L->get(i, j, l);
-        return v;
-    }
-
-    virtual int get_depth() const
-    {
-        return rows;
+        pixel p = L->get(i, j);
+        return pixel(p.r * M[ 0] + p.g * M[ 1] + p.b * M[ 2] + p.a * M[ 3],
+                     p.r * M[ 4] + p.g * M[ 5] + p.b * M[ 6] + p.a * M[ 7],
+                     p.r * M[ 8] + p.g * M[ 9] + p.b * M[10] + p.a * M[11],
+                     p.r * M[12] + p.g * M[13] + p.b * M[14] + p.a * M[15]);
     }
 
     virtual void doc(std::ostream& out) const
     {
-        out << "matrix " << rows << " " << columns;
+        out << "matrix";
     }
 
 private:
-    int rows;
-    int columns;
-    std::vector<double> values;
+    std::vector<double> M;
 };
 
 //------------------------------------------------------------------------------
@@ -70,16 +51,17 @@ class rgb2yuv : public matrix
     /// Transform image *L* from the RGB to the YUV color space.
 
 public:
-    rgb2yuv(image *L) : matrix(3, 3, std::vector<double>(v, v + 9), L) { }
+    rgb2yuv(image *L) : matrix(std::vector<double>(v, v + 16), L) { }
 
 private:
-    static const double v[9];
+    static const double v[16];
 };
 
-const double rgb2yuv::v[9] = {
-     0.29900,  0.58700,  0.11400,
-    -0.14713,  0.28886,  0.43600,
-     0.61500, -0.51499,  0.10001
+const double rgb2yuv::v[16] = {
+     0.29900,  0.58700,  0.11400, 0.00000,
+    -0.14713,  0.28886,  0.43600, 0.00000,
+     0.61500, -0.51499,  0.10001, 0.00000,
+     0.00000,  0.00000,  0.00000, 1.00000,
 };
 
 //------------------------------------------------------------------------------
@@ -91,16 +73,17 @@ class yuv2rgb : public matrix
 public:
     /// Transform image *L* from the YUV to the RGB color space.
 
-    yuv2rgb(image *L) : matrix(3, 3, std::vector<double>(v, v + 9), L) { }
+    yuv2rgb(image *L) : matrix(std::vector<double>(v, v + 16), L) { }
 
 private:
-    static const double v[9];
+    static const double v[16];
 };
 
-const double yuv2rgb::v[9] = {
-     1.00000,  0.00000,  1.13983,
-     1.00000, -0.39465, -0.58060,
-     1.00000,  2.03211,  0.00000
+const double yuv2rgb::v[16] = {
+     1.00000,  0.00000,  1.13983, 0.00000,
+     1.00000, -0.39465, -0.58060, 0.00000,
+     1.00000,  2.03211,  0.00000, 0.00000,
+     0.00000,  0.00000,  0.00000, 1.00000,
 };
 
 //------------------------------------------------------------------------------

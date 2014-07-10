@@ -20,30 +20,34 @@
 class solid : public image
 {
 public:
-    /// Generate a block of pixels with the given *width* and *height*, a
-    /// depth of one, and a constant *value*.
+    /// Generate a block of pixels with the given *width* and *height* and
+    /// color *r*, *g*, *b*, *a*.
 
-    solid(int height, int width, double value)
-        : height(height), width(width), value(value) { }
+    solid(int height, int width, float r, float g, float b, float a)
+        : height(height), width(width), p(r, g, b, a) { }
 
-    virtual double get(int i, int j, int k) const
+    virtual pixel get(int i, int j) const
     {
-        return value;
+        return p;
     }
 
     virtual int get_height() const { return height; }
     virtual int get_width () const { return width;  }
-    virtual int get_depth () const { return 1;      }
 
     virtual void doc(std::ostream& out) const
     {
-        out << "solid " << height << " " << width << " " << value;
+        out << "solid " << height
+                 << " " << width
+                 << " " << p.r
+                 << " " << p.g
+                 << " " << p.b
+                 << " " << p.a;
     }
 
 private:
-    int    height;
-    int    width;
-    double value;
+    int   height;
+    int   width;
+    pixel p;
 };
 
 //------------------------------------------------------------------------------

@@ -28,7 +28,7 @@ public:
 
     append(image *L, image *R) : image(L, R) { }
 
-    virtual double get(int i, int j, int k) const
+    virtual pixel get(int i, int j) const
     {
         const int d = L->get_depth();
 

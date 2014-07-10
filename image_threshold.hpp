@@ -27,12 +27,14 @@ public:
 
     threshold(double value, image *L) : image(L), value(value) { }
 
-    virtual double get(int i, int j, int k) const
+    virtual pixel get(int i, int j) const
     {
-        if (L->get(i, j, k) > value)
-            return 1.0;
-        else
-            return 0.0;
+        pixel p = L->get(i, j);
+
+        return pixel(p.r > value ? 1 : 0,
+                     p.g > value ? 1 : 0,
+                     p.b > value ? 1 : 0,
+                     p.a > value ? 1 : 0);
     }
 
     virtual void tweak(int a, int v)

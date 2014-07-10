@@ -52,16 +52,24 @@ public:
         delete file;
     }
 
-    virtual double get(int i, int j, int k) const
+    virtual pixel get(int i, int j) const
     {
-        return (0 <= i && i < file->get_height() &&
-                0 <= j && j < file->get_width () &&
-                0 <= k && k < file->get_depth ()) ? file->get(i, j, k) : 0.0;
+        if (0 <= i && i < file->get_height() && 0 <= j && j < file->get_width ())
+        {
+            int d = file->get_depth();
+
+            float r = d > 0 ? file->get(i, j, 0) : 0;
+            float g = d > 1 ? file->get(i, j, 1) : 0;
+            float b = d > 2 ? file->get(i, j, 2) : 0;
+            float a = d > 3 ? file->get(i, j, 3) : 0;
+
+            return pixel(r, g, b, a);
+        }
+        return pixel();
     }
 
     virtual int get_height() const { return file->get_height(); }
     virtual int get_width () const { return file->get_width (); }
-    virtual int get_depth () const { return file->get_depth (); }
 
     virtual void doc(std::ostream& out) const
     {

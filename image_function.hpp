@@ -24,9 +24,10 @@ public:
 
     absolute(image *L) : image(L) { }
 
-    virtual double get(int i, int j, int k) const
+    virtual pixel get(int i, int j) const
     {
-        return fabs(L->get(i, j, k));
+        pixel p = L->get(i, j);
+        return pixel(fabsf(p.r), fabsf(p.g), fabsf(p.b), fabsf(p.a));
     }
 
     virtual void doc(std::ostream& out) const
