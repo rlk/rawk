@@ -28,7 +28,20 @@ void syserr()
     exit(-1);
 }
 
-uint8_t *rawopen(int *d, const char *name, size_t l)
+uint8_t *rawread(int *d, const char *name, size_t l)
+{
+    void *p;
+
+    if ((*d = open(name, O_RDONLY, 0666)) == -1)
+        syserr();
+
+    if ((p = mmap(0, l, PROT_READ, MAP_SHARED, *d, 0)) == MAP_FAILED)
+        syserr();
+
+    return (uint8_t *) p;
+}
+
+uint8_t *rawwrite(int *d, const char *name, size_t l)
 {
     void *p;
 
@@ -53,52 +66,99 @@ void rawclose(int *d, uint8_t *p, size_t l)
         syserr();
 }
 
-int main(int argc, char **argv)
+int extcmp(const char *name, const char *ext)
 {
-    if (argc == 3)
+    return strcasecmp(name + strlen(name) - strlen(ext), ext);
+}
+
+void tif2raw(const char *in, const char *out)
+{
+    if (TIFF *T = TIFFOpen(in, "r"))
     {
-        if (TIFF *T = TIFFOpen(argv[1], "r"))
+        uint32 W = 0, H = 0;
+        uint32 w = 0, h = 0;
+        uint16 b = 0, c = 0;
+
+        TIFFGetField(T, TIFFTAG_TILEWIDTH,       &W);
+        TIFFGetField(T, TIFFTAG_TILELENGTH,      &H);
+        TIFFGetField(T, TIFFTAG_IMAGEWIDTH,      &w);
+        TIFFGetField(T, TIFFTAG_IMAGELENGTH,     &h);
+        TIFFGetField(T, TIFFTAG_SAMPLESPERPIXEL, &c);
+        TIFFGetField(T, TIFFTAG_BITSPERSAMPLE,   &b);
+
+        size_t n = size_t(TIFFNumberOfTiles(T));
+        size_t s = size_t(TIFFTileSize(T));
+        size_t p = size_t(c * b / 8);
+        size_t l = size_t(w * h * p);
+
+        size_t cols = size_t((w + W - 1) / W);
+
+        uint8_t src[s];
+
+        int d = 0;
+
+        if (uint8_t *dst = rawwrite(&d, out, l))
         {
-            uint32 W = 0, H = 0;
-            uint32 w = 0, h = 0;
-            uint16 b = 0, c = 0;
-
-            TIFFGetField(T, TIFFTAG_TILEWIDTH,       &W);
-            TIFFGetField(T, TIFFTAG_TILELENGTH,      &H);
-            TIFFGetField(T, TIFFTAG_IMAGEWIDTH,      &w);
-            TIFFGetField(T, TIFFTAG_IMAGELENGTH,     &h);
-            TIFFGetField(T, TIFFTAG_SAMPLESPERPIXEL, &c);
-            TIFFGetField(T, TIFFTAG_BITSPERSAMPLE,   &b);
-
-            size_t n = size_t(TIFFNumberOfTiles(T));
-            size_t s = size_t(TIFFTileSize(T));
-            size_t p = size_t(c * b / 8);
-            size_t l = size_t(w * h * p);
-
-            size_t cols = size_t((w + W - 1) / W);
-
-            uint8_t src[s];
-
-            int d = 0;
-
-            if (uint8_t *dst = rawopen(&d, argv[2], l))
+            for (size_t t = 0; t < n; t++)
             {
-                for (size_t t = 0; t < n; t++)
-                {
-                    size_t x = (t % cols) * size_t(W);
-                    size_t y = (t / cols) * size_t(H);
+                size_t x = (t % cols) * size_t(W);
+                size_t y = (t / cols) * size_t(H);
 
-                    if (TIFFReadTile(T, src, x, y, 0, 0) > 0)
-                    {
-                        for (size_t i = 0; i < H; i++)
-                            memcpy(dst + p * ((y + i) * w + x),
-                                   src + p * ((    i) * W), W * p);
-                    }
+                if (TIFFReadTile(T, src, x, y, 0, 0) > 0)
+                {
+                    for (size_t i = 0; i < H; i++)
+                        memcpy(dst + p * ((y + i) * w + x),
+                               src + p * ((    i) * W), W * p);
                 }
-                rawclose(&d, dst, l);
             }
+            rawclose(&d, dst, l);
+        }
+        TIFFClose(T);
+    }
+}
+
+void raw2tif(const char *in, const char *out, uint32 h, uint32 w, uint16 c, uint16 b, uint16 f)
+{
+    size_t p = size_t(c * b / 8);
+    size_t l = size_t(w * h * p);
+
+    int d = 0;
+
+    if (uint8_t *src = rawread(&d, in, l))
+    {
+        if (TIFF *T = TIFFOpen(out, "w8"))
+        {
+            TIFFSetField(T, TIFFTAG_IMAGELENGTH,     h);
+            TIFFSetField(T, TIFFTAG_IMAGEWIDTH,      w);
+            TIFFSetField(T, TIFFTAG_SAMPLESPERPIXEL, c);
+            TIFFSetField(T, TIFFTAG_BITSPERSAMPLE,   b);
+            TIFFSetField(T, TIFFTAG_SAMPLEFORMAT,    f);
+            TIFFSetField(T, TIFFTAG_PLANARCONFIG,    PLANARCONFIG_CONTIG);
+
+            if (c == 3)
+                TIFFSetField(T, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_RGB);
+            else
+                TIFFSetField(T, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_MINISBLACK);
+
+            for (uint32 i = 0; i < h; i++)
+                TIFFWriteScanline(T, src + p * w * i, i, 0);
+
             TIFFClose(T);
         }
+        rawclose(&d, src, l);
     }
+}
+
+int main(int argc, char **argv)
+{
+    if (argc == 3 && extcmp(argv[1], ".tif") == 0)
+        tif2raw(argv[1], argv[2]);
+
+    if (argc == 8 && extcmp(argv[2], ".tif") == 0)
+        raw2tif(argv[1], argv[2], int(strtol(argv[3], 0, 0)),
+                                  int(strtol(argv[4], 0, 0)),
+                                  int(strtol(argv[5], 0, 0)),
+                                  int(strtol(argv[6], 0, 0)),
+                                  int(strtol(argv[7], 0, 0)));
     return 0;
 }
