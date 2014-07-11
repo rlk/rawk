@@ -807,16 +807,22 @@ void rawk::key(int key, bool down, bool repeat)
             if (SDL_GetModState() & KMOD_SHIFT)
                 switch (key)
                 {
-                    case SDL_SCANCODE_1:
-                        init_program("rawk.vert", "rawk_gray.frag");
-                        break;
-                    case SDL_SCANCODE_2:
-                        init_program("rawk.vert", "rawk_luma.frag");
-                        break;
-                    case SDL_SCANCODE_3:
+                    case SDL_SCANCODE_GRAVE:
                         init_program("rawk.vert", "rawk_rgb.frag");
                         break;
+                    case SDL_SCANCODE_1:
+                        init_program("rawk.vert", "rawk_1.frag");
+                        break;
+                    case SDL_SCANCODE_2:
+                        init_program("rawk.vert", "rawk_2.frag");
+                        break;
+                    case SDL_SCANCODE_3:
+                        init_program("rawk.vert", "rawk_3.frag");
+                        break;
                     case SDL_SCANCODE_4:
+                        init_program("rawk.vert", "rawk_luma.frag");
+                        break;
+                    case SDL_SCANCODE_5:
                         init_program("rawk.vert", "rawk_color.frag");
                         break;
                 }
