@@ -20,10 +20,7 @@ MEGT= \
 	paste   256     0 input megt88n180hb.img 0 5632 11520 1 S \
 	                  solid 23040 46080 0
 
-# The subtleties of a 16-bit height map are difficult to detect by eye.
-# Detect the edges of the height map to produce a useful reference.
-
-OUTLINE= gain 10.0 absolute gradient 2 $(MEGT)
+MOLA= input Mars_MGS_MOLA_DEM_mosaic_global_463m.raw 0 23041 46081 1 s
 
 # MOLA interpolation was clearly performed on 2048-pixel chunks. This resulted
 # in a discontinuity in the derivative with respect to latitude in the in-fill
@@ -33,18 +30,18 @@ OUTLINE= gain 10.0 absolute gradient 2 $(MEGT)
 # first step in isolating the artifact and filtering it out.
 
 BADLINES= \
-	paste  1279 0 solid     2 46080 1 \
-	paste  3327 0 solid     2 46080 1 \
-	paste  5375 0 solid     2 46080 1 \
-	paste  7423 0 solid     2 46080 1 \
-	paste  9471 0 solid     2 46080 1 \
-	paste 11519 0 solid     2 46080 1 \
-	paste 13567 0 solid     2 46080 1 \
-	paste 15615 0 solid     2 46080 1 \
-	paste 17663 0 solid     2 46080 1 \
-	paste 19711 0 solid     2 46080 1 \
-	paste 21759 0 solid     2 46080 1 \
-				  solid 22528 46080 0
+	paste  1280 0 solid     1 46081 1 \
+	paste  3328 0 solid     1 46081 1 \
+	paste  5376 0 solid     1 46081 1 \
+	paste  7424 0 solid     1 46081 1 \
+	paste  9472 0 solid     1 46081 1 \
+	paste 11520 0 solid     1 46081 1 \
+	paste 13568 0 solid     1 46081 1 \
+	paste 15616 0 solid     1 46081 1 \
+	paste 17664 0 solid     1 46081 1 \
+	paste 19712 0 solid     1 46081 1 \
+	paste 21760 0 solid     1 46081 1 \
+				  solid 23041 46081 0
 
 # As these discontinuities are found in the derivative with respect to latitude,
 # they can be detected by a vertical Sobel filter, thresholded to trigger only
@@ -58,7 +55,7 @@ BADLINES= \
 
 BADPIXELS= multiply \
 				$(BADLINES) \
-				threshold 0.015 absolute sobely 2 $(MEGT)
+				threshold 0.01 absolute sobely 2 $(MOLA)
 
 # If the bad pixels were simply replaced with repared pixels then new
 # discontinuities would emerge. We must instead blend toward the repair.
@@ -67,18 +64,61 @@ BADPIXELS= multiply \
 # standard deviation of 1.0. We'll need to dilate by three times that radius
 # to ensure that the lit pixels of the input remain 100% lit after the blur.
 
-BADMASK= gaussian 1 2 dilate 3 2 $(BADPIXELS)
+BADNEIGHBORHOOD= output mola-badneighborhood.raw s \
+					dilate 5 2 $(BADPIXELS)
+
+#BADMASK= output mola-badmask.raw s \
+#	gaussian 1.666 2 $(BADNEIGHBORHOOD)
+BADMASK= input mola-badmask.raw 0 23041 46081 1 s
 
 # Despite the discontinuity in the input, none of the pixels are bad, as such.
-# They're simply not connect relative to one another. The only way to fix them
+# They're simply not correct relative to one another. The only way to fix them
 # then is to move them closer to one another using a wide blur.
 
-BLURRED= gaussianv 4 2 $(MEGT)
+BLURRED= output mola-blurred.raw s \
+	gaussianv 3 2 $(MOLA)
 
 # Blend the original input with its blurred self using our carefully-crafted
 # mask.
 
-REPAIRED= blend append $(BLURRED) $(BADMASK) $(MEGT)
+#REPAIRED= output mola-repaired.raw s \
+#	blend append $(BLURRED) $(BADMASK) $(MOLA)
+REPAIRED= input mola-repaired.raw 0 23041 46081 1 s
+
+UPSAMPLED= output mola-upsampled.raw s \
+	cubic 46080 92160 2 crop 0 0 23040 46080 $(REPAIRED)
+
+SMOOTHED= output mola-smoothed.raw s \
+	reduce median 5 2 $(UPSAMPLED)
+#SMOOTHED= input mola-smoothed.raw 0 23040 46080 1 s
+
+#-------------------------------------------------------------------------------
+
+LOCATION= -y 9472 -x 6000 -z 1
+
+test :
+	rawk append relief 5 5 2 $(TESTING) \
+		        relief 5 5 2 $(REPAIRED)
+
+raw :
+	rawk $(LOCATION) append $(MOLA) $(BADLINES)
+
+relief :
+	rawk relief 5 5 2 $(MOLA)
+
+repair :
+	rawk -n $(REPAIRED)
+
+process :
+	rawk -n $(SMOOTHED)
 
 preview :
-	rawk gain 10.0 absolute gradient 2 $(REPAIRED)
+	rawk relief 5 5 2 $(REPAIRED)
+
+check :
+	rawk append relief 5 5 2 $(SMOOTHED) \
+	     append relief 5 5 2 $(MOLA) \
+	     		$(BADMASK)
+
+tif :
+	rawtif mola-smoothed.raw mola-smoothed.tif 23040 46080 1 16 2
