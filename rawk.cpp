@@ -955,13 +955,14 @@ void rawk::retitle()
 
 void rawk::cache_row(image *p, state *s, int r, int d)
 {
-    for     (int c = 0; c < width; ++c)
+    for (int c = 0; c < width; ++c)
+    {
+        int i = toint(s->y + (r - height / 2) * s->z);
+        int j = toint(s->x + (c - width  / 2) * s->z);
+
         for (int k = 0; k < d; ++k)
-        {
-            int i = toint(s->y + (r - height / 2) * s->z);
-            int j = toint(s->x + (c - width  / 2) * s->z);
             curr_cache[(r * width + c) * 3 + k] = p->get(i, j, k);
-        }
+    }
 }
 
 /// Update the contents of the image cache.

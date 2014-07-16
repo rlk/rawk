@@ -96,6 +96,10 @@ private:
 class relief : public image
 {
 public:
+    /// Show image *L* in shaded relief, with the light coming from direction
+    /// (*dy*, *dx*). Higher values for *dx* and *dy* give a more stark relief.
+    /// *Mode* gives the @ref "wrap mode".
+
     relief(double dy, double dx, int mode, image *L)
         : image(L), dy(dy), dx(dx), mode(mode) { }
 
