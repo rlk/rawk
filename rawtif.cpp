@@ -151,14 +151,23 @@ void raw2tif(const char *in, const char *out, uint32 h, uint32 w, uint16 c, uint
 
 int main(int argc, char **argv)
 {
-    if (argc == 3 && extcmp(argv[1], ".tif") == 0)
+    if      (argc == 3 && extcmp(argv[1], ".tif") == 0)
         tif2raw(argv[1], argv[2]);
 
-    if (argc == 8 && extcmp(argv[2], ".tif") == 0)
+    else if (argc == 8 && extcmp(argv[2], ".tif") == 0)
         raw2tif(argv[1], argv[2], int(strtol(argv[3], 0, 0)),
                                   int(strtol(argv[4], 0, 0)),
                                   int(strtol(argv[5], 0, 0)),
                                   int(strtol(argv[6], 0, 0)),
                                   int(strtol(argv[7], 0, 0)));
+
+    else
+        fprintf(stderr, "Usage:\t%s input.tif output.raw\n"
+                              "\t%s input.raw output.tif "
+                              "height width channels bitdepth format\n"
+                              "\t\tformat 1: unsigned integer\n"
+                              "\t\tformat 2: signed integer\n"
+                              "\t\tformat 3: floating point\n",
+                              argv[0], argv[0]);
     return 0;
 }
