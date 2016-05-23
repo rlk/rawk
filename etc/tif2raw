@@ -1,0 +1,7 @@
+#!/bin/sh
+
+for tif in "$@"
+do
+	raw=${tif/%tif/raw}
+	rawtif $tif $raw
+done
