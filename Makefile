@@ -21,7 +21,7 @@ rawtif : rawtif.cpp
 	$(CXX) $(FLAGS) -o $@ rawtif.cpp -I/usr/local/include -L/usr/local/lib -ltiff
 
 clean :
-	rm -f rawk rawtiff
+	rm -f rawk rawtif
 
 rawk : image.hpp
 rawk : image_append.hpp
