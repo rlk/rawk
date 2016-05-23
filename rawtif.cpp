@@ -86,30 +86,38 @@ void tif2raw(const char *in, const char *out)
         TIFFGetField(T, TIFFTAG_SAMPLESPERPIXEL, &c);
         TIFFGetField(T, TIFFTAG_BITSPERSAMPLE,   &b);
 
-        size_t n = size_t(TIFFNumberOfTiles(T));
-        size_t s = size_t(TIFFTileSize(T));
         size_t p = size_t(c * b / 8);
         size_t l = size_t(w * h * p);
-
-        size_t cols = size_t((w + W - 1) / W);
-
-        uint8_t src[s];
 
         int d = 0;
 
         if (uint8_t *dst = rawwrite(&d, out, l))
         {
-            for (size_t t = 0; t < n; t++)
+            if (W && H)
             {
-                size_t x = (t % cols) * size_t(W);
-                size_t y = (t / cols) * size_t(H);
+                size_t n = size_t(TIFFNumberOfTiles(T));
+                size_t s = size_t(TIFFTileSize(T));
+                size_t C = size_t((w + W - 1) / W);
 
-                if (TIFFReadTile(T, src, x, y, 0, 0) > 0)
+                uint8_t src[s];
+
+                for (size_t t = 0; t < n; t++)
                 {
-                    for (size_t i = 0; i < H; i++)
-                        memcpy(dst + p * ((y + i) * w + x),
-                               src + p * ((    i) * W), W * p);
+                    size_t x = (t % C) * size_t(W);
+                    size_t y = (t / C) * size_t(H);
+
+                    if (TIFFReadTile(T, src, x, y, 0, 0) > 0)
+                    {
+                        for (size_t i = 0; i < H; i++)
+                            memcpy(dst + p * ((y + i) * w + x),
+                                   src + p * ((    i) * W), W * p);
+                    }
                 }
+            }
+            else
+            {
+                for (size_t i = 0; i < h; i++)
+                    TIFFReadScanline(T, dst + i * w * p, i, 0);
             }
             rawclose(&d, dst, l);
         }
