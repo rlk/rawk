@@ -1,10 +1,10 @@
 FLAGS  = -Wall
 
-#CXX = c++
-#FLAGS += -O2
+# CXX = c++
+# FLAGS += -O2
 
-#CXX = c++
-#FLAGS += -g
+# CXX = c++
+# FLAGS += -g
 
 CXX = /usr/local/bin/g++
 FLAGS += -O2 -fopenmp
